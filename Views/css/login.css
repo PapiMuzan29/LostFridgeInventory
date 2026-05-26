@@ -1,0 +1,276 @@
+/* --- RESET Y FUENTE --- */
+* {
+  box-sizing: border-box; 
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh; 
+  background-image: url('../../SRC/control-de-temperatura.jpg'); 
+  background-size: cover;          
+  background-repeat: no-repeat;      
+  background-position: center;       
+  background-attachment: fixed; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+}
+
+.tarjeta-blanca {
+  background-color: white;
+  width: 900px; 
+  border-radius: 12px; 
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15); 
+  display: flex; 
+  flex-direction: column;
+  overflow: hidden; 
+}
+
+.contenido-superior {
+  display: flex;
+  padding: 40px;
+}
+
+.columna-izquierda {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  padding-right: 20px; 
+}
+
+.logo-lfi {
+  width: 300px; 
+  height: 300px;
+  object-fit: cover;
+  margin-bottom: 20px;
+  margin-top: -15px;
+}
+
+/* Títulos de la izquierda más grandes */
+.titulo-lfi {
+  color: #1a365d; 
+  font-size: 34px; 
+  font-weight: bold;
+  margin-top: -20px;
+  margin-bottom: 10px;
+  
+  /* ESTO EVITA QUE SE ROMPA EN DOS LÍNEAS */
+  white-space: nowrap; 
+}
+
+.subtitulo-lfi {
+  color: #64748b;
+  font-size: 17px; /* Subió de 15px a 17px */
+  line-height: 1.5;
+  margin: 0;
+}
+
+.logo-america {
+  width: 250px;           
+  height: auto;
+  margin-top: 20px;       
+  padding-top: 20px;     
+  border-top: 1px solid #dfdcdc; 
+}
+
+.linea-divisoria {
+  width: 1px;
+  height: auto; 
+  background-color: #dfdcdc;
+  margin: 0 30px;
+}
+
+.columna-derecha {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.encabezado-bienvenida {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+/* Icono principal un poco más grande para balancear */
+#usuarioCirculo {
+  color: #255CD0;
+  font-size: 55px; /* Subió de 50px a 55px */
+  margin: 0;
+}
+
+/* Titulares de bienvenida más grandes */
+#Bienvenido {
+  color: #1a365d;
+  margin: 0 0 5px 0;
+  font-size: 32px; /* Subió de 28px a 32px */
+}
+
+#iniciarSesion {
+  color: #64748b;
+  margin: 0;
+  font-size: 16px; /* Subió de 14px a 16px */
+}
+
+.grupo-input {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Etiquetas (Usuario / Contraseña) más legibles */
+.credenciales {
+  font-weight: bold;
+  font-size: 16px; /* Subió de 14px a 16px */
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.caja-con-icono {
+  position: relative;
+}
+
+/* Texto de las cajas más grande */
+.caja-con-icono input {
+  width: 100%;
+  padding: 14px 15px; /* Más relleno para la letra grande */
+  padding-left: 45px; 
+  padding-right: 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 16px; /* Subió de 14px a 16px */
+  outline: none; 
+}
+
+.caja-con-icono input:focus {
+  border-color: #1a365d; 
+}
+
+/* Iconos ajustados para que no se descentren con las cajas más grandes */
+#usericon, #candado {
+  position: absolute;
+  left: 15px;
+  top: 42px; /* Ajustado de 38px a 42px */
+  margin: 0; 
+  color: #255CD0; 
+  font-size: 17px; /* Iconos un poquito más grandes */
+  transition: opacity 0.3s;
+}
+
+#iconoOjo {
+  position: absolute;
+  right: 15px;       
+  top: 42px; /* Ajustado de 38px a 42px */
+  color: #a0aec0;    
+  font-size: 17px; /* Iconos un poquito más grandes */
+  cursor: pointer;   
+  transition: color 0.3s;
+}
+
+#iconoOjo:hover {
+  color: #255CD0;    
+}
+
+/* Botón más grande e imponente */
+.boton-iniciar {
+  background-color: #255CD0; 
+  color: white;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px; /* Subió de 16px a 18px */
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 40px;
+  transition: background-color 0.3s;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.boton-iniciar:hover {
+  background-color: #1a4299; 
+}
+
+/* --- PIE DE PÁGINA --- */
+.pie-de-pagina {
+  border-top: 1px solid #e2e8f0;
+  padding: 20px 40px;
+  background-color: #f8fafc;
+  color: #64748b;
+  font-size: 18px;
+  
+  /* ESTO ES LO NUEVO */
+  display: flex;
+  justify-content: space-between; /* Empuja la fecha a la izquierda y el botón a la derecha */
+  align-items: center;            /* Los centra verticalmente para que no queden chuecos */
+}
+
+.fecha-hora {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Le quitamos el justify-content: center para que respete su lado izquierdo */
+}
+
+.separador-vertical {
+  color: #cbd5e1;
+  margin: 0 10px;
+}
+
+#reloj, #calendario {
+  color: #255CD0;
+  margin: 0;
+  font-size: 18px;
+}
+
+.boton-acerca {
+  background-color: transparent;
+  color: #255CD0; /* Tu azul */
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+}
+
+/* --- CERDITO SEGUIDOR --- */
+#cerditoCursor {
+  position: fixed;       /* Lo hace flotar sobre todo */
+  top: 0;
+  left: 0;
+  font-size: 30px;       /* Tamaño del emoji (cámbialo si usas imagen) */
+  pointer-events: none;  /* ¡MÁGICO! Evita que el cerdito bloquee tus clics */
+  z-index: 9999;         /* Lo pone por encima de todos los elementos */
+  
+  /* Esto crea un pequeño y suave "retraso" para que parezca que te persigue */
+  transition: left 0.1s ease-out, top 0.1s ease-out; 
+  
+  /* Lo centra en la pura punta de tu flecha del mouse */
+  transform: translate(-50%, -50%);
+}
+
+/* --- MAGIA PARA OCULTAR EL CURSOR --- */
+/* 1. Apaga el cursor clásico de flecha y la "manita" en toda la página */
+* {
+  cursor: none !important;
+}
+
+/* 2. (Recomendado) Mantiene el cursor de texto solo adentro de los inputs para que sepas dónde estás escribiendo */
+input {
+  cursor: text !important;
+}
