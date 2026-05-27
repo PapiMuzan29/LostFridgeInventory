@@ -1,0 +1,73 @@
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../Models/User.php';
+
+class AuthService {
+
+    private User $userModel;
+
+    public function __construct() {
+
+        $this->userModel = new User();
+    }
+
+    public function login(string $username, string $password): bool {
+
+    $user = $this->userModel->findByUsername($username);
+
+    if ($user !== null &&isset($user['contrasenaUsuario']) &&$password === $user['contrasenaUsuario'])
+    {
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        session_regenerate_id(true);
+
+        $_SESSION['apodoUsuario'] = $user['apodoUsuario'];
+
+        return true;
+    }
+
+    return false;
+}
+
+    public function logout(): void {
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $_SESSION = [];
+
+        if (ini_get("session.use_cookies")) {
+
+            $params = session_get_cookie_params();
+
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params["path"],
+                $params["domain"],
+                $params["secure"],
+                $params["httponly"]
+            );
+        }
+
+        session_destroy();
+    }
+
+    public function isAuthenticated(): bool {
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        return isset($_SESSION['apodoUsuario']);
+    }
+}
+
+?>

@@ -1,0 +1,20 @@
+#cerditoCursor{
+    position: fixed;
+    top: 0;
+    left: 0;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 200000;
+    transition: left 0.1s ease-out, top 0.1s ease-out;
+    transform: translate(-50%, -50%);
+}
+
+/* --- OCULTAR CURSOR --- */
+
+*{
+    cursor: none !important;
+}
+
+input{
+    cursor: text !important;
+}

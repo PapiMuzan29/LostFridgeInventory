@@ -1,6 +1,6 @@
 CREATE TABLE Rol(
     idRol INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    nombreRol VARCHAR(60),
+    nombreRol ENUM('Administrador', 'Vendedor', 'Operador', 'Ayudante', 'Checador') NOT NULL UNIQUE,
     estado BIT
 );
 
