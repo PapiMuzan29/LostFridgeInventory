@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($usuario && $password) {
         if ($auth->login($usuario, $password)) {
             // Login correcto → redirige al dashboard
-            header("Location: ../Views/principal.php");
+            header("Location: ../Views/inicio.php");
             exit;
         } else {
             // Login incorrecto → regresa al login con mensaje

@@ -1,33 +1,5 @@
-<?php
-
-session_start();
-
-if (!isset($_SESSION['apodoUsuario'])) {
-
-    header('Location: login.php');
-    exit();
-}
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LostFridgeInventory</title>
-
-    <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" href="css/barraNavegacion.css">
-    <link rel="stylesheet" href="css/cerdito.css">
-</head>
-
-<body>
-
-    
-    
-
-    <div class="sidebar">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<div class="sidebar">
 
         <div class="sidebar-header">
             <img src="../SRC/Logo LFI - copia.png" alt="Logo LFI" class="logo-america">
@@ -74,10 +46,9 @@ if (!isset($_SESSION['apodoUsuario'])) {
                  <i class="fa-solid fa-arrow-right-from-bracket"></i> CERRAR SESION
             </button>
         </div>
+</div>
 
-    </div>
-
-    <div class="top-bar-dashboard">
+<div class="top-bar-dashboard">
 
         <div class="top-bar-metrics">
 
@@ -167,20 +138,23 @@ if (!isset($_SESSION['apodoUsuario'])) {
 
     </div>
 
-    <div class="main-content">
 
-        <div id="contenedor-principal"></div>
+    <div class="modal" id="modal-logout" style="display: none;">
+            <div class="modal-contenido">
+                <h2>¿Quiere Cerrar Sesión?</h2>
+                <span class="cerrar" onclick="getElementById('modal-logout').style.display='none'">Cancelar</span>
+                <form action="../Config/Logouth.php">
+                <button class="btn-logout">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    Confirmar
+                </button>
 
+            </form>
+            </div>
     </div>
 
-    
-    <div id="cerditoCursor" style="z-index: 9999">
-        🐷
-    </div>
-
-    <script src="../Services/navegacion.js"></script>
+    <div id="cerditoCursor" style="z-index: 9999">🐷</div>
     <script src="../Services/cerdito.js"></script>
     <script src="../Services/funciones.js"></script>
-    
+    <script src="../Services/navegacion.js"></script>
 </body>
-</html>

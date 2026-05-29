@@ -15,24 +15,32 @@ class AuthService {
 
     public function login(string $username, string $password): bool {
 
-    $user = $this->userModel->findByUsername($username);
+        $user = $this->userModel->findByUsername($username);
 
-    if ($user !== null &&isset($user['contrasenaUsuario']) &&$password === $user['contrasenaUsuario'])
-    {
+        if (
+    $user !== null &&
+    isset($user['contrasenaUsuario']) &&
+    isset($user['apodoUsuario']) &&
+    isset($user['nombreRol']) &&
+    isset($user['estado']) &&
+    $user['estado'] == 1 &&
+    $password === $user['contrasenaUsuario']
+) {
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            session_regenerate_id(true);
+
+            $_SESSION['apodoUsuario'] = $user['apodoUsuario'];
+            $_SESSION['nombreRol'] = $user['nombreRol'];
+
+            return true;
         }
 
-        session_regenerate_id(true);
-
-        $_SESSION['apodoUsuario'] = $user['apodoUsuario'];
-
-        return true;
+        return false;
     }
-
-    return false;
-}
 
     public function logout(): void {
 

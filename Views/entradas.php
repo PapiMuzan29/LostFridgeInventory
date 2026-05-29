@@ -1,9 +1,17 @@
-<div class="header-seccion">
-    <button class="btn-nuevo">Nueva Entrada</button>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/barraNavegacion.css">
+    <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/cerdito.css">
+</head>
+<body>
 
 <?php
-
+ include 'assets/barraNavegacion.php';
 $entradas_recientes = [
     ['id' => 101, 'producto' => 'Corte Ribeye', 'cantidad' => '50 kg', 'fecha' => date('Y-m-d')],
     ['id' => 102, 'producto' => 'Pierna de Cerdo', 'cantidad' => '120 kg', 'fecha' => date('Y-m-d')]
@@ -29,4 +37,17 @@ $entradas_recientes = [
             </tr>
         <?php endforeach; ?>
     </tbody>
+
+    
+
 </table>
+
+
+
+
+    
+</body>
+</html><div class="header-seccion">
+    <button class="btn-nuevo">Nueva Entrada</button>
+</div>
+

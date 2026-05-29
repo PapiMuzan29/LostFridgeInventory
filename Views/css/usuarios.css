@@ -1,0 +1,679 @@
+/* ==========================================
+   1. RESET, FUENTE Y CONFIGURACIÓN BASE
+========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex; 
+    height: 100vh;
+    background-color: #e2e8f0; 
+    overflow: hidden; 
+}
+
+/* ================================================= */
+/* 2. CONTENEDOR PRINCIPAL (CONVIVE CON TOP-BAR)     */
+/* ================================================= */
+.contenedor {
+    flex: 1;
+    height: calc(100vh - 65px); /* Resta el alto exacto de la top-bar */
+    margin-top: 65px;          /* Empuja el contenido debajo de la top-bar */
+    background-color: #ffffff;
+    padding: 30px; 
+    overflow-y: auto;          /* Genera el scroll aquí adentro si la tabla crece */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ================================================= */
+/* 3. HEADER                                         */
+/* ================================================= */
+.header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;            
+    width: 100%;
+    min-height: 50px;               
+    flex-shrink: 0;                 
+    margin-bottom: 10px;            
+}
+
+.header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    color: #1f2f56;                 
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ================================================= */
+/* 4. BOTONES GENERALES                              */
+/* ================================================= */
+.btnNuevo {
+    background: #2f5ea7;
+    color: white;
+    border: none;
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: .3s;
+}
+
+.btnNuevo:hover {
+    background: #244a82;
+    transform: translateY(-1px);
+}
+
+.btnAplicar {
+    height: 44px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 10px;
+    background: #2f5ea7;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: .3s;
+}
+
+.btnAplicar:hover {
+    background: #244a82;
+}
+
+.btnLimpiar {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 10px;
+    border: 1px solid #d5dce6;
+    background: white;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.btnLimpiar:hover {
+    background: #f8fafc;
+}
+
+/* ================================================= */
+/* 5. CARDS DE ESTADÍSTICAS                          */
+/* ================================================= */
+.cards {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.card {
+    flex: 1;
+    min-width: 240px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 24px;
+    transition: .3s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card h3 {
+    color: #64748b;
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.card span {
+    font-size: 38px;
+    font-weight: bold;
+    color: #1f2f56;
+}
+
+.success {
+    border-left: 5px solid #22c55e;
+}
+
+.danger {
+    border-left: 5px solid #ef4444;
+}
+
+/* ================================================= */
+/* 6. BARRA FILTROS                                  */
+/* ================================================= */
+.barra-filtros {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.filtros-izquierda {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.buscador {
+    position: relative;
+    width: 420px;
+}
+
+.buscador input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #d5dce6;
+    border-radius: 10px;
+    padding: 0 44px 0 16px;
+    outline: none;
+    font-size: 14px;
+    color: #1f2f56;
+    background: white;
+    transition: .3s;
+}
+
+.buscador input::placeholder {
+    color: #94a3b8;
+}
+
+.buscador input:focus {
+    border-color: #2f5ea7;
+    box-shadow: 0 0 0 3px rgba(47,94,167,0.12);
+}
+
+.buscador i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 15px;
+}
+
+.select-estados {
+    height: 44px;
+    border: 1px solid #d5dce6;
+    border-radius: 10px;
+    padding: 0 14px;
+    background: white;
+    color: #1f2f56;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.select-estados:focus {
+    border-color: #2f5ea7;
+    box-shadow: 0 0 0 3px rgba(47,94,167,0.12);
+}
+
+/* ================================================= */
+/* 7. TABLA DE USUARIOS (ALINEACIÓN CORREGIDA)       */
+/* ================================================= */
+.tablaUsuarios {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.tablaUsuarios thead {
+    background: #f1f5f9;
+}
+
+.tablaUsuarios thead th {
+    padding: 16px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2f56;
+}
+
+.tablaUsuarios tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 14px;
+    color: #334155;
+    vertical-align: middle; /* Centra todo el contenido verticalmente */
+    height: 68px;           /* Estandariza la altura para alinear todas las líneas */
+}
+
+.tablaUsuarios tbody tr {
+    transition: .2s;
+}
+
+.tablaUsuarios tbody tr:hover {
+    background: #f8fbff;
+}
+
+/* Celda de Usuario con ícono */
+.usuarioCell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 100%; 
+}
+
+.usuarioCell i {
+    color: #2f5ea7;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* ================================================= */
+/* 8. BADGES DE ESTADOS (ACTIVO / INACTIVO)          */
+/* ================================================= */
+.estado {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.estado::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.activo {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.activo::before {
+    background: #15803d;
+}
+
+.inactivo {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.inactivo::before {
+    background: #b91c1c;
+}
+
+/* ================================================= */
+/* 9. COLUMNA DE ACCIONES (BOTONES CORREGIDOS)       */
+/* ================================================= */
+.acciones {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.acciones button.btn-accion {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    padding: 0; 
+    cursor: pointer;
+    pointer-events: auto !important; /* Asegura que capturen los clics de JS */
+    transition: .3s;
+}
+
+.acciones button.btn-accion i {
+    font-size: 16px; 
+    color: white;   
+}
+
+.acciones button.editar {
+    background: #2f5ea7;
+}
+
+.acciones button.eliminar {
+    background: #ef4444;
+}
+
+.acciones button.btn-accion:hover {
+    transform: scale(1.06);
+    opacity: 0.9; 
+}
+
+/* ================================================= */
+/* 10. PAGINACIÓN                                    */
+/* ================================================= */
+.botones-paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #edf2f7;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.btn-pagina {
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid #d5dce6;
+    background: white;
+    color: #334155;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: .2s;
+}
+
+.btn-pagina:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.btn-pagina.activa {
+    background: #2f5ea7;
+    color: white;
+    border-color: #2f5ea7;
+}
+
+.puntos {
+    color: #64748b;
+    font-weight: 600;
+    padding: 0 4px;
+}
+
+/* ================================================= */
+/* 11. VENTANAS EMERGENTES (MODALES COMPACTOS)       */
+/* ================================================= */
+.modal {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.modal-contenido {
+    background-color: #ffffff;
+    padding: 20px 24px; 
+    border-radius: 12px;
+    width: 100%;
+    max-width: 560px; 
+    max-height: 95vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.modal-contenido h2 {
+    font-size: 20px; 
+    font-weight: 700;
+    color: #1f2f56;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 8px;
+}
+
+/* Cuadrícula de 2 columnas en paralelo */
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 12px 16px; 
+}
+
+.modal-contenido .grupo-input {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+    margin-bottom: 0; 
+}
+
+.modal-contenido label {
+    font-size: 13px; 
+    font-weight: 600;
+    color: #475569;
+}
+
+.modal-contenido input,
+.modal-contenido select {
+    width: 100%;
+    height: 38px; 
+    border: 1px solid #d5dce6;
+    border-radius: 8px;
+    padding: 0 12px;
+    outline: none;
+    font-size: 13.5px;
+    color: #1f2f56;
+    background: #ffffff;
+    transition: .2s;
+}
+
+
+
+/* Botón de cerrar (X) */
+.cerrar-modal {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 24px;
+    color: #ff0000;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+
+
+/* Botón guardar dentro de modales */
+.btnGuardarUsuario {
+    width: 100%;
+    height: 40px; 
+    background: #255cd0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    transition: .2s;
+}
+
+
+
+/* ================================================= */
+/* 12. CURSOR Y RESPONSIVE                           */
+/* ================================================= */
+#cerditoCursor {
+    pointer-events: none;
+    z-index: 1;
+}
+
+@media(max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cards {
+        flex-direction: column;
+    }
+
+    .barra-filtros {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtros-izquierda {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .buscador {
+        width: 100%;
+    }
+
+    .select-estados {
+        width: 100%;
+    }
+
+    .btnAplicar {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btnLimpiar {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tablaUsuarios {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+@media(max-width: 550px) {
+    .modal-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+/* ================================================= */
+/* ANIMACIÓN "SOBRESALIR" PARA BOTONES DEL MODAL      */
+/* ================================================= */
+
+/* 1. Definimos la transición base en los botones para que no cambien de golpe */
+#modalEliminarUsuario .btnLimpiar,
+#modalEliminarUsuario .btnAplicar {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease;
+}
+
+/* 2. Efecto al pasar el cursor (Hover) */
+#modalEliminarUsuario .btnLimpiar:hover,
+#modalEliminarUsuario .btnAplicar:hover {
+    /* Empuja el botón 4 píxeles hacia arriba simulando que se eleva */
+    transform: translateY(-4px); 
+    
+    /* Crea una sombra más oscura, amplia y suave abajo, dando el efecto de que se despegó del fondo */
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15); 
+}
+
+/* 3. Efecto al hacer clic (Active) */
+#modalEliminarUsuario .btnLimpiar:active,
+#modalEliminarUsuario .btnAplicar:active {
+    /* Regresa casi a su posición original al presionarlo para dar sensación de hundimiento */
+    transform: translateY(-1px); 
+    
+    /* La sombra se encoge porque el botón volvió a "bajar" */
+    box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1); 
+}
+
+
+#modalEditarUsuario .btnGuardarUsuario {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease;
+}
+
+/* 2. Efecto al pasar el cursor (Hover) */
+#modalEditarUsuario .btnGuardarUsuario:hover {
+    /* Empuja el botón 4 píxeles hacia arriba simulando que se eleva */
+    transform: translateY(-4px); 
+    
+    /* Crea una sombra más oscura, amplia y suave abajo, dando el efecto de que se despegó del fondo */
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15); 
+}
+
+/* 3. Efecto al hacer clic (Active) */
+#modalEditarsuario .btnGuardarUsuario:active {
+    /* Regresa casi a su posición original al presionarlo para dar sensación de hundimiento */
+    transform: translateY(-1px); 
+    
+    /* La sombra se encoge porque el botón volvió a "bajar" */
+    box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1); 
+}
+
+#modalNuevoUsuario .btnGuardarUsuario{
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease;
+}
+/* 2. Efecto al pasar el cursor (Hover) */
+#modalNuevoUsuario .btnGuardarUsuario:hover {
+    /* Empuja el botón 4 píxeles hacia arriba simulando que se eleva */
+    transform: translateY(-4px); 
+    
+    /* Crea una sombra más oscura, amplia y suave abajo, dando el efecto de que se despegó del fondo */
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15); 
+}
+
+/* 3. Efecto al hacer clic (Active) */
+#modalNuevoUsuario .btnGuardarUsuario:active {
+    /* Regresa casi a su posición original al presionarlo para dar sensación de hundimiento */
+    transform: translateY(-1px); 
+    
+    /* La sombra se encoge porque el botón volvió a "bajar" */
+    box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1); 
+}
+
+/* ================================================= */
+/* CONTENEDOR Y ESTILO DEL PUERQUITO / ANIMACIÓN     */
+/* ================================================= */
+.contenedor-animacion-eliminar {
+    width: 100%;
+    height: 120px;     /* Forzamos un alto fijo para que el modal no se mueva */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.delete-gif {
+    height: 100%;      /* El puerquito se adapta perfectamente al alto del contenedor */
+    width: auto;       /* Mantiene la proporción para que no se vea estirado ni aplastado */
+    object-fit: contain;
+}

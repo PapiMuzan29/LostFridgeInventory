@@ -95,7 +95,7 @@ CREATE TABLE Mermas(
     idProducto INT NULL,
     FOREIGN KEY (idProducto) REFERENCES Producto(idProducto),
     loteId INT,
-    FOREIGN KEY (loteId) REFERENCES Lote(loteId),
+    FOREIGN KEY (loteId) REFERENCES Lote(idLote),
    	pesoMerma DECIMAL(18,4) NOT NULL,
     motivoMerma ENUM('caducado','dañado','error','descomposicion'),
     fechaMerma DATETIME DEFAULT CURRENT_TIMESTAMP

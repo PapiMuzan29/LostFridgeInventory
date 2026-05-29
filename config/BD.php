@@ -13,6 +13,27 @@ class BD extends PDO {
 
     private static ?BD $instancia = null;
 
+    private array $bloqueos = [
+        '/--/',
+        '/#/',
+        '/;/',
+        // Palabras clave peligrosas
+        '/\bUNION\b/i',
+        '/\bDROP\b/i',
+        '/\bTRUNCATE\b/i',
+        '/\bALTER\b/i',
+        // DELETE o UPDATE sin WHERE
+        '/\bDELETE\b(?!.*WHERE)/is',
+        '/\bUPDATE\b(?!.*WHERE)/is',
+        // Funciones peligrosas
+        '/\bLOAD_FILE\b/i',
+        '/\bINTO OUTFILE\b/i'
+    ];
+
+    public function registrosAfectados(): int{
+        return $this->registros;
+    }
+
     private bool $conexionExitosa = false;
 
     public function __construct() {
@@ -51,26 +72,36 @@ class BD extends PDO {
         return self::$instancia;
     }
 
+    public function validar(string $query): bool {
+        foreach ($this->bloqueos as $regex) {
+            if (preg_match($regex, $query)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function validarExcepcion(string $query): void {
+        if (!$this->validar($query)) {
+            throw new Exception('Error en la consulta');
+        }
+    }
+
     public function conexionActiva(): bool {
 
         return $this->conexionExitosa;
     }
 
     public function consulta(string $query, array $params = []): PDOStatement {
-
+        $this->validarExcepcion($query);
         $this->registros = 0;
-
         $stmt = $this->prepare($query);
-
         $stmt->execute($params);
-
         $this->registros = $stmt->rowCount();
-
         return $stmt;
     }
 
     public function select(string $query, array $params = []): array {
-
         return $this->consulta($query, $params)->fetchAll();
     }
 

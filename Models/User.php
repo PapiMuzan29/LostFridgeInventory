@@ -15,8 +15,7 @@ class User {
 
     public function findByUsername(string $username): ?array {
 
-        $query = "SELECT * FROM cuenta WHERE apodoUsuario = ? LIMIT 1";
-
+        $query = "SELECT cuenta.idCuenta,cuenta.apodoUsuario,cuenta.contrasenaUsuario,cuenta.estado,rol.nombreRol FROM cuenta INNER JOIN rol ON cuenta.idRol = rol.idRol WHERE cuenta.apodoUsuario = ? LIMIT 1";
         $result = $this->db->select($query, [$username]);
 
         return !empty($result) ? $result[0] : null;
