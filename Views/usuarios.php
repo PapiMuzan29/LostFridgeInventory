@@ -195,7 +195,7 @@ $stats = $service->getStats();
                         <select name="estado">
                             <option value="1">Activo</option>
                             <option value="0">Inactivo</option>
-                        </select>d
+                        </select>
                     </div>
                 </div>
 
@@ -299,122 +299,95 @@ $stats = $service->getStats();
     </div>
 </div>
      
-   
+        <div class="modal" id="modalCerrarSesion" style="display: none;">
+    <div class="modal-contenido" style="max-width: 400px; text-align: center; padding: 24px;">
+        
+        <div class="contenedor-animacion-eliminar">
+    <img id="imgAnimacionLogout" src="../SRC/bye/0.png" alt="Animación de cierre de sesión" class="delete-gif">
+</div>
+
+        <h2 style="color: #1f2f56; font-size: 22px; font-weight: 700; margin-bottom: 12px;">¿Desea cerrar sesión?</h2>
+        
+        <p style="color: #64748b; margin-top: 8px; font-size: 15px; line-height: 1.5; padding: 0 10px;">
+            Su sesión actual se cerrará y volverá a la pantalla de inicio de sesión.
+        </p>
+        
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 25px;">
+            <button type="button" class="btnLimpiar" onclick="cerrarModalLogout()" style="margin:0; flex: 1; height: 44px;">Cancelar</button>
+            <a href="login.php" class="btnAplicar" style="background: #ef4444; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 8px; margin:0; flex: 1; height: 44px; color: #ffffff; font-weight: 600; border-radius: 6px;">
+                <i class="fa-solid fa-right-from-bracket"></i> Confirmar
+            </a>
+        </div>
+    </div>
+</div>
     
 
     <script>
-        // Elementos del DOM
+        // 1. Elementos del DOM
         const formFiltros = document.getElementById('formFiltrosUsuarios');
         const inputBusqueda = document.getElementById('inputBusqueda');
         const selectEstado = document.getElementById('selectEstado');
         const btnLimpiar = document.getElementById('btnLimpiar');
+        const botonesNumero = document.querySelectorAll('.numero-pagina');
+        const btnAnterior = document.getElementById('btnAnterior');
+        const btnSiguiente = document.getElementById('btnSiguiente');
 
-        /* FUNCION FILTRAR */
-        function aplicarFiltros() {
-            const busqueda = inputBusqueda.value;
-            const estado = selectEstado.value;
+        // 2. Estado de la paginación local (Declarada una sola vez)
+        let paginaActual = 1;
 
-            // Petición asíncrona a sí mismo para no recargar la página entera
-            fetch(`usuarios.php?busqueda=${encodeURIComponent(busqueda)}&estado=${estado}`)
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const nuevaTabla = doc.querySelector('.tablaUsuarios tbody');
-                
-                // Inyectamos solo las filas nuevas en la tabla
-                document.querySelector('.tablaUsuarios tbody').innerHTML = nuevaTabla.innerHTML;
-            })
-            .catch(error => console.error('Error al procesar los filtros:', error));
+        // 3. Función para actualizar la numeración visual de los botones
+        function actualizarNumeros() {
+            botonesNumero.forEach((boton, index) => {
+                boton.textContent = paginaActual + index;
+            });
         }
 
-        /* EVENTO SUBMIT DEL FORMULARIO (Al dar Enter o clic en Aplicar) */
-        formFiltros.addEventListener('submit', function(e) {
-            e.preventDefault(); // Evita el envío tradicional y recarga de página
-            aplicarFiltros();
+        // 4. Eventos de los botones Anterior y Siguiente
+        btnSiguiente.addEventListener('click', () => {
+            paginaActual++;
+            window.cambiarPaginaUsuarios(paginaActual);
+            actualizarNumeros();
         });
 
-        /* FILTRADO AUTOMÁTICO (Opcional: filtra al cambiar el selector de Estado) */
+        btnAnterior.addEventListener('click', () => {
+            if (paginaActual > 1) {
+                paginaActual--;
+                window.cambiarPaginaUsuarios(paginaActual);
+                actualizarNumeros();
+            }
+        });
+
+        // 5. Sincronización de filtros con la búsqueda en tiempo real
+        formFiltros.addEventListener('submit', function(e) {
+            e.preventDefault(); // Evita que la página se recargue agresivamente
+            inputBusqueda.dispatchEvent(new Event('input')); // Dispara la búsqueda asíncrona
+        });
+
         selectEstado.addEventListener('change', () => {
             inputBusqueda.dispatchEvent(new Event('input'));
         });
 
-        /* BOTON LIMPIAR */
+        // 6. Botón Limpiar filtros
         btnLimpiar.addEventListener('click', function () {
             inputBusqueda.value = '';
             selectEstado.value = '';
+            paginaActual = 1;
+            actualizarNumeros();
             inputBusqueda.dispatchEvent(new Event('input')); 
         });
 
-
-        const botonesNumero = document.querySelectorAll('.numero-pagina');
-
-        const btnAnterior = document.getElementById('btnAnterior');
-
-        const btnSiguiente = document.getElementById('btnSiguiente');
-
-        /* =========================
-        PAGINA INICIAL
-        ========================= */
-
-        let paginaActual = 1;
-
-        /* =========================
-        ACTUALIZAR NUMEROS
-        ========================= */
-
-        function actualizarNumeros() {
-
-            botonesNumero.forEach((boton, index) => {
-
-                boton.textContent = paginaActual + index;
-
-            });
-
-        }
-
-        /* =========================
-        SIGUIENTE
-        ========================= */
-
-        btnSiguiente.addEventListener('click', () => {
-
-            paginaActual++;
-
-            actualizarNumeros();
-
-        });
-
-        /* =========================
-        ANTERIOR
-        ========================= */
-
-        btnAnterior.addEventListener('click', () => {
-
-            if (paginaActual > 1) {
-
-                paginaActual--;
-
-                actualizarNumeros();
-
-            }
-
-        });
-
+        // 7. Inicialización del módulo (Se ejecuta cuando el HTML está listo)
         document.addEventListener('DOMContentLoaded', () => {
             configurarBusquedaRealTime(
-                'inputBusqueda', 
-                'tabla-usuarios-tbody', 
-                '../Controllers/usuariosController.php', 
+                'inputBusqueda',
+                'tabla-usuarios-tbody',
+                '../Controllers/usuariosController.php',
                 renderizarFilaUsuario
             );
 
-            const input = document.getElementById('inputBusqueda');
-            input.dispatchEvent(new Event('input')); 
+            // Forzar carga inicial de usuarios
+            inputBusqueda.dispatchEvent(new Event('input')); 
         });
-
-
-
     </script>
 
 

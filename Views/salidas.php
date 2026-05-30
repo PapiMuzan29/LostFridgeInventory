@@ -1,23 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-     <link rel="stylesheet" href="css/barraNavegacion.css">
-     <link rel="stylesheet" href="../Views/css/cerdito.css">
-    <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
-</head>
-<body>
-
 <?php
 
-include 'assets/barraNavegacion.php'
+session_start();
+
+if (!isset($_SESSION['apodoUsuario'])) {
+
+    header('Location: login.php');
+    exit();
+}
+require_once __DIR__ . '/../Services/usuariosServicio.php';
+
+$service = new usuariosServicio();
+
+$busqueda = $_GET['busqueda'] ?? '';
+$estado = $_GET['estado'] ?? '';
+
+$usuarios = $service->getUsers($busqueda, $estado);
+$stats = $service->getStats();
+
 ?>
 
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+    <meta charset="UTF-8">
+    <title>Salidas</title>
+    <link rel="icon" type="image/png" href="../SRC/Logo LFI - copia.png">
+    <link rel="stylesheet" href="../Views/css/cerdito.css">
+    <link rel="stylesheet" href="../Views/css/usuarios.css">
+    <link rel="stylesheet" href="../Views/css/barraNavegacion.css">
+</head>
 
-    
+<body>
+    <?php include 'assets/barraNavegacion.php';?>
 </body>
 </html>
-

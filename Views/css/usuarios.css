@@ -19,13 +19,18 @@ body {
 /* 2. CONTENEDOR PRINCIPAL (CONVIVE CON TOP-BAR)     */
 /* ================================================= */
 .contenedor {
-    flex: 1;
-    height: calc(100vh - 65px); /* Resta el alto exacto de la top-bar */
-    margin-top: 65px;          /* Empuja el contenido debajo de la top-bar */
+    width: calc(100% - 260px);
+    margin-left: 260px;
+
+    height: calc(100vh - 65px);
+    margin-top: 65px;
+
     background-color: #ffffff;
-    padding: 30px; 
-    overflow-y: auto;          /* Genera el scroll aquí adentro si la tabla crece */
+    padding: 30px;
+
+    overflow-y: auto;
     box-sizing: border-box;
+
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -237,7 +242,7 @@ body {
 }
 
 /* ================================================= */
-/* 7. TABLA DE USUARIOS (ALINEACIÓN CORREGIDA)       */
+/* 7. TABLA DE USUARIOS                              */
 /* ================================================= */
 .tablaUsuarios {
     width: 100%;
@@ -264,8 +269,8 @@ body {
     border-bottom: 1px solid #edf2f7;
     font-size: 14px;
     color: #334155;
-    vertical-align: middle; /* Centra todo el contenido verticalmente */
-    height: 68px;           /* Estandariza la altura para alinear todas las líneas */
+    vertical-align: middle; 
+    height: 68px;           
 }
 
 .tablaUsuarios tbody tr {
@@ -329,7 +334,7 @@ body {
 }
 
 /* ================================================= */
-/* 9. COLUMNA DE ACCIONES (BOTONES CORREGIDOS)       */
+/* 9. COLUMNA DE ACCIONES                            */
 /* ================================================= */
 .acciones {
     display: flex;
@@ -347,7 +352,7 @@ body {
     border: none;
     padding: 0; 
     cursor: pointer;
-    pointer-events: auto !important; /* Asegura que capturen los clics de JS */
+    pointer-events: auto !important; 
     transition: .3s;
 }
 
@@ -370,7 +375,7 @@ body {
 }
 
 /* ================================================= */
-/* 10. PAGINACIÓN                                    */
+/* 10. PAGINACIÓN (CORREGIDA CON MICROINTERACCIONES)  */
 /* ================================================= */
 .botones-paginacion {
     display: flex;
@@ -397,18 +402,34 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: .2s;
+    min-width: 38px; 
+    text-align: center;
+    
+    /* 🔥 CORRECCIÓN: Transiciones combinadas y elásticas */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
 .btn-pagina:hover {
     background: #f1f5f9;
     border-color: #cbd5e1;
+    /* 🔥 Elevación limpia al pasar el cursor de cerdo */
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* 🔥 NUEVO: Hundimiento mecánico sutil al hacer clic real */
+.btn-pagina:active {
+    transform: scale(0.94); 
 }
 
 .btn-pagina.activa {
     background: #2f5ea7;
     color: white;
     border-color: #2f5ea7;
+    box-shadow: 0 4px 10px rgba(47, 94, 167, 0.2);
+    
+    /* 🔥 NUEVO: Dispara el rebote elástico de cambio de página */
+    animation: transicionBotonActivo 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .puntos {
@@ -442,8 +463,8 @@ body {
     border-radius: 12px;
     width: 100%;
     max-width: 560px; 
-    max-height: 95vh;
-    overflow-y: auto;
+    max-height: 90vh; 
+    overflow-y: auto; 
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     position: relative;
 }
@@ -491,8 +512,6 @@ body {
     transition: .2s;
 }
 
-
-
 /* Botón de cerrar (X) */
 .cerrar-modal {
     position: absolute;
@@ -503,8 +522,6 @@ body {
     cursor: pointer;
     transition: color 0.2s;
 }
-
-
 
 /* Botón guardar dentro de modales */
 .btnGuardarUsuario {
@@ -525,7 +542,25 @@ body {
     transition: .2s;
 }
 
+/* ==========================================================
+   11B. CORRECCIÓN ESPECÍFICA: ESTILOS VISIBILIDAD DE MODAL ELIMINAR 
+========================================================== */
+#modalEliminarUsuario .btnAplicar {
+    background-color: #ef4444 !important; 
+    color: #ffffff !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
+#modalEliminarUsuario .btnLimpiar {
+    background-color: #f1f5f9 !important; 
+    color: #334155 !important;
+    border: 1px solid #cbd5e1 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
 /* ================================================= */
 /* 12. CURSOR Y RESPONSIVE                           */
@@ -589,74 +624,48 @@ body {
 /* ================================================= */
 /* ANIMACIÓN "SOBRESALIR" PARA BOTONES DEL MODAL      */
 /* ================================================= */
-
-/* 1. Definimos la transición base en los botones para que no cambien de golpe */
 #modalEliminarUsuario .btnLimpiar,
 #modalEliminarUsuario .btnAplicar {
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease;
 }
 
-/* 2. Efecto al pasar el cursor (Hover) */
 #modalEliminarUsuario .btnLimpiar:hover,
 #modalEliminarUsuario .btnAplicar:hover {
-    /* Empuja el botón 4 píxeles hacia arriba simulando que se eleva */
     transform: translateY(-4px); 
-    
-    /* Crea una sombra más oscura, amplia y suave abajo, dando el efecto de que se despegó del fondo */
     box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15); 
 }
 
-/* 3. Efecto al hacer clic (Active) */
 #modalEliminarUsuario .btnLimpiar:active,
 #modalEliminarUsuario .btnAplicar:active {
-    /* Regresa casi a su posición original al presionarlo para dar sensación de hundimiento */
     transform: translateY(-1px); 
-    
-    /* La sombra se encoge porque el botón volvió a "bajar" */
     box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1); 
 }
-
 
 #modalEditarUsuario .btnGuardarUsuario {
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease;
 }
 
-/* 2. Efecto al pasar el cursor (Hover) */
 #modalEditarUsuario .btnGuardarUsuario:hover {
-    /* Empuja el botón 4 píxeles hacia arriba simulando que se eleva */
     transform: translateY(-4px); 
-    
-    /* Crea una sombra más oscura, amplia y suave abajo, dando el efecto de que se despegó del fondo */
     box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15); 
 }
 
-/* 3. Efecto al hacer clic (Active) */
-#modalEditarsuario .btnGuardarUsuario:active {
-    /* Regresa casi a su posición original al presionarlo para dar sensación de hundimiento */
+#modalEditarUsuario .btnGuardarUsuario:active {
     transform: translateY(-1px); 
-    
-    /* La sombra se encoge porque el botón volvió a "bajar" */
     box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1); 
 }
 
 #modalNuevoUsuario .btnGuardarUsuario{
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease;
 }
-/* 2. Efecto al pasar el cursor (Hover) */
+
 #modalNuevoUsuario .btnGuardarUsuario:hover {
-    /* Empuja el botón 4 píxeles hacia arriba simulando que se eleva */
     transform: translateY(-4px); 
-    
-    /* Crea una sombra más oscura, amplia y suave abajo, dando el efecto de que se despegó del fondo */
     box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15); 
 }
 
-/* 3. Efecto al hacer clic (Active) */
 #modalNuevoUsuario .btnGuardarUsuario:active {
-    /* Regresa casi a su posición original al presionarlo para dar sensación de hundimiento */
     transform: translateY(-1px); 
-    
-    /* La sombra se encoge porque el botón volvió a "bajar" */
     box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1); 
 }
 
@@ -665,7 +674,7 @@ body {
 /* ================================================= */
 .contenedor-animacion-eliminar {
     width: 100%;
-    height: 120px;     /* Forzamos un alto fijo para que el modal no se mueva */
+    height: 120px;     
     display: flex;
     justify-content: center;
     align-items: center;
@@ -673,7 +682,60 @@ body {
 }
 
 .delete-gif {
-    height: 100%;      /* El puerquito se adapta perfectamente al alto del contenedor */
-    width: auto;       /* Mantiene la proporción para que no se vea estirado ni aplastado */
+    height: 100%;      
+    width: auto;       
     object-fit: contain;
+}
+
+/* ===================================================================================
+   EFECTO DE TRANSICIÓN FLUIDA PARA LA PAGINACIÓN DE USUARIOS
+=================================================================================== */
+.tablaUsuarios tbody tr {
+    opacity: 0;
+    animation: suavizarEntradaUsuarios 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.tablaUsuarios tbody tr:nth-child(1) { animation-delay: 0.02s; }
+.tablaUsuarios tbody tr:nth-child(2) { animation-delay: 0.04s; }
+.tablaUsuarios tbody tr:nth-child(3) { animation-delay: 0.06s; }
+.tablaUsuarios tbody tr:nth-child(4) { animation-delay: 0.08s; }
+.tablaUsuarios tbody tr:nth-child(5) { animation-delay: 0.10s; }
+.tablaUsuarios tbody tr:nth-child(6) { animation-delay: 0.12s; }
+.tablaUsuarios tbody tr:nth-child(7) { animation-delay: 0.14s; }
+.tablaUsuarios tbody tr:nth-child(8) { animation-delay: 0.16s; }
+
+.botones-paginacion, 
+#contenedorNumeros {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* ===================================================================================
+   KEYFRAMES DE LAS ANIMACIONES (FADE IN + POP ELÁSTICO)
+=================================================================================== */
+@keyframes suavizarEntradaUsuarios {
+    from {
+        opacity: 0;
+        transform: translateY(8px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);    
+    }
+}
+
+/* 🔥 NUEVO: Regla matemática para el rebote elástico de los botones */
+@keyframes transicionBotonActivo {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.06); 
+    }
+    100% {
+        transform: scale(1); 
+        opacity: 1;
+    }
 }

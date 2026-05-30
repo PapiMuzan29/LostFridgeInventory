@@ -1,33 +1,44 @@
+/* ==========================================
+   SIDEBAR
+========================================== */
+
 .sidebar {
     width: 260px;
-    min-width: 260px; 
-    background-color: #111827; 
+    min-width: 260px;
+    height: 100vh;
+
+    background-color: #111827;
     color: white;
+
     display: flex;
-    flex-direction: column; 
-    justify-content: space-between; 
-    z-index: 1010; 
+    flex-direction: column;
+
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    z-index: 1010;
 }
 
 .sidebar-header {
-    padding: 30px 20px;
+    padding: 15px 20px;
     text-align: center;
 }
 
 .logo-america {
-    width: 150px; 
-    height: 150px;
-    border-radius: 50%; 
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     object-fit: cover;
 }
 
 .nav-menu {
-    list-style: none; 
-    flex-grow: 1; 
+    list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 5px; 
+    gap: 5px;
     padding: 0 10px;
+    margin-top: 10px;
 }
 
 .nav-link {
@@ -36,51 +47,60 @@
     font-size: 14px;
     font-weight: bold;
     border-radius: 6px;
+
     display: flex;
     align-items: center;
-    gap: 15px; 
+    gap: 15px;
+
     transition: background-color 0.3s;
 }
 
 .nav-link i {
     font-size: 18px;
-    width: 25px; 
+    width: 25px;
     text-align: center;
 }
 
 .nav-link:hover {
-    background-color: #1f2937; 
+    background-color: #1f2937;
 }
 
 .nav-link.activo {
-    background-color: rgba(255, 255, 255, 0.1); 
-    border-left: 4px solid white; 
+    background-color: rgba(255,255,255,.1);
+    border-left: 4px solid white;
 }
 
 .sidebar-linea-divisoria {
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.2); 
+    background-color: rgba(255,255,255,.2);
     margin: 10px 20px;
 }
 
 .sidebar-footer {
-    padding: 15px 20px 30px 20px;
+    margin-top: auto;
+    padding: 15px 20px 20px 20px;
 }
 
 .btn-logout {
-    background: none;
+    width: 100%;
+
+    background: transparent;
     border: none;
+
     color: white;
     font-size: 14px;
     font-weight: bold;
+
     cursor: pointer;
+
     display: flex;
     align-items: center;
     gap: 15px;
-    width: 100%;
+
     padding: 12px 20px;
     border-radius: 6px;
-    transition: background-color 0.3s;
+
+    transition: background-color .3s;
 }
 
 .btn-logout i {
@@ -90,7 +110,7 @@
 }
 
 .btn-logout:hover {
-    background-color: #ef4444; 
+    background-color: #ef4444;
 }
 
 /* ==========================================
@@ -197,4 +217,137 @@
 #contenedor-principal {
     width: 100%;
     box-sizing: border-box;
+}
+
+/* ==========================================
+   MODAL CERRAR SESIÓN
+========================================== */
+
+.modal-logout {
+    max-width: 420px;
+    text-align: center;
+}
+
+.mensaje-logout {
+    color: #64748b;
+    margin-top: 10px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.acciones-logout {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.acciones-logout form {
+    flex: 1;
+}
+
+.btnCancelarLogout {
+    flex: 1;
+
+    height: 44px;
+
+    border: 1px solid #d5dce6;
+    border-radius: 8px;
+
+    background: #f8fafc;
+    color: #334155;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: .3s;
+}
+
+.btnCancelarLogout:hover {
+    background: #e2e8f0;
+}
+
+.btnConfirmarLogout {
+    width: 100%;
+    height: 44px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #ef4444;
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    transition: .3s;
+}
+
+.btnConfirmarLogout:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+/* ===================================================================================
+   ESTILOS CORREGIDOS PARA EL GLOBO DE TEXTO (DENTRO DEL MODAL)
+=================================================================================== */
+
+.globo-texto {
+    position: relative; /* 🔥 CAMBIO: Ahora respeta los límites del cuadro blanco */
+    display: inline-block;
+    background: #ffffff; 
+    color: #1f2f56; 
+    border: 2px solid #cbd5e1; 
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    z-index: 10;
+    margin-bottom: 5px;
+    
+    /* Animación de flotación continua */
+    animation: flotarGlobo 2s infinite ease-in-out;
+}
+
+/* La pequeña flecha del globo apuntando hacia abajo a la vaquita */
+.globo-texto::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; 
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 7px 7px 0;
+    border-style: solid;
+    border-color: #ffffff transparent; 
+    display: block;
+    width: 0;
+}
+
+/* Borde exterior de la flechita */
+.globo-texto::before {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: #cbd5e1 transparent;
+    display: block;
+    width: 0;
+    z-index: -1;
+}
+
+@keyframes flotarGlobo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }

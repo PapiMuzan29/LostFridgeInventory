@@ -98,25 +98,31 @@ switch ($action) {
 
     case 'busqueda':
 
-        $textoBusqueda =
-            $_GET['busqueda'] ?? '';
+    $textoBusqueda =
+        $_GET['busqueda'] ?? '';
 
-        $estado =
-            $_GET['estado'] ?? '';
+    $estado =
+        $_GET['estado'] ?? '';
 
-        $listaUsuarios =
-            $service->getUsers(
-                $textoBusqueda,
-                $estado
-            );
+    $pagina =
+        isset($_GET['pagina'])
+            ? (int)$_GET['pagina']
+            : 1;
 
-        header(
-            'Content-Type: application/json; charset=utf-8'
+    $listaUsuarios =
+        $service->getUsers(
+            $textoBusqueda,
+            $estado,
+            $pagina
         );
 
-        echo json_encode($listaUsuarios);
+    header(
+        'Content-Type: application/json; charset=utf-8'
+    );
 
-        exit;
+    echo json_encode($listaUsuarios);
+
+    exit;
 
     /* =========================
        ACCION INVALIDA
@@ -128,8 +134,4 @@ switch ($action) {
 
         exit;
 }
-
-
-
-
 ?>

@@ -59,7 +59,7 @@ class BD extends PDO {
 
             $this->conexionExitosa = false;
 
-            error_log("Error de conexión: " . $e->getMessage());
+            error_log("Error de conexion: " . $e->getMessage());
         }
     }
 
@@ -128,4 +128,5 @@ class BD extends PDO {
     }
 }
 
-?>
+
+

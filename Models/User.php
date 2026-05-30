@@ -21,5 +21,4 @@ class User {
         return !empty($result) ? $result[0] : null;
     }
 }
-
 ?>

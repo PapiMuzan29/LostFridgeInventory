@@ -8,20 +8,9 @@ class ModeloReportes{
         $this->db = BD::obtenerInstancia();
     }
 
-    public function getAllReports(): array {
-
-        $query = "SELECT 
-                    Documentos.idDocumento,
-                    Documentos.nombreOriginal,
-                    Documentos.rutaArchivo,
-                    Documentos.tipoDocumento,
-                    Documentos.tamanoBytes,
-                    Documentos.idCuenta,
-                    Documentos.fechaCreacion,
-                FROM Documentos ORDER BY Documentos.fechaCreacion DESC;"
-        return $this->db->select($query);
+    public function obtenerReportes() {
+        
     }
-
     
 }
 ?>

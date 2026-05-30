@@ -14,12 +14,17 @@ class usuariosServicio {
     }
 
     public function getUsers(
-        string $busqueda = '',
-        string $estado = ''
-        ): array {
+    string $busqueda = '',
+    string $estado = '',
+    int $pagina = 1
+): array {
 
-        return $this->model->getAllUsers($busqueda, $estado);
-    }
+    return $this->model->getAllUsers(
+        $busqueda,
+        $estado,
+        $pagina
+    );
+}
 
     public function create(array $data): int {
 
