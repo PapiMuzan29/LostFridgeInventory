@@ -10,16 +10,16 @@
                 <i class="fa-solid fa-house"></i> INICIO
             </li>
 
+            <li class="nav-link" onclick="cargarModulo('inventario')">
+                <i class="fa-solid fa-boxes-stacked"></i> INVENTARIO
+            </li>
+
             <li class="nav-link" onclick="cargarModulo('entradas')">
                 <i class="fa-solid fa-arrow-right-to-bracket"></i> ENTRADAS
             </li>
 
             <li class="nav-link" onclick="cargarModulo('salidas')">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> SALIDAS
-            </li>
-
-            <li class="nav-link" onclick="cargarModulo('inventario')">
-                <i class="fa-solid fa-boxes-stacked"></i> INVENTARIO
             </li>
 
             <li class="nav-link" onclick="cargarModulo('ubicaciones')">

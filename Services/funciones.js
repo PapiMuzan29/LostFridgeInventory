@@ -174,6 +174,7 @@ function renderizarFilaUsuario(usuario) {
     `;
 }
 
+
 // ===================================================================================
 // 5. GESTIÓN DE MODALES (CREAR, EDITAR, ELIMINAR)
 // ===================================================================================
@@ -370,3 +371,5 @@ function cerrarModalLogout() {
         musicaLogout.currentTime = 0; 
     }
 }
+
+

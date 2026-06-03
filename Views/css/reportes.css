@@ -1,0 +1,326 @@
+/* ================================================= */
+/* 1. RESET, FUENTE Y CONFIGURACIÓN BASE (SISTEMA)   */
+/* ================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex; 
+    height: 100vh;
+    background-color: #e2e8f0; 
+    overflow: hidden; 
+}
+
+/* ================================================= */
+/* 2. CONTENEDOR PRINCIPAL INTERNO (ÁREA DE TRABAJO) */
+/* ================================================= */
+.contenedor {
+    width: calc(100% - 260px);
+    margin-left: 260px;
+    height: calc(100vh - 65px);
+    margin-top: 65px;
+    background-color: #ffffff;
+    padding: 30px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;            
+    width: 100%;
+    min-height: 50px;               
+    flex-shrink: 0;                 
+    margin-bottom: 10px;            
+}
+
+.header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    color: #1f2f56;                 
+}
+
+/* ================================================= */
+/* 3. BOTONES CON EL ESTILO ORIGINAL DE TU SISTEMA   */
+/* ================================================= */
+.btnNuevo {
+    background: #2f5ea7;
+    color: white;
+    border: none;
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: .3s;
+}
+
+.btnNuevo:hover {
+    background: #244a82;
+    transform: translateY(-1px);
+}
+
+.btnAplicar {
+    height: 44px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 10px;
+    background: #2f5ea7;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: .3s;
+}
+
+.btnAplicar:hover {
+    background: #244a82;
+}
+
+.btnLimpiar {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 10px;
+    border: 1px solid #d5dce6;
+    background: white;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.btnLimpiar:hover {
+    background: #f8fafc;
+}
+
+/* Microinteracciones mecánicas al hacer clic */
+.btnNuevo:active, .btnAplicar:active, .btnLimpiar:active {
+    transform: scale(0.96);
+}
+
+/* ================================================= */
+/* 4. COMPONENTES DEL PANEL DE FILTROS              */
+/* ================================================= */
+.panel-controles-reportes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    width: 100%;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filtros-reportes-izquierda {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+}
+
+.grupo-input-reporte {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+}
+
+.grupo-input-reporte label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Ajuste de select e inputs de fechas */
+.grupo-input-reporte select,
+.grupo-input-reporte input[type="date"] {
+    height: 44px;
+    border: 1px solid #d5dce6;
+    border-radius: 10px;
+    padding: 0 14px;
+    background: white;
+    color: #1f2f56;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: .3s;
+    font-family: inherit;
+    width: 100%;
+}
+
+.grupo-input-reporte select:focus,
+.grupo-input-reporte input[type="date"]:focus {
+    border-color: #2f5ea7;
+    box-shadow: 0 0 0 3px rgba(47,94,167,0.12);
+}
+
+/* ================================================= */
+/* 5. ESTILOS DE LA TABLA DE REPORTES               */
+/* ================================================= */
+.tabla-reportes-contenedor {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.tabla-reportes-modulo {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-reportes-modulo thead {
+    background: #f1f5f9;
+}
+
+.tabla-reportes-modulo th {
+    padding: 16px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2f56;
+}
+
+.tabla-reportes-modulo td {
+    padding: 16px;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 14px;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.tabla-reportes-modulo tbody tr {
+    transition: .2s;
+    opacity: 0;
+    animation: suavizarEntradaReportes 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.tabla-reportes-modulo tbody tr:hover {
+    background: #f8fbff;
+}
+
+#tabla-documentos-tbody tr td[colspan] {
+    text-align: center !important;
+    color: #64748b;
+    font-style: italic;
+    padding: 40px 0;
+}
+
+/* ================================================= */
+/* 6. ANIMACIONES Y RESPONSIVE                       */
+/* ================================================= */
+@keyframes suavizarEntradaReportes {
+    from {
+        opacity: 0;
+        transform: translateY(8px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);    
+    }
+} 
+
+@media(max-width: 992px) {
+    .panel-controles-reportes {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filtros-reportes-izquierda {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .grupo-input-reporte {
+        width: 100%;
+    }
+    .btnNuevo, .btnAplicar, .btnLimpiar {
+        width: 100%;
+        justify-content: center;
+    }
+}
+/* ================================================= */
+/* 10. PAGINACIÓN (CORREGIDA CON MICROINTERACCIONES)  */
+/* ================================================= */
+.botones-paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #edf2f7;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.btn-pagina {
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid #d5dce6;
+    background: white;
+    color: #334155;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 38px; 
+    text-align: center;
+    
+    /* 🔥 CORRECCIÓN: Transiciones combinadas y elásticas */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-pagina:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    /* 🔥 Elevación limpia al pasar el cursor de cerdo */
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* 🔥 NUEVO: Hundimiento mecánico sutil al hacer clic real */
+.btn-pagina:active {
+    transform: scale(0.94); 
+}
+
+.btn-pagina.activa {
+    background: #2f5ea7;
+    color: white;
+    border-color: #2f5ea7;
+    box-shadow: 0 4px 10px rgba(47, 94, 167, 0.2);
+    
+    /* 🔥 NUEVO: Dispara el rebote elástico de cambio de página */
+    animation: transicionBotonActivo 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.puntos {
+    color: #64748b;
+    font-weight: 600;
+    padding: 0 4px;
+}

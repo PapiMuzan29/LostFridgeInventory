@@ -16,16 +16,28 @@ CREATE TABLE Cuenta(
     estado BIT
 );
 
+CREATE TABLE Proveedor(
+    idProveedor INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    nombreProveedor VARCHAR(60),
+    rfc varchar(20),
+    direccion VARCHAR(250),
+    colonia VARCHAR(20),
+    codigoPostal VARCHAR(20),
+    estadoRepublica VARCHAR(100),
+    status tinyint(1) DEFAULT 1
+);
+   
+
 CREATE TABLE Categoria(
     idCategoria INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     nombreCategoria VARCHAR(60) NOT NULL UNIQUE,
-    estado BIT
+    estado tinyint (1) DEFAULT 1
 );
 
 CREATE TABLE Ubicacion(
     idUbicacion INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     nombreUbicacion VARCHAR(60) NOT NULL UNIQUE,
-    estado BIT
+    estado tinyint (1) DEFAULT 1
 );
 
 CREATE TABLE Producto(
@@ -34,7 +46,10 @@ CREATE TABLE Producto(
     idCategoria INT NOT NULL,
     FOREIGN KEY (idCategoria) REFERENCES Categoria(idCategoria),
     codigoProducto VARCHAR(100) NULL UNIQUE,
-    activo BIT
+    pesoProductivo DECIMAL(18,4) NOT NULL,
+    fechaCaducidad DATE NULL,
+    
+    activo tinyint(1) DEFAULT 1
 );
 
 CREATE TABLE Lote(
@@ -49,7 +64,7 @@ CREATE TABLE Lote(
     pesoActual DECIMAL(18,4),
     fechaVencimiento DATE NULL,
     estadoCalidad ENUM('optimo', 'alerta', 'expirado') DEFAULT 'optimo',
-    activo BIT
+    activo tinyint(1) DEFAULT 1
 );
 
 CREATE TABLE TransaccionesInventario(
@@ -64,7 +79,7 @@ CREATE TABLE TransaccionesInventario(
 CREATE TABLE Cliente(
 	idCliente INT AUTO_INCREMENT PRIMARY KEY,
     nombreCliente VARCHAR(50),
-    activo BIT
+    activo tinyint(1) DEFAULT 1
 );
 
 CREATE TABLE Notas(
@@ -106,18 +121,24 @@ CREATE TABLE Documentos (
     nombreOriginal VARCHAR(255) NOT NULL,
     nombreServidor VARCHAR(255) NOT NULL,
     rutaArchivo VARCHAR(500) NOT NULL,   
-    tipoDocumento ENUM(
+    nombreDocumento ENUM(
         'movimiento_inventario',
         'inventario_actual',
         'vencimiento',
         'movimientos_usuario',
         'utilizacion_ubicaciones'
     ) NOT NULL,
+    tipoDocumento ENUM(
+        'Inventario',
+        'Alertas',
+        'Auditoria'
+    ) NOT NULL, 
     tamanoBytes INT NOT NULL,             
     idCuenta INT NULL,                    
     FOREIGN KEY (idCuenta) REFERENCES Cuenta(idCuenta),
     fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    activo BIT DEFAULT 1
+    fechaFinalizacion DATETIME NULL,
+    activo tinyint(1) DEFAULT 1
 );
 
 CREATE TABLE Auditoria (

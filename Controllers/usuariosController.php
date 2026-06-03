@@ -46,7 +46,7 @@ switch ($action) {
             $service->create($data);
         }
 
-        header('Location: ../Views/principal.php');
+        header('Location: ../Views/usuarios.php');
 
         exit;
 
@@ -130,7 +130,7 @@ switch ($action) {
 
     default:
 
-        header('Location: ../Views/principal.php');
+        header('Location: ../Views/inicio.php');
 
         exit;
 }
