@@ -26,6 +26,10 @@
                 <i class="fa-solid fa-location-dot"></i> UBICACIONES
             </li>
 
+            <li class="nav-link" onclick="cargarModulo('movimientos')">
+                <i class="fa-solid fa-retweet"></i> MOVIMIENTOS
+            </li>
+
             <li class="nav-link" onclick="cargarModulo('reportes')">
                 <i class="fa-solid fa-file-lines"></i> REPORTES
             </li>

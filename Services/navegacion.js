@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         salidas: 'Salidas',
         inventario: 'Inventario',
         ubicaciones: 'Ubicaciones',
+        movimientos: 'Movimientos',
         reportes: 'Reportes',
         usuarios: 'Usuarios',
         configuracion: 'Configuración'

@@ -125,7 +125,7 @@ if (!isset($_SESSION['apodoUsuario'])) {
         </div>
 
     </div>
-    <script src="../Views/js/funcionesReportes.js"></script>
+    <script src="../Services/funcionesReportes.js"></script>
     
 
 
