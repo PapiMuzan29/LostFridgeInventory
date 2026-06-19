@@ -29,6 +29,8 @@ $stats = $service->getStats();
     <link rel="stylesheet" href="../Views/css/cerdito.css">
     <link rel="stylesheet" href="../Views/css/usuarios.css">
     <link rel="stylesheet" href="../Views/css/barraNavegacion.css">
+    <link rel="stylesheet" href="../Views/css/inventario.css">
+    <script src="../Services/movimiento.js"></script>
 </head>
 
 <body>

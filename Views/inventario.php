@@ -6,13 +6,14 @@ if (!isset($_SESSION['apodoUsuario'])) {
     exit();
 }
 
-// Datos de prueba temporales para las tarjetas KPI superiores
-$stats = [
-    'productos' => 128,
-    'cajas' => '1,245',
-    'proximos' => 18,
-    'vencidos' => 3
-];
+// Conectamos con el modelo para extraer las métricas en tiempo real
+require_once __DIR__ . '/../Models/modeloInventario.php';
+$modeloInv = new modeloInventario();
+$stats = $modeloInv->getKpiStats();
+
+// CONSULTAS COLECTADAS EN EL MODELO PARA LOS SELECTS DEL MODAL
+$listaProveedores = $modeloInv->getProveedores(); 
+$listaCategorias = $modeloInv->getCategorias();   
 ?>
 
 <!DOCTYPE html>
@@ -26,6 +27,8 @@ $stats = [
     <link rel="stylesheet" href="../Views/css/barraNavegacion.css">
     <link rel="stylesheet" href="../Views/css/usuarios.css">
     <link rel="stylesheet" href="../Views/css/inventario.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -57,53 +60,25 @@ $stats = [
 
         <div class="inventario-cards-grid">
             <div class="kpi-card">
-                <div class="kpi-icon-circle bg-azul">
-                    <i class="fa-solid fa-cubes"></i>
-                </div>
+                <div class="kpi-icon-circle bg-azul"><i class="fa-solid fa-cubes"></i></div>
                 <div class="kpi-datos">
                     <h3>Total de productos</h3>
-                    <span class="kpi-numero"><?= $stats['productos'] ?></span>
+                    <span class="kpi-numero" id="kpi-total-productos"><?= htmlspecialchars((string)$stats['productos']) ?></span>
                     <p class="kpi-subtexto">Productos diferentes</p>
                 </div>
             </div>
-
             <div class="kpi-card">
-                <div class="kpi-icon-circle bg-verde">
-                    <i class="fa-solid fa-box-open"></i>
-                </div>
+                <div class="kpi-icon-circle bg-verde"><i class="fa-solid fa-box-open"></i></div>
                 <div class="kpi-datos">
                     <h3>Total de cajas</h3>
-                    <span class="kpi-numero"><?= $stats['cajas'] ?></span>
+                    <span class="kpi-numero" id="kpi-total-cajas"><?= htmlspecialchars((string)$stats['cajas']) ?></span>
                     <p class="kpi-subtexto">Cajas en inventario</p>
-                </div>
-            </div>
-
-            <div class="kpi-card">
-                <div class="kpi-icon-circle bg-naranja">
-                    <i class="fa-solid fa-clock"></i>
-                </div>
-                <div class="kpi-datos">
-                    <h3>Próximos a vencer</h3>
-                    <span class="kpi-numero"><?= $stats['proximos'] ?></span>
-                    <p class="kpi-subtexto">En los próximos 7 días</p>
-                </div>
-            </div>
-
-            <div class="kpi-card">
-                <div class="kpi-icon-circle bg-rojo">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-                <div class="kpi-datos">
-                    <h3>Vencidos</h3>
-                    <span class="kpi-numero"><?= $stats['vencidos'] ?></span>
-                    <p class="kpi-subtexto">Cajas vencidas</p>
                 </div>
             </div>
         </div>
 
         <div class="inventario-filtro-container">
             <form id="formFiltrosInventario" class="inventario-filtro-form" onsubmit="event.preventDefault();">
-                
                 <div class="filtro-grupo">
                     <label>Buscar por</label>
                     <select id="selectTipoBusqueda">
@@ -111,232 +86,199 @@ $stats = [
                         <option value="proveedor">🚚 Proveedor</option>
                     </select>
                 </div>
-
                 <div class="filtro-grupo flex-grande">
                     <label id="labelDinamicoBusqueda">Buscar producto</label>
                     <div class="inventario-buscador-wrapper">
-                        <input type="text" id="inputBusquedaInventario" placeholder="Nombre, código o descripción...">
+                        <input type="text" id="inputBusqueda" placeholder="Nombre, código o descripción...">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
                 </div>
-
                 <div class="filtro-grupo">
                     <label>Ubicación</label>
-                    <select id="selectUbicacion">
-                        <option value="">Todas</option>
-                    </select>
+                    <select id="selectUbicacion"><option value="">Todas</option></select>
                 </div>
-
                 <div class="filtro-grupo">
                     <label>Estado</label>
-                    <select id="selectEstadoInventario">
-                        <option value="">Todos</option>
-                        <option value="optimo">Óptimo</option>
-                        <option value="proximo">Próximo a vencer</option>
-                        <option value="vencido">Vencido</option>
+                    <select id="selectEstado">
+                        <option value="">Todos los estados</option>
+                        <option value="1">Activos / Disponibles</option>
+                        <option value="0">Inactivos / Desactivados</option>
                     </select>
                 </div>
-
                 <div class="filtro-botones">
-                    
-                    <button type="button" id="btnLimpiarInventario" class="btn-limpiar-inv"><i class="fa-solid fa-rotate"></i> Limpiar filtros</button>
+                    <button type="button" id="btnLimpiar" class="btn-limpiar-inv"><i class="fa-solid fa-rotate"></i> Limpiar filtros</button>
                 </div>
             </form>
         </div>
 
-        <table class="tabla-inventario">
-            <thead id="thead-inventario">
-                <tr>
-                    <th>Código</th>
-                    <th>Producto</th>
-                    <th>Existencia (cajas)</th>
-                    <th>Peso total (kg)</th>
-                    <th>Próx. vencimiento</th>
-                    <th>Estado</th>
-                    <th class="txt-centro">Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tabla-inventario-tbody">
-                </tbody>
+        <table class="tablaUsuarios">
+            <thead id="thead-inventario"></thead>
+            <tbody id="tabla-inventario-tbody"></tbody>
         </table>
 
-        <div class="inventario-paginacion-footer">
+        <div class="botones-paginacion" style="display: flex; gap: 6px; justify-content: center; margin-top: 25px; padding-bottom: 40px;">
+            <button type="button" class="btn-pagina" id="btnAnterior">
+                <i class="fa-solid fa-chevron-left"></i> Anterior
+            </button>
             
-            <div class="paginacion-controles">
-                <button type="button" class="btn-pagina-inv" id="btnAnteriorInv">Anterior</button>
-                <div id="contenedorNumerosInv" class="numeros-wrapper"></div>
-                <button type="button" class="btn-pagina-inv" id="btnSiguienteInv">Siguiente</button>
-            </div>
+            <button type="button" class="btn-pagina numero-pagina activa" id="btnPag1">1</button>
+            <button type="button" class="btn-pagina numero-pagina" id="btnPag2">2</button>
+            
+            <button type="button" class="btn-pagina" id="btnSiguiente">
+                Siguiente <i class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
-
     </div>
 
-    <script>
-        // 📊 BD Temporal interna para que la tabla muestre datos inmediatamente en la pantalla
-        const dePruebaProductos = [
-            { codigo: "PROD-001", nombre: "Rib Eye Premium", existencia: 45, ubicacion: "Cámara 1", vencimiento: "2026-06-15", estado: "Óptimo" },
-            { codigo: "PROD-002", nombre: "Filete de Salmón",  existencia: 20, ubicacion: "Cámara 3", vencimiento: "2026-06-03", estado: "Próximo" },
-            { codigo: "PROD-003", nombre: "Costilla de Cerdo", existencia: 63, ubicacion: "Cámara 1", vencimiento: "2026-05-20", estado: "Vencido" }
-        ];
 
-        const dePruebaProveedores = [
-            { id: "PROV-101", empresa: "Distribuidora de Carnes del Norte", rfc: "DCN920412AA1", telefono: "811-234-5678", correo: "ventas@carnesnorte.com", direccion: "Av. Industrial #450, Monterrey", estado: "Activo" },
-            { id: "PROV-102", empresa: "Mariscos del Pacífico S.A.", rfc: "MPA8810305B2", telefono: "664-987-6543", correo: "contacto@marispacifico.mx", direccion: "Calle Marina #12, Ensenada", estado: "Activo" },
-            { id: "PROV-103", empresa: "Empaques Frigoríficos Robles", rfc: "EFR150722TR4", telefono: "555-432-1098", correo: "info@roblesfrigo.com", direccion: "Eje Central #89, CDMX", estado: "Inactivo" }
-        ];
+    <div class="modal" id="modalAgregarProducto" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); justify-content: center; align-items: center;">
+        <div class="modal-contenido" style="background: white; padding: 24px; border-radius: 12px; width: 100%; max-width: 500px; position: relative;">
+            <span class="cerrar-modal" onclick="cerrarModalAgregarProducto()" style="position: absolute; top: 16px; right: 20px; font-size: 24px; color: #ef4444; cursor: pointer;">&times;</span>
+            
+            <h2 style="font-size: 20px; font-weight: 700; color: #1f2f56; margin-bottom: 16px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Registrar Nuevo Producto</h2>
+            
+            <form id="formNuevoProducto" onsubmit="guardarProducto(event)">
+                <div class="modal-grid" style="display: grid; grid-template-columns: 1fr; gap: 14px;">
+                    
+                    <div class="grupo-input">
+                        <label for="prodCodigo">Código de Producto *</label>
+                        <input type="text" id="prodCodigo" name="codigoProducto" placeholder="Ej: H1175104157" required style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px;">
+                    </div>
+                    
+                    <div class="grupo-input">
+                        <label for="prodNombre">Nombre del Producto *</label>
+                        <input type="text" id="prodNombre" name="nombreProducto" placeholder="Ej: Harina de Trigo 1kg" required style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px;">
+                    </div>
+                    
+                    <div class="grupo-input">
+                        <label for="prodProveedor">Proveedor Asociado *</label>
+                        <select id="prodProveedor" name="idProveedor" required style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; background-color: white;">
+                            <option value="" disabled selected>Seleccione un proveedor...</option>
+                            <?php 
+                            if (!empty($listaProveedores)) {
+                                foreach ($listaProveedores as $prov) {
+                                    echo '<option value="' . htmlspecialchars((string)$prov['idProveedor']) . '">' . htmlspecialchars($prov['nombreProveedor']) . '</option>';
+                                }
+                            } 
+                            ?>
+                        </select>
+                    </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const selectTipo = document.getElementById('selectTipoBusqueda');
-            const labelDinamico = document.getElementById('labelDinamicoBusqueda');
-            const inputBusqueda = document.getElementById('inputBusquedaInventario');
-            const theadInventario = document.getElementById('thead-inventario');
-            const tbodyInventario = document.getElementById('tabla-inventario-tbody');
-            const txtMostrando = document.getElementById('txtMostrandoRegistros');
+                    <div class="grupo-input">
+                        <label for="prodCategoria">Categoría del Producto *</label>
+                        <select id="prodCategoria" name="idCategoria" required style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; background-color: white;">
+                            <option value="" disabled selected>Seleccione una categoría...</option>
+                            <?php 
+                            if (!empty($listaCategorias)) {
+                                foreach ($listaCategorias as $cat) {
+                                    echo '<option value="' . htmlspecialchars((string)$cat['idCategoria']) . '">' . htmlspecialchars($cat['nombreCategoria']) . '</option>';
+                                }
+                            } 
+                            ?>
+                        </select>
+                    </div>
+                    
+                </div>
+                
+                <button type="submit" class="btnGuardarUsuario" style="width: 100%; height: 40px; background: #0d6efd; color: white; border: none; border-radius: 8px; margin-top: 20px; font-weight: 600; cursor: pointer;">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
+                </button>
+            </form>
+        </div>
+    </div>
 
-            // Cabeceras HTML estructuradas
-            const columnasProducto = `
-                <tr>
-                    <th>Código</th>
-                    <th>Producto</th>
-                    <th>Existencia (cajas)</th>
-                    <th>Peso total (kg)</th>
-                    <th>Próx. vencimiento</th>
-                    <th>Estado</th>
-                    <th class="txt-centro">Acciones</th>
-                </tr>
-            `;
 
-            const columnasProveedor = `
-                <tr>
-                    <th>Código/ID</th>
-                    <th>Nombre / Empresa</th>
-                    <th>RFC</th>
-                    <th>Dirección</th>
-                    <th>Colonia</th>
-                    <th>C.P.</th>
-                    <th>Estado</th>
-                    <th>Status</th>
-                    <th class="txt-centro">Acciones</th>
-                </tr>
-            `;
+    <div class="modal" id="modalAgregarProveedor" style="display: none;">
+        <div class="modal-contenido">
+            <span class="cerrar-modal" onclick="cerrarModalAgregarProveedor()">&times;</span>
+            <h2>Registrar Nuevo Proveedor</h2>
+            
+            <form action="../Controllers/inventarioController.php?action=agregarProveedor" method="POST" id="formNuevoProveedor" onsubmit="guardarProveedor(event)">
+                <div class="modal-grid">
+                    <div class="grupo-input">
+                        <label for="provCodigo">Código de Proveedor *</label>
+                        <input type="text" id="provCodigo" name="codigoProveedor" placeholder="Ej: PROV-001" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provNombre">Nombre / Empresa *</label>
+                        <input type="text" id="provNombre" name="nombreProveedor" placeholder="Nombre comercial" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provRfc">RFC *</label>
+                        <input type="text" id="provRfc" name="rfc" placeholder="12 o 13 dígitos" maxlength="13" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provDireccion">Dirección (Calle y Número) *</label>
+                        <input type="text" id="provDireccion" name="direccion" placeholder="Av. Principal #123" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provColonia">Colonia *</label>
+                        <input type="text" id="provColonia" name="colonia" placeholder="Centro" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provCp">Código Postal *</label>
+                        <input type="text" id="provCp" name="codigoPostal" placeholder="72000" maxlength="5" required>
+                    </div>
+                    <div class="grupo-input" style="grid-column: span 2;">
+                        <label for="provEstado">Estado de la República *</label>
+                        <input type="text" id="provEstado" name="estadoRepublica" placeholder="Ej: Puebla, CDMX, Veracruz..." autocomplete="off" required>
+                    </div>
+                    
+                    <div style="grid-column: span 2; margin-top: 15px; border-top: 2px dashed #e2e8f0; padding-top: 15px;">
+                        <h3 style="font-size: 14px; font-weight: 700; color: #475569; margin-bottom: 10px;">
+                            <i class="fa-solid fa-qrcode"></i> Configuración de Lectura (Escáner QR)
+                        </h3>
+                    </div>
 
-            // Función encargada de filtrar y pintar las filas en la pantalla
-            function actualizarTabla() {
-                const tipo = selectTipo.value;
-                const busqueda = inputBusqueda.value.toLowerCase().trim();
-                tbodyInventario.innerHTML = ''; 
+                    <div style="grid-column: span 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        
+                        <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #f8fafc;">
+                            <span style="font-size: 12px; font-weight: 700; color: #0d6efd; display: block; margin-bottom: 8px;">Código de Producto</span>
+                            <div class="grupo-input" style="margin-bottom: 6px;">
+                                <label style="font-size: 11px;">Posición Inicio</label>
+                                <input type="number" name="codigoBarrasProductosPosicion" value="0" min="0" required style="height: 32px;">
+                            </div>
+                            <div class="grupo-input">
+                                <label style="font-size: 11px;">Longitud (Letras)</label>
+                                <input type="number" name="codigoBarrasProductosLongitud" value="0" min="0" required style="height: 32px;">
+                            </div>
+                        </div>
 
-                if (tipo === 'proveedor') {
-                    // Filtrar proveedores
-                    const filtrados = dePruebaProveedores.filter(p => 
-                        p.id.toLowerCase().includes(busqueda) || 
-                        p.empresa.toLowerCase().includes(busqueda) || 
-                        p.rfc.toLowerCase().includes(busqueda)
-                    );
+                        <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #f8fafc;">
+                            <span style="font-size: 12px; font-weight: 700; color: #0d6efd; display: block; margin-bottom: 8px;">Peso Kilos (Enteros)</span>
+                            <div class="grupo-input" style="margin-bottom: 6px;">
+                                <label style="font-size: 11px;">Posición Inicio</label>
+                                <input type="number" name="codigoBarrasEnterosPosicion" value="0" min="0" required style="height: 32px;">
+                            </div>
+                            <div class="grupo-input">
+                                <label style="font-size: 11px;">Longitud (Dígitos)</label>
+                                <input type="number" name="codigoBarrasEnterosLongitud" value="0" min="0" required style="height: 32px;">
+                            </div>
+                        </div>
 
-                    if (filtrados.length === 0) {
-                        tbodyInventario.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px;">No se encontraron proveedores</td></tr>`;
-                    } else {
-                        filtrados.forEach(p => {
-                            const claseEstado = p.estado === 'Activo' ? 'activo' : 'inactivo';
-                            tbodyInventario.innerHTML += `
-                                <tr>
-                                    <td>${p.codigo}</td>
-                                    <td><strong>${p.nombre}</strong></td>
-                                    <td>${p.existencia}</td>
-                                    <td>${p.ubicacion}</td>
-                                    <td>${p.vencimiento}</td>
-                                    <td>
-                                        <span class="estado ${claseEstado}">
-                                            ${p.estado}
-                                        </span>
-                                    </td>
-                                    <td class="txt-centro">
-                                        <div class="acciones">
-                                            <button type="button" class="btn-accion editar">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </button>
-                                            <button type="button" class="btn-accion eliminar">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    }
-                    txtMostrando.textContent = `Mostrando 1 a ${filtrados.length} de ${filtrados.length} proveedores`;
+                        <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #f8fafc;">
+                            <span style="font-size: 11px; font-weight: 700; color: #0d6efd; display: block; margin-bottom: 8px;">Peso Gramos (Decimales)</span>
+                            <div class="grupo-input" style="margin-bottom: 6px;">
+                                <label style="font-size: 11px;">Posición Inicio</label>
+                                <input type="number" name="codigoBarrasDecimalesPosicion" value="0" min="0" required style="height: 32px;">
+                            </div>
+                            <div class="grupo-input">
+                                <label style="font-size: 11px;">Longitud (Dígitos)</label>
+                                <input type="number" name="codigoBarrasDecimalesLongitud" value="0" min="0" required style="height: 32px;">
+                            </div>
+                        </div>
 
-                } else {
-                    // Filtrar productos
-                    const filtrados = dePruebaProductos.filter(p => 
-                        p.codigo.toLowerCase().includes(busqueda) || 
-                        p.nombre.toLowerCase().includes(busqueda) || 
-                        p.categoria.toLowerCase().includes(busqueda)
-                    );
+                    </div>
+                </div>
 
-                    if (filtrados.length === 0) {
-                        tbodyInventario.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px;">No se encontraron productos</td></tr>`;
-                    } else {
-                        filtrados.forEach(p => {
-                            let claseEstado = 'activo'; // óptimo
-                            if(p.estado === 'Próximo') claseEstado = 'inactivo'; // naranja/rojo alternativo
-                            if(p.estado === 'Vencido') claseEstado = 'inactivo'; 
+                <button type="submit" class="btnGuardarUsuario" style="background: #1e293b;">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Proveedor
+                </button>
+            </form>
+        </div>
+    </div>
 
-                            tbodyInventario.innerHTML += `
-                                <tr>
-                                    <td>${p.codigo}</td>
-                                    <td><strong>${p.nombre}</strong></td>
-                                    <td>${p.categoria}</td>
-                                    <td>${p.existencia}</td>
-                                    <td>${p.ubicacion}</td>
-                                    <td>${p.vencimiento}</td>
-                                    <td><span class="estado ${claseEstado}">${p.estado}</span></td>
-                                    <td class="txt-centro">
-                                        <div class="acciones">
-                                            <button type="button" class="btn-accion editar" onclick="console.log('Editar prod')"><i class="fa-solid fa-pen"></i></button>
-                                            <button type="button" class="btn-accion eliminar" onclick="console.log('Borrar prod')"><i class="fa-solid fa-trash"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    }
-                    txtMostrando.textContent = `Mostrando 1 a ${filtrados.length} de ${filtrados.length} productos`;
-                }
-            }
-
-            // Escucha cambios en el tipo de consulta (Producto / Proveedor)
-            selectTipo.addEventListener('change', function() {
-                if (this.value === 'proveedor') {
-                    labelDinamico.textContent = 'Buscar proveedor';
-                    inputBusqueda.placeholder = 'Nombre, RFC, teléfono o marca...';
-                    theadInventario.innerHTML = columnasProveedor; 
-                } else {
-                    labelDinamico.textContent = 'Buscar producto';
-                    inputBusqueda.placeholder = 'Nombre, código o descripción...';
-                    theadInventario.innerHTML = columnasProducto; 
-                }
-                inputBusqueda.value = ''; // Limpiamos el buscador al cambiar
-                actualizarTabla();
-            });
-
-            // Escucha la escritura en tiempo real en el buscador
-            inputBusqueda.addEventListener('input', actualizarTabla);
-
-            // Cargar la tabla inicialmente con los productos
-            actualizarTabla();
-
-            // Botón limpiar filtros
-            document.getElementById('btnLimpiarInventario').addEventListener('click', () => {
-                inputBusqueda.value = '';
-                actualizarTabla();
-            });
-        });
-
-        // Modales de control del sistema LFI
-        function abrirModalAgregarProducto() { console.log("Abriendo modal producto"); }
-        function abrirModalAgregarProveedor() { console.log("Abriendo modal proveedor"); }
-    </script>
+    <script src="../Services/funcionesInventario.js"></script>
+    
 </body>
 </html>

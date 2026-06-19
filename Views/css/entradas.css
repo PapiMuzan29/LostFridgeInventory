@@ -1,0 +1,276 @@
+/* ================================================= */
+/* CONFIGURACIÓN Y CONTENEDORES DEL PANEL DE MATRIZ */
+/* ================================================= */
+.contenedor {
+    width: calc(100% - 260px);
+    margin-left: 260px;
+    height: calc(100vh - 65px);
+    margin-top: 65px;
+    background-color: #f8fafc; /* Fondo gris sutil corporativo */
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.shadow-soft {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Tarjeta contenedora de la Matriz */
+.card-entrada {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* ================================================= */
+/* FORMULARIO DE DATOS GENERALES (CAMPOS SUPERIORES) */
+/* ================================================= */
+.grupo-campo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.grupo-campo label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #475569; /* Gris Slate elegante */
+    white-space: nowrap;
+}
+
+/* Estilos de Inputs unificados con Inventario */
+.input-captura, .select-captura {
+    width: 100%;
+    height: 38px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 14px;
+    color: #1e293b;
+    outline: none;
+    background: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.input-captura:focus, .select-captura:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.input-readonly {
+    width: 100%;
+    height: 38px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 14px;
+    color: #64748b;
+    background: #f1f5f9;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.text-success-status {
+    color: #16a34a !important; /* Verde óptimo unificado */
+}
+
+/* ================================================= */
+/* BARRA DE CAPTURA OPERATIVA (CÓDIGO DE BARRAS)    */
+/* ================================================= */
+.captura-line-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 20px;
+    background: #cbd5e1 !important; /* Gris de separación intermedio */
+    border-top: 1px solid #94a3b8;
+    border-bottom: 1px solid #94a3b8;
+    box-sizing: border-box;
+}
+
+.input-with-icon-bar {
+    position: relative;
+    width: 100%;
+}
+
+.input-with-icon-bar input {
+    padding-right: 40px;
+    border-color: #94a3b8;
+}
+
+.input-with-icon-bar i {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 16px;
+}
+
+.label-inline {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    white-space: nowrap;
+}
+
+.modos-captura-radios {
+    display: flex;
+    gap: 16px;
+}
+
+.radio-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+}
+
+.radio-inline input[type="radio"] {
+    accent-color: #0d6efd; /* Azul Rey para los controles */
+}
+
+/* ================================================= */
+/* REJILLA INFERIOR: TABLA Y TOTALES                 */
+/* ================================================= */
+.tabla-partidas-container {
+    background: #ffffff;
+    overflow-x: auto;
+}
+
+/* Tabla Maestra heredada de tus módulos */
+.tablaUsuarios {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tablaUsuarios thead {
+    background: #f8fafc;
+}
+
+.tablaUsuarios th {
+    padding: 12px 16px;
+    color: #1f2f56;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.tablaUsuarios td {
+    padding: 12px 16px;
+    color: #334155;
+    font-size: 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.font-bold { font-weight: 700; }
+.font-600 { font-weight: 600; }
+.txt-verde { color: #16a34a; }
+
+/* Botón de eliminación de partidas */
+.btn-borrar-partida {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #fef2f2;
+    color: #dc2626;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-borrar-partida:hover {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+/* Tarjetas Laterales de Totales */
+.panel-totales-entradas {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card-total-indicador {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card-total-indicador h3 {
+    font-size: 14px;
+    color: #475569;
+    margin: 0;
+    font-weight: 600;
+}
+
+.card-total-indicador span {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    font-family: monospace, sans-serif;
+}
+
+.bg-total-qty { border-left: 4px solid #0d6efd; } /* Franja Azul */
+.bg-total-kgs { border-left: 4px solid #16a34a; } /* Franja Verde */
+
+/* Botonera de acciones */
+.grupo-botones-captura {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-block-matriz {
+    width: 100%;
+    height: 40px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btnAplicar.btn-block-matriz {
+    background: #0d6efd;
+    color: #ffffff;
+    border: none;
+}
+
+.btnAplicar.btn-block-matriz:hover {
+    background: #0b5ed7;
+}
+
+.btnLimpiar.btn-block-matriz {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
+
+.btnLimpiar.btn-block-matriz:hover {
+    background: #f8fafc;
+}

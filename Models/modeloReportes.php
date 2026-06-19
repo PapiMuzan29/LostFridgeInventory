@@ -12,6 +12,27 @@ class ModeloReportes {
         $registrosPorPagina = 4;
         $offset = ($pagina - 1) * $registrosPorPagina;
         $params = [];
+        $paramsCount = [];
+
+        $whereClause = " WHERE 1 = 1";
+
+        if ($tipoReporte !== '') {
+            $whereClause .= " AND d.tipoDocumento = ?";
+            $params[]      = $tipoReporte;
+            $paramsCount[] = $tipoReporte;
+        }
+
+        if ($fechaInicio !== '' && $fechaFin !== '') {
+            $whereClause .= " AND d.fechaCreacion >= ? AND d.fechaCreacion <= ?";
+            $params[]      = $fechaInicio;
+            $params[]      = $fechaFin;
+            $paramsCount[] = $fechaInicio;
+            $paramsCount[] = $fechaFin;
+        }
+
+        $queryCount  = "SELECT COUNT(*) AS total FROM Documentos d INNER JOIN Cuenta c ON c.idCuenta = d.idCuenta" . $whereClause;
+        $resultCount = $this->db->select($queryCount, $paramsCount);
+        $total       = (int)($resultCount[0]['total'] ?? 0);
 
         $query = "SELECT 
                     d.idDocumento,
@@ -21,25 +42,20 @@ class ModeloReportes {
                     d.fechaCreacion,
                     d.fechaFinalizacion,
                     CONCAT_WS(' ', c.nombreUsuario, c.apellidoPaternoUsuario, c.apellidoMaternoUsuario) AS nombreCompletoResponsable
-                  FROM Documentos d
-                  INNER JOIN Cuenta c ON c.idCuenta = d.idCuenta 
-                  WHERE 1 = 1";
+                FROM Documentos d
+                INNER JOIN Cuenta c ON c.idCuenta = d.idCuenta"
+                . $whereClause .
+                " ORDER BY d.fechaCreacion DESC LIMIT $registrosPorPagina OFFSET $offset";
 
-        if ($tipoReporte !== '') {
-            $query .= " AND d.tipoDocumento = ?"; 
-            $params[] = $tipoReporte;
-        }
+        $registros = $this->db->select($query, $params);
 
-        // Filtro por rango de fechas
-        if ($fechaInicio !== '' && $fechaFin !== '') {
-            $query .= " AND d.fechaCreacion >= ? AND d.fechaCreacion <= ?";
-            $params[] = $fechaInicio;
-            $params[] = $fechaFin;
-        }
-
-        $query .= " ORDER BY d.fechaCreacion DESC LIMIT $registrosPorPagina OFFSET $offset";
-       
-        return $this->db->select($query, $params);
+        return [
+            'datos'              => $registros,
+            'total'              => $total,
+            'pagina'             => $pagina,
+            'registrosPorPagina' => $registrosPorPagina,
+            'totalPaginas'       => (int)ceil($total / $registrosPorPagina),
+        ];
     }
 }
 ?>

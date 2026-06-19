@@ -1,0 +1,420 @@
+/* ==========================================
+   1. RESET, FUENTE Y CONFIGURACIÓN BASE (Heredados)
+========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex; 
+    height: 100vh;
+    background-color: #f1f5f9; /* Cambiado a gris sutil consistente */
+    overflow: hidden; 
+}
+
+/* ================================================= */
+/* 2. CONTENEDOR PRINCIPAL (CONVIVE CON TOP-BAR)     */
+/* ================================================= */
+.contenedor {
+    width: calc(100% - 260px);
+    margin-left: 260px;
+    height: calc(100vh - 65px);
+    margin-top: 65px;
+    background-color: #ffffff;
+    padding: 30px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ================================================= */
+/* 3. HEADER                                         */
+/* ================================================= */
+.header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;            
+    width: 100%;
+    min-height: 50px;               
+    flex-shrink: 0;                 
+    margin-bottom: 10px;            
+}
+
+.header h1 {
+    font-size: 26px; /* Ajustado a 26px para hacer match con el título de Inventario */
+    font-weight: 700;
+    margin: 0;
+    color: #1f2f56;                 
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ================================================= */
+/* 4. BOTONES GENERALES                              */
+/* ================================================= */
+.btnAplicar, .btnLimpiar {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: .3s;
+}
+
+.btnAplicar {
+    background: #0d6efd; /* Azul Rey corporativo */
+    color: white;
+    border: none;
+}
+
+.btnAplicar:hover {
+    background: #0b5ed7; /* Azul Rey hover */
+}
+
+.btnLimpiar {
+    border: 1px solid #cbd5e1; /* Gris Slate claro */
+    background: white;
+    color: #475569; /* Gris Slate de texto */
+    text-decoration: none;
+}
+
+.btnLimpiar:hover {
+    background: #f8fafc;
+}
+
+/* ================================================= */
+/* 5. CARDS DE ESTADÍSTICAS                          */
+/* ================================================= */
+.cards {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.card {
+    flex: 1;
+    min-width: 240px;
+    background: #ffffff; /* Fondo blanco limpio */
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 24px;
+    transition: .3s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card h3 {
+    color: #64748b;
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.card span {
+    font-size: 38px;
+    font-weight: bold;
+    color: #1e293b; /* Slate oscuro principal */
+}
+
+/* Bordes personalizados alineados a tus clases corporativas */
+.general-mov { border-left: 5px solid #0d6efd; } /* Azul corporativo */
+.success { border-left: 5px solid #16a34a; }      /* Verde unificado */
+.danger { border-left: 5px solid #dc2626; }       /* Rojo unificado */
+
+/* ================================================= */
+/* 6. BARRA FILTROS (ADAPTADA CON EL SELECTOR RADIO) */
+/* ================================================= */
+.barra-filtros {
+    width: 100%;
+    background: #ffffff;
+    flex-shrink: 0;
+}
+
+.form-movimientos-filtros {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.filtros-izquierda-movimientos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    min-width: 320px;
+}
+
+.tipo-movimiento-selector {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.radio-movimiento {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+}
+
+.radio-movimiento input[type="radio"] {
+    accent-color: #0d6efd; /* Radio buttons en azul rey */
+    margin: 0;
+}
+
+.buscador {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+}
+
+.buscador input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #cbd5e1; /* Gris unificado */
+    border-radius: 10px;
+    padding: 0 44px 0 16px;
+    outline: none;
+    font-size: 14px;
+    color: #1e293b;
+    background: white;
+    transition: .3s;
+}
+
+.buscador input:focus {
+    border-color: #0d6efd; /* Foco azul rey */
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.buscador i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8; /* Buscador placeholder icon */
+    font-size: 15px;
+}
+
+.filtros-derecha-movimientos {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.input-fecha-bitacora {
+    height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0 14px;
+    color: #1e293b;
+    font-size: 14px;
+    outline: none;
+    background: white;
+}
+
+/* ================================================= */
+/* 7. TABLA DE REGISTROS                             */
+/* ================================================= */
+.tablaUsuarios {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.tablaUsuarios thead {
+    background: #f8fafc; /* Color de cabecera limpio */
+}
+
+.tablaUsuarios thead th {
+    padding: 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f2f56;
+}
+
+.tablaUsuarios tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    color: #334155;
+    vertical-align: middle; 
+    height: 68px;           
+}
+
+.tablaUsuarios tbody tr {
+    transition: .2s;
+}
+
+.tablaUsuarios tbody tr:hover {
+    background: #f8fafc; /* Hover sutil estándar */
+}
+
+.usuarioCell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 100%; 
+}
+
+.usuarioCell i {
+    color: #0d6efd; /* Ícono de usuario en azul rey */
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* ================================================= */
+/* 8. BADGES DE TIPOS OVALADOS                       */
+/* ================================================= */
+.badge-tipo {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-usr { background-color: #eff6ff; color: #1e40af; } /* Unificado con badge-ubicacion */
+.badge-ent { background-color: #f0fdf4; color: #16a34a; } /* Unificado con estado-optimo */
+.badge-sal { background-color: #fef2f2; color: #dc2626; } /* Unificado con estado-vencido */
+.badge-inv { background-color: #fff7ed; color: #ea580c; } /* Unificado con estado-proximo */
+
+.txt-verde { color: #16a34a; }
+.txt-rojo { color: #dc2626; }
+.font-600 { font-weight: 600; }
+
+.btn-info-bitacora {
+    background: transparent;
+    border: none;
+    color: #0d6efd; /* Enlace de información en azul rey */
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* ================================================= */
+/* 10. PAGINACIÓN CON INTERACCIONES                  */
+/* ================================================= */
+.botones-paginacion {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 8px; 
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #edf2f7;
+    width: 100%;
+    flex-shrink: 0;
+    font-family: 'Segoe UI', sans-serif; 
+}
+
+#contenedorNumeros {
+    display: flex; 
+    gap: 8px; 
+    align-items: center;
+}
+
+.btn-pagina {
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #475569;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 38px; 
+    text-align: center;
+    text-decoration: none; 
+    
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-pagina:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+}
+
+.btn-pagina:active {
+    transform: scale(0.94); 
+}
+
+.btn-pagina.activa {
+    background: #0d6efd; /* Botón activo azul rey */
+    color: white;
+    border-color: #0d6efd;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+    animation: transicionBotonActivo 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.btn-pagina:disabled {
+    color: #94a3b8;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.puntos {
+    color: #64748b;
+    font-weight: 600;
+    padding: 0 4px;
+}
+
+/* ================================================= */
+/* 12. ANIMACIÓN DE ENTRADA FLUIDA                   */
+/* ================================================= */
+.tablaUsuarios tbody tr {
+    opacity: 0;
+    animation: suavizarEntradaUsuarios 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.tablaUsuarios tbody tr:nth-child(1) { animation-delay: 0.02s; }
+.tablaUsuarios tbody tr:nth-child(2) { animation-delay: 0.04s; }
+.tablaUsuarios tbody tr:nth-child(3) { animation-delay: 0.06s; }
+.tablaUsuarios tbody tr:nth-child(4) { animation-delay: 0.08s; }
+
+@keyframes suavizarEntradaUsuarios {
+    from {
+        opacity: 0;
+        transform: translateY(8px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);    
+    }
+}
+
+@keyframes transicionBotonActivo {
+    0% { transform: scale(0.9); opacity: 0.8; }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.text-center { text-align: center; }         

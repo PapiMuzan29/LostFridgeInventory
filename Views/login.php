@@ -18,8 +18,8 @@
                 
                 <div class="columna-izquierda">
                     <img src="../SRC/Logo LFI - copia.png" alt="Logo LFI" class="logo-lfi">
-                    <h2 class="titulo-lfi">LFI - Local Fridge Inventory</h2>
-                    <p class="subtitulo-lfi">Sistema Local de Control para<br>Cámaras Frigoríficas</p>
+                    <h2 class="titulo-lfi">LFI - Lost Fridge Inventory</h2>
+                    <p class="subtitulo-lfi">Sistema de Control para<br>Cámaras Frigoríficas</p>
                     <img src="../SRC/Logo Grupo America.png" alt="Logo Grupo Cárnico AMERICA" class="logo-america">
                 </div>
 

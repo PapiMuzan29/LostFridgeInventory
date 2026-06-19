@@ -1,3 +1,13 @@
+<style>
+    .sidebar .nav-menu .nav-link.menu-enfocado {
+    background-color: rgba(47, 94, 167, 0.15) !important; /* Tono azul transparente */
+    color: #2f5ea7 !important; /* Cambia el texto al azul rey de tus botones */
+    font-weight: 700 !important;
+    border-left: 4px solid #2f5ea7; /* Una pestaña azul de enfoque al lado izquierdo */
+    padding-left: 16px; /* Ajuste ligero para que no se mueva el ícono */
+    transition: all 0.2s ease;
+}
+</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <div class="sidebar">
 
