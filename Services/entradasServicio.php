@@ -11,4 +11,8 @@ class entradasServicio {
     public function listarProveedores() {
         return $this->modelo->obtenerTodosProveedores();
     }
+
+    public function crearEntrada(array $data) {
+        return $this->modelo->crearEntrada($data);
+    }
 }

@@ -302,5 +302,3 @@ JOIN Ubicacion     u ON l.idUbicacion = u.idUbicacion
 JOIN almacenes     a ON u.idAlmacen   = a.id_almacen
 WHERE l.activo = 1
 GROUP BY p.idProducto, u.idUbicacion;
-
-SET FOREIGN_KEY_CHECKS = 1;
