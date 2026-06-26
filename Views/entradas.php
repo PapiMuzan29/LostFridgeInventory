@@ -10,6 +10,7 @@ if (!isset($_SESSION['apodoUsuario'])) {
 try {
     require_once __DIR__ . '/../Services/entradasServicio.php';
     $entradasService = new entradasServicio();
+    // 🛠️ Cambiado al método dinámico que te extrae también las posiciones del escáner por proveedor
     $proveedores = $entradasService->listarProveedoresParaSelect();
 } catch (Throwable $e) {
     error_log("Error en la vista entradas al cargar proveedores: " . $e->getMessage());
@@ -118,7 +119,13 @@ try {
                     <select class="select-captura" name="idProveedor" id="idProveedor" style="width: 100%; height: 40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 12px; background-color: white;">
                         <option value="">-- Seleccione un proveedor --</option>
                         <?php foreach ($proveedores as $prov): ?>
-                            <option value="<?php echo htmlspecialchars($prov['idProveedor']); ?>">
+                            <option value="<?php echo htmlspecialchars($prov['idProveedor']); ?>"
+                                    data-prod-pos="<?php echo (int)($prov['codigoBarrasProductosPosicion'] ?? 0); ?>"
+                                    data-prod-lon="<?php echo (int)($prov['codigoBarrasProductosLongitud'] ?? 0); ?>"
+                                    data-kg-pos="<?php echo (int)($prov['codigoBarrasEnterosPosicion'] ?? 0); ?>"
+                                    data-kg-lon="<?php echo (int)($prov['codigoBarrasEnterosLongitud'] ?? 0); ?>"
+                                    data-gr-pos="<?php echo (int)($prov['codigoBarrasDecimalesPosicion'] ?? 0); ?>"
+                                    data-gr-lon="<?php echo (int)($prov['codigoBarrasDecimalesLongitud'] ?? 0); ?>">
                                 <?php echo htmlspecialchars($prov['nombreProveedor']); ?>
                             </option>
                         <?php endforeach; ?>
@@ -156,45 +163,33 @@ try {
         <div class="seccion-tabla-totales-grid">
             
             <div class="tabla-partidas-container shadow-soft">
-    <table class="tablaUsuarios" style="margin-top: 0; border: none; width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #f8fafc;">
-                <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 40px;">▶</th>
-                <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0;">Lib</th>
-                <th style="padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0;">Producto</th>
-                <th style="padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0;">Descripcion Producto</th>
-                <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Cantidad</th>
-                <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Costo</th>
-                <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Importe</th>
-                <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 60px;">Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="background: #ffffff; border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 16px; text-align: center; color: #64748b;">1</td>
-                <td style="padding: 16px; text-align: center; color: #16a34a; font-weight: 600;">✓</td>
-                <td style="padding: 16px; font-weight: 600;">P001</td>
-                <td style="padding: 16px;">Costilla de Res Pro (Caja de importación)</td>
-                <td style="padding: 16px; text-align: right; font-weight: 600;">0</td>
-                <td style="padding: 16px; text-align: right;">0.00</td>
-                <td style="padding: 16px; text-align: right; font-weight: 600;">0.00</td>
-                <td style="padding: 16px; text-align: center;">
-                    <button class="btn-borrar-partida"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+                <table class="tablaUsuarios" style="margin-top: 0; border: none; width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8fafc;">
+                            <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 40px;">▶</th>
+                            <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0;">Lib</th>
+                            <th style="padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0;">Producto</th>
+                            <th style="padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0;">Descripcion Producto</th>
+                            <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Cantidad</th>
+                            <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Costo</th>
+                            <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Importe</th>
+                            <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 60px;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPartidasBody">
+                    </tbody>
+                </table>
+            </div>
 
             <div class="panel-totales-entradas">
                 <div class="card-total-indicador bg-total-qty shadow-soft">
                     <h3>Cantidad Total</h3>
-                    <span>20</span>
+                    <span id="totalCantidad">0</span>
                 </div>
 
                 <div class="card-total-indicador bg-total-kgs shadow-soft">
                     <h3>Total Kgs</h3>
-                    <span>0.00</span>
+                    <span id="totalKgs">0.00</span>
                 </div>
                 
                 <div class="grupo-botones-captura">
@@ -206,6 +201,7 @@ try {
         </div>
 
     </div>
-    <script src="../Services/funcionesEntradas.js"></script> </body>
+    
+    <script src="../Services/funcionesEntradas.js"></script>
 </body>
 </html>

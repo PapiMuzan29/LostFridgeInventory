@@ -1,15 +1,10 @@
 <?php
-// Usamos la misma lógica de inclusión que ya te funciona en los otros modelos
-require_once __DIR__ . '/../Config/BD.php'; // O como se llame tu archivo principal de conexión si no es directo. 
-// Si marcas error de ruta, recuerda que puedes usar require_once 'Conexion.php' si están en la misma carpeta.
+require_once __DIR__ . '/../Config/BD.php'; 
 
 class modeloEntradas {
     private $db;
 
     public function __construct() {
-        // Inicializamos tu clase de base de datos habitual
-        // En tu controlador anterior llamabas a $this->db->consulta(), por lo que asumimos que tienes un objeto global o una clase inyectada.
-        // Si usas una clase llamada 'Conexion' o 'BD', instánciala aquí:
         $this->db = new BD(); 
     }
 
@@ -17,7 +12,7 @@ class modeloEntradas {
      * 👥 Trae los proveedores activos
      */
     public function obtenerTodosProveedores() {
-        $query = "SELECT idProveedor, nombreProveedor FROM proveedor WHERE activo = 1 ORDER BY nombreProveedor ASC";
+        $query = "SELECT idProveedor, nombreProveedor FROM proveedor WHERE status = 1 ORDER BY nombreProveedor ASC";
         try {
             $stmt = $this->db->consulta($query);
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -37,8 +32,7 @@ class modeloEntradas {
             return [];
         }
 
-        // Medida de seguridad: Validar que la columna sea correcta y evitar inyección
-        $columnasValidas = ['codigoProveedor', 'nombreProveedor', 'rfcProveedor'];
+        $columnasValidas = ['idProveedor', 'codigoProveedor', 'nombreProveedor', 'rfc'];
         if (!in_array($columna, $columnasValidas)) {
             return [];
         }
@@ -50,11 +44,10 @@ class modeloEntradas {
                     codigoBarrasEnterosLongitud,
                     codigoBarrasDecimalesPosicion,
                     codigoBarrasDecimalesLongitud 
-                  FROM Proveedor 
+                  FROM proveedor 
                   WHERE {$columna} = ? 
-                  AND activo = 1";
+                  AND status = 1";
     
-        // CORRECCIÓN: Debe ser un arreglo
         $params = [$valor]; 
 
         try {
@@ -87,7 +80,7 @@ class modeloEntradas {
         ];
     }
 
-    public function obtenerProducto(
+   public function obtenerProducto(
         string $codigoBarras = '',
         string $codigoProveedor = '',
         string $nombreProveedor = '',
@@ -102,47 +95,75 @@ class modeloEntradas {
         $valor = '';
 
         if ($codigoProveedor !== '') {
-            $columna = 'codigoProveedor';
+            $columna = 'idProveedor'; 
             $valor = $codigoProveedor;
         } else if ($nombreProveedor !== '') {
             $columna = 'nombreProveedor';
             $valor = $nombreProveedor;
         } else if ($rfc !== '') {
-            $columna = 'rfcProveedor';
+            $columna = 'rfc';
             $valor = $rfc;
         } else {
             return [];
         }
         
+        // Ejecutamos el desglose matemático (Devuelve el producto, enteros y decimales)
         $Producto = $this->obtenerCodigoDeProducto($columna, $valor, $codigoBarras);
 
-        if (empty($Producto)) {
-            return [];
+        if (empty($Producto) || !isset($Producto['codigoProducto']) || $Producto['codigoProducto'] === '') {
+            return []; 
         }
 
-        $query = "SELECT 
-                    nombreProducto
-                  FROM Producto 
-                  WHERE codigoBarrasProducto = ?";
+        $claveLimpia = trim($Producto['codigoProducto']); // Ej: "3390"
+
+        // 🛡️ BÚSQUEDA ULTRA-FLEXIBLE: 
+        // 1. Busca coincidencia exacta.
+        // 2. Busca ignorando ceros a la izquierda (por si en la BD está como 03390).
+        // 3. Busca con LIKE por si hay espacios invisibles en tu catálogo.
+        $query = "SELECT nombreProducto FROM Producto 
+                  WHERE TRIM(codigoProducto) = ? 
+                     OR LTRIM(REPLACE(codigoProducto, '0', ' ')) = LTRIM(REPLACE(?, '0', ' '))
+                     OR codigoProducto LIKE ? 
+                  LIMIT 1";
                   
-        $params = [$Producto['codigoProducto']]; 
+        $params = [$claveLimpia, $claveLimpia, "%" . $claveLimpia . "%"]; 
 
         try {
             $stmt = $this->db->consulta($query, $params);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$result) {
-                return []; 
+                return []; // Si de verdad no existe de ninguna forma, sale vacío
             }
 
+            // 🔥 AQUÍ ESTÁ EL TRUCO DEL PESO:
+            // Si el producto SÍ existe, regresamos los cortes reales de los kilogramos
+            // para que el JavaScript pinte 0.54 en lugar de caer en el "1.00" de emergencia.
             return [
                 'nombreProducto' => $result['nombreProducto'] ?? '',
-                'codigoEnteros' => $Producto['codigoEnteros'] ?? '',
-                'codigoDecimales' => $Producto['codigoDecimales'] ?? ''
+                'codigoEnteros' => $Producto['codigoEnteros'] ?? '0',
+                'codigoDecimales' => $Producto['codigoDecimales'] ?? '00'
             ];
         } catch (Exception $e) {
-            error_log("Error en modeloEntradas: " . $e->getMessage());
+            error_log("Error en modeloEntradas (obtenerProducto): " . $e->getMessage());
             return [];
+        }
+    }
+
+    /**
+     * 🎛️ PUENTE DE ENTRADA DIRECTA (MODO QR)
+     */
+    public function buscarProductoPorCodigoYProveedor($codigo, $idProveedor) {
+        // 🛡️ OPTIMIZACIÓN ULTRA-ESTRICTA: Mismo criterio para búsquedas globales manuales
+        $query = "SELECT nombreProducto FROM Producto WHERE CAST(TRIM(codigoProducto) AS CHAR) = CAST(TRIM(?) AS CHAR) LIMIT 1";
+        $params = [trim($codigo)];
+
+        try {
+            $stmt = $this->db->consulta($query, $params);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (Exception $e) {
+            error_log("Error en buscarProductoPorCodigoYProveedor: " . $e->getMessage());
+            return null;
         }
     }
 }

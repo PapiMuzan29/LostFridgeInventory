@@ -302,3 +302,16 @@ JOIN Ubicacion     u ON l.idUbicacion = u.idUbicacion
 JOIN almacenes     a ON u.idAlmacen   = a.id_almacen
 WHERE l.activo = 1
 GROUP BY p.idProducto, u.idUbicacion;
+
+
+
+CREATE TABLE IF NOT EXISTS bitacora_movimientos (
+    idMovimiento INT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('usuario', 'entrada', 'salida', 'inventario') NOT NULL,
+    usuarioResponsable VARCHAR(50) NOT NULL,
+    descripcion TEXT NOT NULL,
+    moduloAfectado VARCHAR(100) NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    detallesJson JSON NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -68,6 +68,28 @@ try {
         }
         header('Location: ../Views/inventario.php');
         exit;
+    }elseif ($action === 'editarProveedor') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'codigoProveedor'               => $_POST['codigoProveedor'],
+                'nombreProveedor'               => $_POST['nombreProveedor'],
+                'rfc'                           => $_POST['rfc'],
+                'direccion'                     => $_POST['direccion'],
+                'colonia'                       => $_POST['colonia'],
+                'codigoPostal'                  => $_POST['codigoPostal'],
+                'estadoRepublica'               => $_POST['estadoRepublica'],
+                'codigoBarrasProductosPosicion' => $_POST['codigoBarrasProductosPosicion'],
+                'codigoBarrasProductosLongitud' => $_POST['codigoBarrasProductosLongitud'],
+                'codigoBarrasEnterosPosicion'   => $_POST['codigoBarrasEnterosPosicion'],
+                'codigoBarrasEnterosLongitud'   => $_POST['codigoBarrasEnterosLongitud'],
+                'codigoBarrasDecimalesPosicion' => $_POST['codigoBarrasDecimalesPosicion'],
+                'codigoBarrasDecimalesLongitud' => $_POST['codigoBarrasDecimalesLongitud'],
+            ];
+
+            $service->editarProveedor($data);
+        }
+        header('Location: ../Views/inventario.php');
+        exit;   
     }
 
     // 🔥 NUEVA ACCIÓN INTEGRADA: Captura el formulario del modal de Productos

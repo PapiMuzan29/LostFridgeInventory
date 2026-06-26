@@ -70,13 +70,13 @@ body {
 }
 
 .btnAplicar {
-    background: #0d6efd; /* Azul Rey corporativo */
+    background: #1a365d; /* Azul Rey corporativo */
     color: white;
     border: none;
 }
 
 .btnAplicar:hover {
-    background: #0b5ed7; /* Azul Rey hover */
+    background: #1a365d; /* Azul Rey hover */
 }
 
 .btnLimpiar {
@@ -129,7 +129,7 @@ body {
 }
 
 /* Bordes personalizados alineados a tus clases corporativas */
-.general-mov { border-left: 5px solid #0d6efd; } /* Azul corporativo */
+.general-mov { border-left: 5px solid #1a365d; } /* Azul corporativo */
 .success { border-left: 5px solid #16a34a; }      /* Verde unificado */
 .danger { border-left: 5px solid #dc2626; }       /* Rojo unificado */
 
@@ -176,7 +176,7 @@ body {
 }
 
 .radio-movimiento input[type="radio"] {
-    accent-color: #0d6efd; /* Radio buttons en azul rey */
+    accent-color: #1a365d; /* Radio buttons en azul rey */
     margin: 0;
 }
 
@@ -200,7 +200,7 @@ body {
 }
 
 .buscador input:focus {
-    border-color: #0d6efd; /* Foco azul rey */
+    border-color: #1a365d; /* Foco azul rey */
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
 }
 
@@ -278,7 +278,7 @@ body {
 }
 
 .usuarioCell i {
-    color: #0d6efd; /* Ícono de usuario en azul rey */
+    color: #1a365d; /* Ícono de usuario en azul rey */
     font-size: 18px;
     flex-shrink: 0;
 }
@@ -306,7 +306,7 @@ body {
 .btn-info-bitacora {
     background: transparent;
     border: none;
-    color: #0d6efd; /* Enlace de información en azul rey */
+    color: #1a365d; /* Enlace de información en azul rey */
     font-size: 18px;
     cursor: pointer;
 }
@@ -365,11 +365,9 @@ body {
 }
 
 .btn-pagina.activa {
-    background: #0d6efd; /* Botón activo azul rey */
+    background: #1a365d; /* Botón activo azul rey */
     color: white;
-    border-color: #0d6efd;
-    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
-    animation: transicionBotonActivo 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    border-color: #1a365d;
 }
 
 .btn-pagina:disabled {

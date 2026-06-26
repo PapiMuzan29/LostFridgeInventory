@@ -278,6 +278,97 @@ $listaCategorias = $modeloInv->getCategorias();
         </div>
     </div>
 
+
+    <div class="modal" id="modalAgregarProveedor" style="display: none;">
+        <div class="modal-contenido">
+            <span class="cerrar-modal" onclick="cerrarModalAgregarProveedor()">&times;</span>
+            <h2 id="modalAgregarProveedor"></h2>
+            
+            <form action="../Controllers/inventarioController.php?action=editarProveedor" method="POST" id="formNuevoProveedor" onsubmit="guardarProveedor(event)">
+                <div class="modal-grid">
+                    <div class="grupo-input">
+                        <label for="provCodigo">Código de Proveedor *</label>
+                        <input type="text" id="provCodigo" name="codigoProveedor" placeholder="Ej: PROV-001" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provNombre">Nombre / Empresa *</label>
+                        <input type="text" id="provNombre" name="nombreProveedor" placeholder="Nombre comercial" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provRfc">RFC *</label>
+                        <input type="text" id="provRfc" name="rfc" placeholder="12 o 13 dígitos" maxlength="13" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provDireccion">Dirección (Calle y Número) *</label>
+                        <input type="text" id="provDireccion" name="direccion" placeholder="Av. Principal #123" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provColonia">Colonia *</label>
+                        <input type="text" id="provColonia" name="colonia" placeholder="Centro" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="provCp">Código Postal *</label>
+                        <input type="text" id="provCp" name="codigoPostal" placeholder="72000" maxlength="5" required>
+                    </div>
+                    <div class="grupo-input" style="grid-column: span 2;">
+                        <label for="provEstado">Estado de la República *</label>
+                        <input type="text" id="provEstado" name="estadoRepublica" placeholder="Ej: Puebla, CDMX, Veracruz..." autocomplete="off" required>
+                    </div>
+                    
+                    <div style="grid-column: span 2; margin-top: 15px; border-top: 2px dashed #e2e8f0; padding-top: 15px;">
+                        <h3 style="font-size: 14px; font-weight: 700; color: #475569; margin-bottom: 10px;">
+                            <i class="fa-solid fa-qrcode"></i> Configuración de Lectura (Escáner QR)
+                        </h3>
+                    </div>
+
+                    <div style="grid-column: span 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        
+                        <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #f8fafc;">
+                            <span style="font-size: 12px; font-weight: 700; color: #0d6efd; display: block; margin-bottom: 8px;">Código de Producto</span>
+                            <div class="grupo-input" style="margin-bottom: 6px;">
+                                <label style="font-size: 11px;">Posición Inicio</label>
+                                <input type="number" name="codigoBarrasProductosPosicion" value="0" min="0" required style="height: 32px;">
+                            </div>
+                            <div class="grupo-input">
+                                <label style="font-size: 11px;">Longitud (Letras)</label>
+                                <input type="number" name="codigoBarrasProductosLongitud" value="0" min="0" required style="height: 32px;">
+                            </div>
+                        </div>
+
+                        <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #f8fafc;">
+                            <span style="font-size: 12px; font-weight: 700; color: #0d6efd; display: block; margin-bottom: 8px;">Peso Kilos (Enteros)</span>
+                            <div class="grupo-input" style="margin-bottom: 6px;">
+                                <label style="font-size: 11px;">Posición Inicio</label>
+                                <input type="number" name="codigoBarrasEnterosPosicion" value="0" min="0" required style="height: 32px;">
+                            </div>
+                            <div class="grupo-input">
+                                <label style="font-size: 11px;">Longitud (Dígitos)</label>
+                                <input type="number" name="codigoBarrasEnterosLongitud" value="0" min="0" required style="height: 32px;">
+                            </div>
+                        </div>
+
+                        <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #f8fafc;">
+                            <span style="font-size: 11px; font-weight: 700; color: #0d6efd; display: block; margin-bottom: 8px;">Peso Gramos (Decimales)</span>
+                            <div class="grupo-input" style="margin-bottom: 6px;">
+                                <label style="font-size: 11px;">Posición Inicio</label>
+                                <input type="number" name="codigoBarrasDecimalesPosicion" value="0" min="0" required style="height: 32px;">
+                            </div>
+                            <div class="grupo-input">
+                                <label style="font-size: 11px;">Longitud (Dígitos)</label>
+                                <input type="number" name="codigoBarrasDecimalesLongitud" value="0" min="0" required style="height: 32px;">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <button type="submit" class="btnGuardarUsuario" style="background: #1e293b;">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Proveedor
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script src="../Services/funcionesInventario.js"></script>
     
 </body>

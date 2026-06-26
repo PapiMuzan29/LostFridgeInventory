@@ -243,6 +243,18 @@ function abrirModalAgregarProducto() {
     modal.style.display = 'flex';
 }
 
+function abrirModalEditarProveedor(){
+    const modal = document.getElementById('modalEditarProveedor');
+    if (!modal) return;
+
+    modal.style.display = 'flex';   
+}
+
+function cerrarModalEditarProveedor(){
+    document.getElementById('modalEditarProveedor').style.display = 'none';
+    document.getElementById('modalEditarProveedor').reset();
+}
+
 function cerrarModalAgregarProducto() {
     document.getElementById('modalAgregarProducto').style.display = 'none';
 }

@@ -60,7 +60,7 @@
 }
 
 .input-captura:focus, .select-captura:focus {
-    border-color: #0d6efd;
+    border-color: #1f2f56;
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
 }
 
@@ -138,7 +138,7 @@
 }
 
 .radio-inline input[type="radio"] {
-    accent-color: #0d6efd; /* Azul Rey para los controles */
+    accent-color: #1f2f56; /* Azul Rey para los controles */
 }
 
 /* ================================================= */
@@ -231,7 +231,7 @@
     font-family: monospace, sans-serif;
 }
 
-.bg-total-qty { border-left: 4px solid #0d6efd; } /* Franja Azul */
+.bg-total-qty { border-left: 4px solid #1f2f56; } /* Franja Azul */
 .bg-total-kgs { border-left: 4px solid #16a34a; } /* Franja Verde */
 
 /* Botonera de acciones */
@@ -256,7 +256,7 @@
 }
 
 .btnAplicar.btn-block-matriz {
-    background: #0d6efd;
+    background: #1f2f56;
     color: #ffffff;
     border: none;
 }
