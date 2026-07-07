@@ -46,53 +46,65 @@ try {
         exit;
     }
 
-    if ($action === 'agregarProveedor') {
+    // 🛠️ CORREGIDO: Cambiado de 'agregarProveedor' a 'crearProveedor' para coincidir con tu JS
+    if ($action === 'crearProveedor') {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
-                'codigoProveedor'               => $_POST['codigoProveedor'],
-                'nombreProveedor'               => $_POST['nombreProveedor'],
-                'rfc'                           => $_POST['rfc'],
-                'direccion'                     => $_POST['direccion'],
-                'colonia'                       => $_POST['colonia'],
-                'codigoPostal'                  => $_POST['codigoPostal'],
-                'estadoRepublica'               => $_POST['estadoRepublica'],
-                'codigoBarrasProductosPosicion' => $_POST['codigoBarrasProductosPosicion'],
-                'codigoBarrasProductosLongitud' => $_POST['codigoBarrasProductosLongitud'],
-                'codigoBarrasEnterosPosicion'   => $_POST['codigoBarrasEnterosPosicion'],
-                'codigoBarrasEnterosLongitud'   => $_POST['codigoBarrasEnterosLongitud'],
-                'codigoBarrasDecimalesPosicion' => $_POST['codigoBarrasDecimalesPosicion'],
-                'codigoBarrasDecimalesLongitud' => $_POST['codigoBarrasDecimalesLongitud'],
+                'codigoProveedor'               => $_POST['codigoProveedor'] ?? '',
+                'nombreProveedor'               => $_POST['nombreProveedor'] ?? '',
+                'rfc'                           => $_POST['rfc'] ?? '',
+                'direccion'                     => $_POST['direccion'] ?? '',
+                'colonia'                       => $_POST['colonia'] ?? '',
+                'codigoPostal'                  => $_POST['codigoPostal'] ?? '',
+                'estadoRepublica'               => $_POST['estadoRepublica'] ?? '',
+                'codigoBarrasProductosPosicion' => $_POST['codigoBarrasProductosPosicion'] ?? 0,
+                'codigoBarrasProductosLongitud' => $_POST['codigoBarrasProductosLongitud'] ?? 0,
+                'codigoBarrasEnterosPosicion'   => $_POST['codigoBarrasEnterosPosicion'] ?? 0,
+                'codigoBarrasEnterosLongitud'   => $_POST['codigoBarrasEnterosLongitud'] ?? 0,
+                'codigoBarrasDecimalesPosicion' => $_POST['codigoBarrasDecimalesPosicion'] ?? 0,
+                'codigoBarrasDecimalesLongitud' => $_POST['codigoBarrasDecimalesLongitud'] ?? 0,
             ];
 
             $service->agregarProveedor($data);
+
+            // 🛠️ CORREGIDO: Devolvemos JSON de éxito en lugar de redireccionar
+            echo json_encode([
+                'status'  => 'success',
+                'message' => 'Proveedor registrado correctamente.'
+            ]);
+            exit;
         }
-        header('Location: ../Views/inventario.php');
-        exit;
-    }elseif ($action === 'editarProveedor') {
+    }
+
+    if ($action === 'editarProveedor') {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
-                'codigoProveedor'               => $_POST['codigoProveedor'],
-                'nombreProveedor'               => $_POST['nombreProveedor'],
-                'rfc'                           => $_POST['rfc'],
-                'direccion'                     => $_POST['direccion'],
-                'colonia'                       => $_POST['colonia'],
-                'codigoPostal'                  => $_POST['codigoPostal'],
-                'estadoRepublica'               => $_POST['estadoRepublica'],
-                'codigoBarrasProductosPosicion' => $_POST['codigoBarrasProductosPosicion'],
-                'codigoBarrasProductosLongitud' => $_POST['codigoBarrasProductosLongitud'],
-                'codigoBarrasEnterosPosicion'   => $_POST['codigoBarrasEnterosPosicion'],
-                'codigoBarrasEnterosLongitud'   => $_POST['codigoBarrasEnterosLongitud'],
-                'codigoBarrasDecimalesPosicion' => $_POST['codigoBarrasDecimalesPosicion'],
-                'codigoBarrasDecimalesLongitud' => $_POST['codigoBarrasDecimalesLongitud'],
+                'codigoProveedor'               => $_POST['codigoProveedor'] ?? '',
+                'nombreProveedor'               => $_POST['nombreProveedor'] ?? '',
+                'rfc'                           => $_POST['rfc'] ?? '',
+                'direccion'                     => $_POST['direccion'] ?? '',
+                'colonia'                       => $_POST['colonia'] ?? '',
+                'codigoPostal'                  => $_POST['codigoPostal'] ?? '',
+                'estadoRepublica'               => $_POST['estadoRepublica'] ?? '',
+                'codigoBarrasProductosPosicion' => $_POST['codigoBarrasProductosPosicion'] ?? 0,
+                'codigoBarrasProductosLongitud' => $_POST['codigoBarrasProductosLongitud'] ?? 0,
+                'codigoBarrasEnterosPosicion'   => $_POST['codigoBarrasEnterosPosicion'] ?? 0,
+                'codigoBarrasEnterosLongitud'   => $_POST['codigoBarrasEnterosLongitud'] ?? 0,
+                'codigoBarrasDecimalesPosicion' => $_POST['codigoBarrasDecimalesPosicion'] ?? 0,
+                'codigoBarrasDecimalesLongitud' => $_POST['codigoBarrasDecimalesLongitud'] ?? 0,
             ];
 
             $service->editarProveedor($data);
+
+            // 🛠️ CORREGIDO: Devolvemos JSON de éxito en lugar de redireccionar
+            echo json_encode([
+                'status'  => 'success',
+                'message' => 'Proveedor actualizado correctamente.'
+            ]);
+            exit;   
         }
-        header('Location: ../Views/inventario.php');
-        exit;   
     }
 
-    // 🔥 NUEVA ACCIÓN INTEGRADA: Captura el formulario del modal de Productos
     if ($action === 'crearProducto') {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
@@ -100,14 +112,12 @@ try {
                 'nombreProducto' => $_POST['nombreProducto'] ?? '',
                 'idProveedor'    => $_POST['idProveedor'] ?? '',
                 'idCategoria'    => $_POST['idCategoria'] ?? '',
-                'totalCajas'     => 0, // Inicia por defecto en 0
+                'totalCajas'     => 0, 
                 'pesoProductive' => 0.00,
                 'activo'         => 1
             ];
 
-            // Nota: Asegúrate de tener este método en tu inventarioServicio.php
-            // El cual a su vez debe llamar al INSERT de tu base de datos.
-            $resultadoServicio = $service->agregarProducto($data); 
+            $service->agregarProducto($data); 
 
             echo json_encode([
                 'status'  => 'success',
