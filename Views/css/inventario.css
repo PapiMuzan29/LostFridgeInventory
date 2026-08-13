@@ -6,22 +6,25 @@
 .inventario-header {
     display: flex;
     justify-content: space-between;
-    
     align-items: center;
     flex-wrap: wrap;
     gap: 15px;
+    position: relative;
+    z-index: 10;
 }
 
 .header-titulos h1 {
     color: #1f2f56;
     font-size: 26px;
     font-weight: 700;
+    transition: color 0.3s ease;
 }
 
 .header-titulos p {
     color: #64748b;
     margin-top: 4px;
     font-size: 14px;
+    transition: color 0.3s ease;
 }
 
 .header-acciones {
@@ -40,7 +43,7 @@
     font-weight: 500;
     cursor: pointer;
     font-size: 14px;
-    transition: background 0.2s;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .btn-exportar {
@@ -59,7 +62,7 @@
 .btn-imprimir i { color: #475569; }
 .btn-imprimir:hover { background: #f8fafc; }
 
-/* 🔥 NUEVO: Estilo para botón Agregar Producto (Azul Rey corporativo) */
+/* Botones de acción principal */
 .btn-agregar-prod {
     background: #0d6efd;
     color: #ffffff;
@@ -67,7 +70,6 @@
 }
 .btn-agregar-prod:hover { background: #0b5ed7; }
 
-/* 🔥 NUEVO: Estilo para botón Agregar Proveedor (Gris Oscuro/Slate elegante o Indigo) */
 .btn-agregar-prov {
     background: #1e293b;
     color: #ffffff;
@@ -76,59 +78,62 @@
 .btn-agregar-prov:hover { background: #0f172a; }
 
 
-/* --- 2. Tarjetas de Indicadores (KPIs) --- */
-.inventario-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    margin-top: 25px;
+/* ================================================= */
+/* 2. CARDS DE ESTADÍSTICAS (ESTÁNDAR DEL SISTEMA)   */
+/* ================================================= */
+.cards {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 20px !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+    position: relative;
+    z-index: 1;
 }
 
-.kpi-card {
+.card {
+    flex: 1 1 220px !important;
+    min-width: 220px !important;
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    padding: 20px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    border-radius: 14px !important;
+    padding: 20px 24px !important;
+    box-sizing: border-box !important;
+    transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.kpi-icon-circle {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
+.card:hover {
+    transform: translateY(-2px);
 }
 
-.bg-azul { background: #eff6ff; color: #2563eb; }
-.bg-verde { background: #f0fdf4; color: #16a34a; }
-.bg-naranja { background: #fff7ed; color: #ea580c; }
-.bg-rojo { background: #fef2f2; color: #dc2626; }
-
-.kpi-datos h3 {
-    font-size: 13px;
+.card h3 {
     color: #64748b;
-    font-weight: 500;
-    margin: 0;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.kpi-numero {
-    font-size: 24px;
-    font-weight: 700;
+.card span {
+    font-size: 36px;
+    font-weight: bold;
     color: #1e293b;
     display: block;
-    margin-top: 4px;
+    line-height: 1.1;
+    transition: color 0.3s ease;
 }
 
-.kpi-subtexto {
-    font-size: 11px;
+.card-subtexto {
+    font-size: 12px;
     color: #94a3b8;
-    margin: 2px 0 0 0;
+    margin-top: 6px;
+    transition: color 0.3s ease;
 }
+
+/* Bordes laterales indicadores */
+.general-mov { border-left: 5px solid #1a365d; } /* Azul corporativo */
+.success     { border-left: 5px solid #16a34a; } /* Verde */
 
 
 /* --- 3. Filtros --- */
@@ -138,6 +143,7 @@
     padding: 20px;
     border-radius: 8px;
     margin-top: 25px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .inventario-filtro-form {
@@ -163,6 +169,7 @@
     font-weight: 600;
     color: #475569;
     margin-bottom: 6px;
+    transition: color 0.3s ease;
 }
 
 .inventario-buscador-wrapper {
@@ -177,6 +184,9 @@
     border-radius: 6px;
     font-size: 14px;
     outline: none;
+    background: #ffffff;
+    color: #1e293b;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .inventario-buscador-wrapper i {
@@ -185,6 +195,7 @@
     top: 50%;
     transform: translateY(-50%);
     color: #94a3b8;
+    transition: color 0.3s ease;
 }
 
 .filtro-grupo select {
@@ -193,8 +204,11 @@
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     background: #ffffff;
+    color: #1e293b;
     font-size: 14px;
     outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .filtro-botones {
@@ -212,6 +226,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .btn-filtrar-inv {
@@ -230,7 +245,8 @@
 
 
 /* --- 4. Tabla de Inventario --- */
-.tabla-inventario {
+.tabla-inventario,
+.tablaUsuarios {
     width: 100%;
     margin-top: 25px;
     background: #ffffff;
@@ -238,63 +254,70 @@
     overflow: hidden;
     border: 1px solid #e2e8f0;
     border-collapse: collapse;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.tabla-inventario thead tr {
+.tabla-inventario thead tr,
+.tablaUsuarios thead tr {
     background: #f8fafc;
     text-align: left;
+    transition: background-color 0.3s ease;
 }
 
-.tabla-inventario th {
+.tabla-inventario th,
+.tablaUsuarios th {
     padding: 14px;
     color: #1f2f56;
     font-size: 13px;
     font-weight: 600;
     border-bottom: 1px solid #e2e8f0;
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
-.tabla-inventario td {
+.tabla-inventario td,
+.tablaUsuarios td {
     padding: 14px;
     color: #334155;
     font-size: 14px;
     border-bottom: 1px solid #f1f5f9;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.tabla-inventario tbody tr:hover,
+.tablaUsuarios tbody tr:hover {
+    background: #f8fafc;
 }
 
 .txt-centro { text-align: center; }
 
+/* Badges y Categorías (Modo Claro) */
+.badge-extra,
+.badge-categoria,
 .badge-ubicacion {
-    background: #eff6ff;
-    color: #1e40af;
-    border: 1px solid #bfdbfe;
-    padding: 4px 8px;
-    border-radius: 4px;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
-    font-family: monospace;
+    text-align: center;
 }
 
-.badge-extra {
-    background: #e0f2fe;
-    color: #0369a1;
-    padding: 4px 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    margin-left: 4px;
+.badge-extra,
+.badge-categoria {
+    background-color: #e0f2fe;
+    color: #0369a1 !important;
+    border: 1px solid #bae6fd;
+}
+
+.badge-ubicacion {
+    background: #eff6ff;
+    color: #1e40af !important;
+    border: 1px solid #bfdbfe;
+    font-family: monospace;
 }
 
 .estado-optimo {
     background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;
-    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;
-}
-
-.estado-proximo {
-    background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5;
-    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;
-}
-
-.estado-vencido {
-    background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2;
     padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;
 }
 
@@ -311,6 +334,7 @@
 #txtMostrandoRegistros {
     color: #64748b;
     font-size: 14px;
+    transition: color 0.3s ease;
 }
 
 .paginacion-controles {
@@ -343,4 +367,270 @@
     background: #0d6efd;
     color: white;
     border-color: #0d6efd;
+}
+
+
+/* ===================================================================
+   6. REGLAS MODO OSCURO (EXCLUSIVAS PARA EL MÓDULO DE INVENTARIO)
+=================================================================== */
+
+body.dark-theme {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .header-titulos h1 {
+    color: #ffffff !important;
+}
+
+body.dark-theme .header-titulos p {
+    color: #a1a1aa !important;
+}
+
+/* Botones Exportar / Imprimir */
+body.dark-theme .btn-exportar,
+body.dark-theme .btn-imprimir {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btn-exportar:hover,
+body.dark-theme .btn-imprimir:hover {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .btn-imprimir i {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .btn-agregar-prov {
+    background-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-agregar-prov:hover {
+    background-color: #3f3f46 !important;
+}
+
+/* Tarjetas de Estadísticas en Modo Oscuro */
+body.dark-theme .card {
+    background-color: #121215 !important;
+    border: 1px solid #27272a !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-theme .card h3 {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .card span {
+    color: #ffffff !important;
+}
+
+body.dark-theme .card-subtexto {
+    color: #71717a !important;
+}
+
+/* Bordes Neón en Modo Oscuro */
+body.dark-theme .general-mov { border-left: 5px solid #2563eb !important; }
+body.dark-theme .card.success { border-left: 5px solid #22c55e !important; }
+
+/* Panel de Filtros */
+body.dark-theme .inventario-filtro-container {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .filtro-grupo label {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .inventario-buscador-wrapper input,
+body.dark-theme .filtro-grupo select {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+}
+
+body.dark-theme .filtro-grupo select option {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .inventario-buscador-wrapper i {
+    color: #71717a !important;
+}
+
+body.dark-theme .btn-limpiar-inv {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btn-limpiar-inv:hover {
+    background-color: #27272a !important;
+}
+
+/* Tabla de Inventario y Visibilidad de Números/Existencias */
+body.dark-theme .tabla-inventario,
+body.dark-theme .tablaUsuarios {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .tabla-inventario thead tr,
+body.dark-theme .tablaUsuarios thead tr {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .tabla-inventario th,
+body.dark-theme .tablaUsuarios th {
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme .tabla-inventario td,
+body.dark-theme .tablaUsuarios td {
+    color: #f4f4f5 !important;
+    border-bottom-color: #1f1f23 !important;
+}
+
+body.dark-theme .tabla-inventario tbody tr:hover,
+body.dark-theme .tablaUsuarios tbody tr:hover {
+    background-color: #18181b !important;
+}
+
+/* Badges de Categorías y Ubicación en Modo Oscuro (Legibilidad Corregida) */
+body.dark-theme .badge-extra,
+body.dark-theme .badge-categoria,
+body.dark-theme .tablaUsuarios td span.badge-extra,
+body.dark-theme .tablaUsuarios td span.badge-categoria,
+body.dark-theme .tabla-inventario td span.badge-extra,
+body.dark-theme .tabla-inventario td span.badge-categoria {
+    background-color: rgba(3, 105, 161, 0.25) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.3) !important;
+}
+
+body.dark-theme .badge-ubicacion,
+body.dark-theme .tablaUsuarios td span.badge-ubicacion,
+body.dark-theme .tabla-inventario td span.badge-ubicacion {
+    background-color: rgba(30, 64, 175, 0.3) !important;
+    color: #93c5fd !important;
+    border-color: rgba(147, 197, 253, 0.3) !important;
+}
+
+body.dark-theme .estado-optimo {
+    background-color: rgba(22, 163, 74, 0.25) !important;
+    color: #4ade80 !important;
+    border-color: rgba(74, 222, 128, 0.3) !important;
+}
+
+/* Paginación Footer */
+body.dark-theme #txtMostrandoRegistros {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .btn-pagina-inv,
+body.dark-theme .btn-pagina {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .btn-pagina-inv:hover,
+body.dark-theme .btn-pagina:hover {
+    background-color: #18181b !important;
+    border-color: #3f3f46 !important;
+}
+
+body.dark-theme .btn-pagina-inv.activa,
+body.dark-theme .btn-pagina.activa {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+
+/* ===================================================================
+   7. REGLAS MODALES (AGREGAR / EDITAR PROVEEDOR Y PRODUCTO)
+=================================================================== */
+
+/* Limpieza de íconos o pseudoelementos indeseados en etiquetas del modal */
+.modal-contenido label::before,
+.modal-contenido label::after {
+    content: none !important;
+}
+
+/* Ajuste de contenedor del modal en modo oscuro */
+body.dark-theme .modal-contenido {
+    background-color: #121215 !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .modal-contenido h2,
+body.dark-theme .modal-contenido h3 {
+    color: #ffffff !important;
+}
+
+/* Corrección de recuadros QR para que se adapten al modo oscuro */
+body.dark-theme .modal-contenido div[style*="background: #f8fafc"],
+body.dark-theme .modal-contenido div[style*="background-color: #f8fafc"] {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+}
+
+/* Labels dentro del modal en modo oscuro */
+body.dark-theme .modal-contenido label {
+    color: #a1a1aa !important;
+}
+
+/* Inputs y Selects dentro de modales en modo oscuro */
+body.dark-theme .modal-contenido input,
+body.dark-theme .modal-contenido select {
+    background-color: #0a0a0c !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+/* Títulos de las tarjetas QR */
+body.dark-theme .modal-contenido span[style*="color: #0d6efd"] {
+    color: #60a5fa !important;
+}
+
+/* Línea divisoria punteada */
+body.dark-theme .modal-contenido div[style*="border-top: 2px dashed"] {
+    border-top-color: #27272a !important;
+}
+
+/* ===================================================================
+   EFECTOS HOVER Y FOCO EN BOTONES DE GUARDAR EN MODALES
+=================================================================== */
+
+/* Estado normal del botón guardar en el modal */
+.modal-contenido .btnGuardarUsuario {
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer !important;
+}
+
+/* Efecto al pasar el mouse por encima (Hover) */
+.modal-contenido .btnGuardarUsuario:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    filter: brightness(1.15);
+}
+
+/* Efecto de clic sostenido (Active) */
+.modal-contenido .btnGuardarUsuario:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Adaptación para Tema Oscuro */
+body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15) !important;
 }

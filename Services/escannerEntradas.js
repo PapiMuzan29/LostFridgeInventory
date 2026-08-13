@@ -38,7 +38,7 @@ async function cargarProveedoresSelect() {
                 option.setAttribute("data-gr-pos", prov.codigoBarrasDecimalesPosicion ?? 0);
                 option.setAttribute("data-gr-lon", prov.codigoBarrasDecimalesLongitud ?? 0);
                 
-                select.appendChild(option);
+                select.appendChild(option); 
             });
         } else if (proveedores.error) {
             console.error("Error devuelto por el servidor:", proveedores.error);

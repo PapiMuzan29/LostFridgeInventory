@@ -122,5 +122,7 @@ $total_paginas = 1;
     </div>
 
     <script src="../Services/funcionesMovimientos.js"></script>
+        <script src="../Services/tema.js"></script>
+
 </body>
 </html>

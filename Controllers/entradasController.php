@@ -38,20 +38,43 @@ try {
         $producto = $service->obtenerProductoPorCodigo($codigo, $idProveedor);
 
         if ($producto) {
-            // 🎯 AGREGAMOS ESTO PARA VER EL DIAGNÓSTICO EN VIVO AUNQUE HAYA ÉXITO
             require_once __DIR__ . '/../Models/modeloEntradas.php';
             $modeloDebug = new modeloEntradas();
             $cortes = $modeloDebug->obtenerCodigoDeProducto('idProveedor', $idProveedor, $codigo);
             
-            // Inyectamos los cortes en la respuesta exitosa
             $producto['codigoEnteros'] = $cortes['codigoEnteros'] ?? '0';
             $producto['codigoDecimales'] = $cortes['codigoDecimales'] ?? '00';
             $producto['codigoProducto'] = $cortes['codigoProducto'] ?? $codigo;
             
             echo json_encode($producto);
         } else {
-            // ... (Tu bloque else de depuración se queda igual)
+            echo json_encode(['error' => 'Producto no encontrado.']);
         }
+        exit;
+    }
+
+    // 3. GUARDAR ENTRADA (NUEVO BLOQUE)
+    if ($action === 'guardarEntrada') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['error' => 'Método no permitido.']);
+            exit;
+        }
+
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json, true);
+
+        if (!$datos || empty($datos['detalle'])) {
+            echo json_encode(['error' => 'No se recibieron datos válidos.']);
+            exit;
+        }
+
+        // Asumimos que guardas el id de cuenta en la sesión, si no, ajusta la variable
+        $idUsuario = $_SESSION['idCuenta'] ?? 4; 
+        
+        // Llamamos al servicio para realizar la transacción SQL
+        $resultado = $service->registrarEntradaCompleta($datos, $idUsuario, $_SESSION['apodoUsuario']);
+        
+        echo json_encode($resultado);
         exit;
     }
 
@@ -60,7 +83,6 @@ try {
     exit;
 
 } catch (Exception $e) {
-    // Captura cualquier falla interna y evita que muera el canal HTTP
     error_log("Error fatal en entradasController: " . $e->getMessage());
     echo json_encode(['error' => 'Falla interna del servidor.']);
     exit;

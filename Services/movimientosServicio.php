@@ -13,7 +13,7 @@ class movimientosServicio {
     }
 
     public function consultarBitacora(string $tipo, string $usuario, string $fecha, int $pagina) {
-        $limite = 10; 
+        $limite = 4; 
         return $this->modelo->listarMovimientos($tipo, $usuario, $fecha, $pagina, $limite);
     }
 

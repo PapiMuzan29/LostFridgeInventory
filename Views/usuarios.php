@@ -391,6 +391,7 @@ $stats = $service->getStats();
             inputBusqueda.dispatchEvent(new Event('input')); 
         });
     </script>
+    <script src="../Services/tema.js"></script>
 
 
 </body>

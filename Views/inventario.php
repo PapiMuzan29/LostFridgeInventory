@@ -58,22 +58,18 @@ $listaCategorias = $modeloInv->getCategorias();
             </div>
         </div>
 
-        <div class="inventario-cards-grid">
-            <div class="kpi-card">
-                <div class="kpi-icon-circle bg-azul"><i class="fa-solid fa-cubes"></i></div>
-                <div class="kpi-datos">
-                    <h3>Total de productos</h3>
-                    <span class="kpi-numero" id="kpi-total-productos"><?= htmlspecialchars((string)$stats['productos']) ?></span>
-                    <p class="kpi-subtexto">Products diferentes</p>
-                </div>
+        <!-- CARDS DE ESTADÍSTICAS -->
+        <div class="cards">
+            <div class="card general-mov">
+                <h3>Total de productos</h3>
+                <span id="kpiTotalProductos"><?= htmlspecialchars((string)($stats['productos'] ?? 0)) ?></span>
+                <p class="card-subtexto">Productos diferentes</p>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-icon-circle bg-verde"><i class="fa-solid fa-box-open"></i></div>
-                <div class="kpi-datos">
-                    <h3>Total de cajas</h3>
-                    <span class="kpi-numero" id="kpi-total-cajas"><?= htmlspecialchars((string)$stats['cajas']) ?></span>
-                    <p class="kpi-subtexto">Cajas en inventario</p>
-                </div>
+
+            <div class="card success">
+                <h3>Total de cajas</h3>
+                <span id="kpiTotalCajas"><?= htmlspecialchars((string)($stats['cajas'] ?? 0)) ?></span>
+                <p class="card-subtexto">Cajas en inventario</p>
             </div>
         </div>
 
@@ -182,7 +178,7 @@ $listaCategorias = $modeloInv->getCategorias();
     </div>
 
 
-    <!-- MODAL AGREGAR PROVEEDOR (CORREGIDO) -->
+    <!-- MODAL AGREGAR PROVEEDOR -->
     <div class="modal" id="modalAgregarProveedor" style="display: none;">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModalAgregarProveedor()">&times;</span>
@@ -272,14 +268,13 @@ $listaCategorias = $modeloInv->getCategorias();
     </div>
 
 
-    <!-- MODAL EDITAR PROVEEDOR (CORREGIDO ID Y ATRIBUTOS) -->
+    <!-- MODAL EDITAR PROVEEDOR -->
     <div class="modal" id="modalEditarProveedor" style="display: none;">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModalEditarProveedor()">&times;</span>
             <h2>Editar Proveedor Existente</h2>
             
             <form action="../Controllers/inventarioController.php?action=editarProveedor" method="POST" id="formEditarProveedor" onsubmit="actualizarProveedor(event)">
-                <!-- Input oculto clave para saber qué proveedor estamos editando -->
                 <input type="hidden" id="editProvId" name="idProveedor">
 
                 <div class="modal-grid">
@@ -365,6 +360,7 @@ $listaCategorias = $modeloInv->getCategorias();
     </div>
 
     <script src="../Services/funcionesInventario.js"></script>
-    
+    <script src="../Services/tema.js"></script>
+
 </body>
 </html>

@@ -11,8 +11,9 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex; 
     height: 100vh;
-    background-color: #f1f5f9; /* Cambiado a gris sutil consistente */
+    background-color: #f1f5f9;
     overflow: hidden; 
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ================================================= */
@@ -24,12 +25,13 @@ body {
     height: calc(100vh - 65px);
     margin-top: 65px;
     background-color: #ffffff;
-    padding: 30px;
-    overflow-y: auto;
+    padding: 20px 30px 40px 30px;
+    overflow-y: auto !important;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ================================================= */
@@ -42,15 +44,18 @@ body {
     width: 100%;
     min-height: 50px;               
     flex-shrink: 0;                 
-    margin-bottom: 10px;            
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 10;            
 }
 
 .header h1 {
-    font-size: 26px; /* Ajustado a 26px para hacer match con el título de Inventario */
+    font-size: 26px;
     font-weight: 700;
     margin: 0;
     color: #1f2f56;                 
     font-family: 'Segoe UI', sans-serif;
+    transition: color 0.3s ease;
 }
 
 /* ================================================= */
@@ -70,19 +75,19 @@ body {
 }
 
 .btnAplicar {
-    background: #1a365d; /* Azul Rey corporativo */
+    background: #1a365d;
     color: white;
     border: none;
 }
 
 .btnAplicar:hover {
-    background: #1a365d; /* Azul Rey hover */
+    background: #244a82;
 }
 
 .btnLimpiar {
-    border: 1px solid #cbd5e1; /* Gris Slate claro */
+    border: 1px solid #cbd5e1;
     background: white;
-    color: #475569; /* Gris Slate de texto */
+    color: #475569;
     text-decoration: none;
 }
 
@@ -99,12 +104,15 @@ body {
     width: 100%;
     flex-wrap: wrap;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    margin-top: 5px;
 }
 
 .card {
     flex: 1;
     min-width: 240px;
-    background: #ffffff; /* Fondo blanco limpio */
+    background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
     padding: 24px;
@@ -120,25 +128,27 @@ body {
     margin-bottom: 12px;
     font-size: 15px;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .card span {
     font-size: 38px;
     font-weight: bold;
-    color: #1e293b; /* Slate oscuro principal */
+    color: #1e293b;
+    transition: color 0.3s ease;
 }
 
-/* Bordes personalizados alineados a tus clases corporativas */
-.general-mov { border-left: 5px solid #1a365d; } /* Azul corporativo */
-.success { border-left: 5px solid #16a34a; }      /* Verde unificado */
-.danger { border-left: 5px solid #dc2626; }       /* Rojo unificado */
+/* Bordes personalizados */
+.general-mov { border-left: 5px solid #1a365d; }
+.success { border-left: 5px solid #16a34a; }
+.danger { border-left: 5px solid #dc2626; }
 
 /* ================================================= */
-/* 6. BARRA FILTROS (ADAPTADA CON EL SELECTOR RADIO) */
+/* 6. BARRA FILTROS                                  */
 /* ================================================= */
 .barra-filtros {
     width: 100%;
-    background: #ffffff;
+    background: transparent;
     flex-shrink: 0;
 }
 
@@ -163,6 +173,7 @@ body {
     display: flex;
     gap: 14px;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .radio-movimiento {
@@ -173,11 +184,27 @@ body {
     font-weight: 600;
     color: #475569;
     cursor: pointer;
+    transition: color 0.3s ease;
 }
 
 .radio-movimiento input[type="radio"] {
-    accent-color: #1a365d; /* Radio buttons en azul rey */
+    accent-color: #1a365d;
     margin: 0;
+}
+
+/* Selects universales de filtro */
+select,
+.select-estados {
+    height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0 14px;
+    background: white;
+    color: #1e293b;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .buscador {
@@ -189,7 +216,7 @@ body {
 .buscador input {
     width: 100%;
     height: 44px;
-    border: 1px solid #cbd5e1; /* Gris unificado */
+    border: 1px solid #cbd5e1;
     border-radius: 10px;
     padding: 0 44px 0 16px;
     outline: none;
@@ -200,7 +227,7 @@ body {
 }
 
 .buscador input:focus {
-    border-color: #1a365d; /* Foco azul rey */
+    border-color: #1a365d;
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
 }
 
@@ -209,7 +236,7 @@ body {
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8; /* Buscador placeholder icon */
+    color: #94a3b8;
     font-size: 15px;
 }
 
@@ -228,6 +255,7 @@ body {
     font-size: 14px;
     outline: none;
     background: white;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 /* ================================================= */
@@ -239,10 +267,12 @@ body {
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid #e2e8f0;
+    transition: border-color 0.3s ease;
 }
 
 .tablaUsuarios thead {
-    background: #f8fafc; /* Color de cabecera limpio */
+    background: #f8fafc;
+    transition: background-color 0.3s ease;
 }
 
 .tablaUsuarios thead th {
@@ -251,6 +281,7 @@ body {
     font-size: 13px;
     font-weight: 700;
     color: #1f2f56;
+    transition: color 0.3s ease;
 }
 
 .tablaUsuarios tbody td {
@@ -259,15 +290,16 @@ body {
     font-size: 14px;
     color: #334155;
     vertical-align: middle; 
-    height: 68px;           
+    height: 68px; 
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .tablaUsuarios tbody tr {
-    transition: .2s;
+    transition: background-color .2s ease;
 }
 
 .tablaUsuarios tbody tr:hover {
-    background: #f8fafc; /* Hover sutil estándar */
+    background: #f8fafc;
 }
 
 .usuarioCell {
@@ -278,9 +310,10 @@ body {
 }
 
 .usuarioCell i {
-    color: #1a365d; /* Ícono de usuario en azul rey */
+    color: #1a365d;
     font-size: 18px;
     flex-shrink: 0;
+    transition: color 0.3s ease;
 }
 
 /* ================================================= */
@@ -294,10 +327,10 @@ body {
     display: inline-block;
 }
 
-.badge-usr { background-color: #eff6ff; color: #1e40af; } /* Unificado con badge-ubicacion */
-.badge-ent { background-color: #f0fdf4; color: #16a34a; } /* Unificado con estado-optimo */
-.badge-sal { background-color: #fef2f2; color: #dc2626; } /* Unificado con estado-vencido */
-.badge-inv { background-color: #fff7ed; color: #ea580c; } /* Unificado con estado-proximo */
+.badge-usr { background-color: #eff6ff; color: #1e40af; }
+.badge-ent { background-color: #f0fdf4; color: #16a34a; }
+.badge-sal { background-color: #fef2f2; color: #dc2626; }
+.badge-inv { background-color: #fff7ed; color: #ea580c; }
 
 .txt-verde { color: #16a34a; }
 .txt-rojo { color: #dc2626; }
@@ -306,13 +339,14 @@ body {
 .btn-info-bitacora {
     background: transparent;
     border: none;
-    color: #1a365d; /* Enlace de información en azul rey */
+    color: #1a365d;
     font-size: 18px;
     cursor: pointer;
+    transition: color 0.3s ease;
 }
 
 /* ================================================= */
-/* 10. PAGINACIÓN CON INTERACCIONES                  */
+/* 9. PAGINACIÓN CON INTERACCIONES                   */
 /* ================================================= */
 .botones-paginacion {
     display: flex; 
@@ -325,6 +359,7 @@ body {
     width: 100%;
     flex-shrink: 0;
     font-family: 'Segoe UI', sans-serif; 
+    transition: border-color 0.3s ease;
 }
 
 #contenedorNumeros {
@@ -349,7 +384,6 @@ body {
     min-width: 38px; 
     text-align: center;
     text-decoration: none; 
-    
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
@@ -365,7 +399,7 @@ body {
 }
 
 .btn-pagina.activa {
-    background: #1a365d; /* Botón activo azul rey */
+    background: #1a365d;
     color: white;
     border-color: #1a365d;
 }
@@ -386,7 +420,7 @@ body {
 }
 
 /* ================================================= */
-/* 12. ANIMACIÓN DE ENTRADA FLUIDA                   */
+/* 10. ANIMACIONES                                   */
 /* ================================================= */
 .tablaUsuarios tbody tr {
     opacity: 0;
@@ -415,4 +449,167 @@ body {
     100% { transform: scale(1); opacity: 1; }
 }
 
-.text-center { text-align: center; }         
+.text-center { text-align: center; }
+
+
+/* ===================================================================
+   11. REGLAS MODO OSCURO (COMPLETAMENTE CORREGIDO)
+=================================================================== */
+
+body.dark-theme {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .contenedor {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .header h1 {
+    color: #ffffff !important;
+}
+
+/* Cards de Estadísticas */
+body.dark-theme .card {
+    background-color: #121215 !important;
+    border-top: 1px solid #27272a !important;
+    border-right: 1px solid #27272a !important;
+    border-bottom: 1px solid #27272a !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-theme .card h3 {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .card span {
+    color: #ffffff !important;
+}
+
+/* Bordes laterales Neón en Cards */
+body.dark-theme .general-mov {
+    border-left: 5px solid #2563eb !important;
+}
+
+body.dark-theme .card.success {
+    border-left: 5px solid #22c55e !important;
+}
+
+body.dark-theme .card.danger {
+    border-left: 5px solid #ef4444 !important;
+}
+
+/* Filtros, Selector Radio, Buscador y Selects Oscuros */
+body.dark-theme .radio-movimiento {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .radio-movimiento input[type="radio"] {
+    accent-color: #2563eb !important;
+}
+
+body.dark-theme select,
+body.dark-theme .select-estados,
+body.dark-theme .buscador input,
+body.dark-theme .input-fecha-bitacora {
+    background-color: #121215 !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+}
+
+body.dark-theme select option {
+    background-color: #121215 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .buscador input::placeholder {
+    color: #71717a !important;
+}
+
+body.dark-theme .buscador i {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .btnLimpiar {
+    background-color: #18181b !important;
+    border: 1px solid #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btnLimpiar:hover {
+    background-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+/* Tabla de Movimientos */
+body.dark-theme .tablaUsuarios {
+    border-color: #27272a !important;
+}
+
+body.dark-theme .tablaUsuarios thead {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .tablaUsuarios thead th {
+    color: #ffffff !important;
+}
+
+body.dark-theme .tablaUsuarios tbody td {
+    border-bottom-color: #1f1f23 !important;
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .tablaUsuarios tbody tr:hover {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .usuarioCell i {
+    color: #3b82f6 !important;
+}
+
+body.dark-theme .btn-info-bitacora {
+    color: #60a5fa !important;
+}
+
+/* Badges de Tipo */
+body.dark-theme .badge-usr { background-color: rgba(30, 64, 175, 0.3) !important; color: #93c5fd !important; }
+body.dark-theme .badge-ent { background-color: rgba(22, 163, 74, 0.25) !important; color: #4ade80 !important; }
+body.dark-theme .badge-sal { background-color: rgba(220, 38, 38, 0.25) !important; color: #f87171 !important; }
+body.dark-theme .badge-inv { background-color: rgba(234, 88, 12, 0.25) !important; color: #fb923c !important; }
+
+body.dark-theme .txt-verde { color: #4ade80 !important; }
+body.dark-theme .txt-rojo { color: #f87171 !important; }
+
+/* Paginación */
+body.dark-theme .botones-paginacion {
+    border-top-color: #27272a !important;
+}
+
+body.dark-theme .btn-pagina {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .btn-pagina:hover {
+    background-color: #18181b !important;
+    border-color: #3f3f46 !important;
+}
+
+body.dark-theme .btn-pagina.activa {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-pagina:disabled {
+    background-color: #0a0a0c !important;
+    border-color: #27272a !important;
+    color: #52525b !important;
+}
+
+body.dark-theme .puntos {
+    color: #a1a1aa !important;
+}

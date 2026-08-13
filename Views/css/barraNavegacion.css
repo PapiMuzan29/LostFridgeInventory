@@ -349,3 +349,69 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
 }
+
+
+/* ===================================================================
+   REGLAS MODO OSCURO PARA SIDEBAR Y TOP BAR
+=================================================================== */
+
+/* 1. Barra Lateral (Sidebar) en Modo Oscuro */
+body.dark-theme .sidebar {
+    background-color: #0b1120 !important;
+    border-right: 1px solid #1e293b;
+}
+
+body.dark-theme .sidebar-footer {
+    background-color: #0b1120 !important;
+}
+
+body.dark-theme .nav-link:hover {
+    background-color: #1e293b !important;
+}
+
+body.dark-theme .nav-link.activo {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+    border-left: 4px solid #3b82f6 !important;
+    color: #60a5fa !important;
+}
+
+body.dark-theme .sidebar-linea-divisoria {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 2. Barra Superior (Top Bar) en Modo Oscuro */
+body.dark-theme .top-bar-dashboard {
+    background-color: #151d36 !important;
+    border-bottom: 1px solid #232d4b !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-theme .modulo-titulo,
+body.dark-theme .metric-item .value,
+body.dark-theme .user-id {
+    color: #ffffff !important;
+}
+
+body.dark-theme .metric-item .label,
+body.dark-theme .user-role {
+    color: #94a3b8 !important;
+}
+
+body.dark-theme .user-badge {
+    border-left: 1px solid #232d4b !important;
+}
+
+/* 3. Globos de texto y Modales en Modo Oscuro */
+body.dark-theme .globo-texto {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .globo-texto::after {
+    border-color: #1e293b transparent !important;
+}
+
+body.dark-theme .globo-texto::before {
+    border-color: #334155 transparent !important;
+}

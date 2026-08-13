@@ -5,10 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login</title>
         <link rel="icon" type="image/png" href="../SRC/Logo LFI - copia.png">
-        <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymus"></script>
+        <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="css/login.css">
         <link rel="stylesheet" href="css/cerdito.css">
-    
     </head>
     
     <body>
@@ -76,6 +75,7 @@
                     <p id="calendario" style="margin:0;"><i class="fa-duotone fa-solid fa-calendar-days"></i></p>
                     <span>
                         <?php
+                        date_default_timezone_set('America/Mexico_City');
                         $meses = [
                             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
@@ -99,39 +99,52 @@
             </div>
         </div>
 
-
-        
-
-        <div class="modal" id="modal">
-
+        <!-- MODAL ACERCA DE -->
+        <div class="modal" id="modal" style="display: none;">
             <div class="modal-contenido">
-
                 <span class="cerrar" onclick="cerrarModal()">&times;</span>
-
                 <h2>Acerca de</h2>
-
                 <p>Sistema de inventario.</p>
                 <p>Versión 1.0</p>
-                <p >Desarrollado por Emmanuel Arroyo, Carlos Montes y Ricardo Emmanuel Perez.</p>                                                   
+                <p>Desarrollado por Emmanuel Arroyo, Carlos Montes y Ricardo Emmanuel Perez.</p>                                                    
                 <p><i class="fa-duotone fa-regular fa-copyright"></i> Todos los derechos reservados</p>
-
             </div>
-
         </div>
 
-        
+        <!-- CURSOR CERDITO -->
+        <div id="cerditoCursor" style="z-index: 99999999; pointer-events: none;">🐷</div>
 
-        <div id="cerditoCursor" style="index: 9999">🐷</div>
+        <!-- SCRIPTS Y CONTROLADORES -->
         <script src="../Services/funciones.js"></script>
         <script src="../Services/cerdito.js"></script>
+
+        <script>
+            function abrirModal() {
+                const modal = document.getElementById('modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                }
+            }
+
+            function cerrarModal() {
+                const modal = document.getElementById('modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('modal');
+                if (event.target === modal) {
+                    cerrarModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    cerrarModal();
+                }
+            });
+        </script>
     </body> 
 </html>
-
-
-
-
-
-
-
-
-

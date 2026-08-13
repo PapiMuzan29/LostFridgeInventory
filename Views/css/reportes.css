@@ -13,6 +13,7 @@ body {
     height: 100vh;
     background-color: #e2e8f0; 
     overflow: hidden; 
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ================================================= */
@@ -30,6 +31,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Header */
@@ -39,7 +41,7 @@ body {
     align-items: center;            
     width: 100%;
     min-height: 50px;               
-    flex-shrink: 0;                 
+    flex-shrink: 0; 
     margin-bottom: 10px;            
 }
 
@@ -48,6 +50,7 @@ body {
     font-weight: 700;
     margin: 0;
     color: #1f2f56;                 
+    transition: color 0.3s ease;
 }
 
 /* ================================================= */
@@ -131,6 +134,7 @@ body {
     width: 100%;
     padding-bottom: 20px;
     border-bottom: 1px solid #e2e8f0;
+    transition: border-color 0.3s ease;
 }
 
 .filtros-reportes-izquierda {
@@ -153,6 +157,7 @@ body {
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    transition: color 0.3s ease;
 }
 
 /* Ajuste de select e inputs de fechas */
@@ -167,7 +172,7 @@ body {
     font-size: 14px;
     outline: none;
     cursor: pointer;
-    transition: .3s;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     font-family: inherit;
     width: 100%;
 }
@@ -179,13 +184,14 @@ body {
 }
 
 /* ================================================= */
-/* 5. ESTILOS DE LA TABLA DE REPORTES               */
+/* 5. ESTILOS DE LA TABLA DE REPORTES                */
 /* ================================================= */
 .tabla-reportes-contenedor {
     width: 100%;
     overflow-x: auto;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
+    transition: border-color 0.3s ease;
 }
 
 .tabla-reportes-modulo {
@@ -195,6 +201,7 @@ body {
 
 .tabla-reportes-modulo thead {
     background: #f1f5f9;
+    transition: background-color 0.3s ease;
 }
 
 .tabla-reportes-modulo th {
@@ -203,6 +210,7 @@ body {
     font-size: 14px;
     font-weight: 700;
     color: #1f2f56;
+    transition: color 0.3s ease;
 }
 
 .tabla-reportes-modulo td {
@@ -211,10 +219,11 @@ body {
     font-size: 14px;
     color: #334155;
     vertical-align: middle;
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .tabla-reportes-modulo tbody tr {
-    transition: .2s;
+    transition: background-color 0.2s ease;
     opacity: 0;
     animation: suavizarEntradaReportes 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
@@ -231,7 +240,66 @@ body {
 }
 
 /* ================================================= */
-/* 6. ANIMACIONES Y RESPONSIVE                       */
+/* 6. PAGINACIÓN CON MICROINTERACCIONES              */
+/* ================================================= */
+.botones-paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #edf2f7;
+    width: 100%;
+    flex-shrink: 0;
+    transition: border-color 0.3s ease;
+}
+
+.btn-pagina {
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid #d5dce6;
+    background: white;
+    color: #334155;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 38px; 
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-pagina:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+}
+
+.btn-pagina:active {
+    transform: scale(0.94); 
+}
+
+.btn-pagina.activa {
+    background: #2f5ea7;
+    color: white;
+    border-color: #2f5ea7;
+    box-shadow: 0 4px 10px rgba(47, 94, 167, 0.2);
+    animation: transicionBotonActivo 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.puntos {
+    color: #64748b;
+    font-weight: 600;
+    padding: 0 4px;
+}
+
+/* ================================================= */
+/* 7. ANIMACIONES Y RESPONSIVE                       */
 /* ================================================= */
 @keyframes suavizarEntradaReportes {
     from {
@@ -243,6 +311,20 @@ body {
         transform: translateY(0);    
     }
 } 
+
+@keyframes transicionBotonActivo {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.06); 
+    }
+    100% {
+        transform: scale(1); 
+        opacity: 1;
+    }
+}
 
 @media(max-width: 992px) {
     .panel-controles-reportes {
@@ -261,66 +343,102 @@ body {
         justify-content: center;
     }
 }
-/* ================================================= */
-/* 10. PAGINACIÓN (CORREGIDA CON MICROINTERACCIONES)  */
-/* ================================================= */
-.botones-paginacion {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-top: 30px;
-    padding-top: 15px;
-    border-top: 1px solid #edf2f7;
-    width: 100%;
-    flex-shrink: 0;
+
+
+/* ===================================================================
+   8. REGLAS MODO OSCURO (EXCLUSIVAS PARA EL MÓDULO DE REPORTES)
+=================================================================== */
+
+body.dark-theme {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
 }
 
-.btn-pagina {
-    height: 38px;
-    padding: 0 14px;
-    border: 1px solid #d5dce6;
-    background: white;
-    color: #334155;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 38px; 
-    text-align: center;
-    
-    /* 🔥 CORRECCIÓN: Transiciones combinadas y elásticas */
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
+body.dark-theme .contenedor {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
 }
 
-.btn-pagina:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    /* 🔥 Elevación limpia al pasar el cursor de cerdo */
-    transform: translateY(-1px); 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+body.dark-theme .header h1 {
+    color: #ffffff !important;
 }
 
-/* 🔥 NUEVO: Hundimiento mecánico sutil al hacer clic real */
-.btn-pagina:active {
-    transform: scale(0.94); 
+/* Filtros y Panel */
+body.dark-theme .panel-controles-reportes {
+    border-bottom-color: #27272a !important;
 }
 
-.btn-pagina.activa {
-    background: #2f5ea7;
-    color: white;
-    border-color: #2f5ea7;
-    box-shadow: 0 4px 10px rgba(47, 94, 167, 0.2);
-    
-    /* 🔥 NUEVO: Dispara el rebote elástico de cambio de página */
-    animation: transicionBotonActivo 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+body.dark-theme .grupo-input-reporte label {
+    color: #a1a1aa !important;
 }
 
-.puntos {
-    color: #64748b;
-    font-weight: 600;
-    padding: 0 4px;
+body.dark-theme .grupo-input-reporte select,
+body.dark-theme .grupo-input-reporte input[type="date"] {
+    background-color: #121215 !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+    color-scheme: dark; /* Hace que el selector de calendario sea oscuro en navegadores */
+}
+
+body.dark-theme .btnLimpiar {
+    background-color: #18181b !important;
+    border: 1px solid #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btnLimpiar:hover {
+    background-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+/* Tabla de Reportes */
+body.dark-theme .tabla-reportes-contenedor {
+    border-color: #27272a !important;
+}
+
+body.dark-theme .tabla-reportes-modulo thead {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .tabla-reportes-modulo th {
+    color: #ffffff !important;
+}
+
+body.dark-theme .tabla-reportes-modulo td {
+    border-bottom-color: #1f1f23 !important;
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .tabla-reportes-modulo tbody tr:hover {
+    background-color: #18181b !important;
+}
+
+body.dark-theme #tabla-documentos-tbody tr td[colspan] {
+    color: #a1a1aa !important;
+}
+
+/* Paginación */
+body.dark-theme .botones-paginacion {
+    border-top-color: #27272a !important;
+}
+
+body.dark-theme .btn-pagina {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .btn-pagina:hover {
+    background-color: #18181b !important;
+    border-color: #3f3f46 !important;
+}
+
+body.dark-theme .btn-pagina.activa {
+    background-color: #2f5ea7 !important;
+    border-color: #2f5ea7 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .puntos {
+    color: #a1a1aa !important;
 }

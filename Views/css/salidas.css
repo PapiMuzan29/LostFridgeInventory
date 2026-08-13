@@ -277,9 +277,7 @@ body {
     transform: translateY(-1px);
 }
 
-/* ===================================================================
-   MODAL Y BOTÓN DE CIERRE (INTERACCIÓN Y Z-INDEX CORREGIDOS)
-=================================================================== */
+/* --- MODAL --- */
 
 .modal {
     display: none;
@@ -353,4 +351,12 @@ body {
 .cerrar:hover {
     color: #dc2626;
     transform: scale(1.15);
+}
+
+/* --- CURSOR DE CERDITO SIEMPRE ARRIBA Y CLIC-THROUGH --- */
+
+#cerditoCursor {
+    position: fixed !important;
+    pointer-events: none !important;
+    z-index: 99999999 !important;
 }

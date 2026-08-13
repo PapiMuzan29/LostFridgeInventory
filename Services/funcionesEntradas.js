@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("🚀 El script funcionesEntradas.js se ha cargado correctamente.");
     cargarProveedoresSelect();
     inicializarEscanner();
+    inicializarBotones(); // 🔥 NUEVA FUNCIÓN AGREGADA
 });
 
 async function cargarProveedoresSelect() {
@@ -38,10 +39,7 @@ function inicializarEscanner() {
     const inputCodigo = document.querySelector(".input-with-icon-bar input") || document.querySelector(".input-captura");
     const selectProveedor = document.getElementById('idProveedor');
 
-    if (!inputCodigo) {
-        console.error("❌ ERROR: No se encontró el input del código de barras en el HTML.");
-        return;
-    }
+    if (!inputCodigo) return;
 
     inputCodigo.focus();
     console.log("🎯 Lector inteligente híbrido activado.");
@@ -51,64 +49,45 @@ function inicializarEscanner() {
             e.preventDefault(); 
             
             const trama = this.value.trim();
-            console.log("⌨️ Se presionó Enter. Trama detectada: ", trama);
-
             if (!trama) return;
 
             const idProveedor = selectProveedor ? selectProveedor.value : '';
-
             if (!idProveedor) {
                 alert("❌ Por favor, seleccione un proveedor primero.");
                 return;
             }
 
-            // =========================================================================
-            // 🔥 DETECTOR INTEGRADO PARA TRAMAS INDUSTRIALES CON '|' (EVITA FALLAS DE BD)
-            // =========================================================================
             let cantidadCalculada = 1.00;
             let codigoParaBuscar = trama;
 
             if (trama.includes('|')) {
-                console.log("🧩 Trama segmentada detectada. Extrayendo datos dinámicamente...");
                 const bloques = trama.split('|');
-                
                 bloques.forEach(bloque => {
                     const textoLimpio = bloque.trim();
-                    // Si empieza con P, es el código limpio del producto (Ej: P124603A1)
-                    if (textoLimpio.startsWith('P')) {
-                        codigoParaBuscar = textoLimpio.substring(1);
-                    }
-                    // Si empieza con Q, es el peso directo (Ej: Q 26.60)
+                    if (textoLimpio.startsWith('P')) codigoParaBuscar = textoLimpio.substring(1);
                     if (textoLimpio.startsWith('Q')) {
                         const pesoTexto = textoLimpio.substring(1).trim();
                         cantidadCalculada = parseFloat(pesoTexto) || 0.00;
                     }
                 });
-                
-                console.log(`🎯 Datos extraídos por JS -> Producto: ${codigoParaBuscar}, Peso: ${cantidadCalculada}`);
             }
 
-            // Enviamos la clave limpia calculada al backend
             fetch(`../Controllers/entradasController.php?action=buscarProducto&codigo=${encodeURIComponent(codigoParaBuscar)}&idProveedor=${idProveedor}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
-                        console.warn("⚠️ Producto no catalogado:", data.error);
                         agregarFilaTabla(codigoParaBuscar, `Código: ${codigoParaBuscar} (No Catalogado)`, cantidadCalculada);
                     } else {
-                        // Si la trama NO tenía '|', calculamos el peso usando las posiciones de la BD que ya te servían
                         if (!trama.includes('|')) {
                             const parteEntera = data.codigoEnteros || "0";
                             const parteDecimal = data.codigoDecimales || "00";
                             cantidadCalculada = parseFloat(`${parteEntera}.${parteDecimal}`) || 0.00;
                         }
-
                         const codigoFinal = data.codigoProducto || codigoParaBuscar;
                         agregarFilaTabla(codigoFinal, data.nombreProducto, cantidadCalculada);
                     }
                 })
                 .catch(error => {
-                    console.error("❌ Error de comunicación:", error);
                     agregarFilaTabla(codigoParaBuscar, "Error de Comunicación con Servidor", cantidadCalculada);
                 });
 
@@ -118,8 +97,6 @@ function inicializarEscanner() {
 }
 
 function agregarFilaTabla(codigo, nombreProducto, cantidad) {
-    console.log("✏️ Pintando fila en la tabla...");
-    
     const tbody = document.querySelector('.tablaUsuarios tbody') || document.querySelector('tbody');
     if (!tbody) return;
 
@@ -136,7 +113,7 @@ function agregarFilaTabla(codigo, nombreProducto, cantidad) {
     tr.innerHTML = `
         <td style="padding: 16px; text-align: center; color: #64748b;">${numeroPartida}</td>
         <td style="padding: 16px; text-align: center; color: #16a34a; font-weight: 600;">✓</td>
-        <td style="padding: 16px; font-weight: 600; text-align: left; color: #1e293b;">${codigo}</td>
+        <td class="partida-codigo" style="padding: 16px; font-weight: 600; text-align: left; color: #1e293b;">${codigo}</td>
         <td style="padding: 16px; text-align: left; color: #334155;">${nombreProducto}</td>
         <td class="partida-cantidad" style="padding: 16px; text-align: right; font-weight: 600;">${cantidad.toFixed(2)}</td>
         <td style="padding: 16px; text-align: right;">${costoActual.toFixed(2)}</td>
@@ -162,9 +139,95 @@ function actualizarTotales() {
         contadorPartidas++;
     });
 
-    const divQty = document.querySelector('.bg-total-qty span') || document.getElementById('totalCantidad') || document.querySelector('.bg-total-qty');
-    const divKgs = document.querySelector('.bg-total-kgs span') || document.getElementById('totalKgs') || document.querySelector('.bg-total-kgs');
+    const divQty = document.querySelector('.bg-total-qty span') || document.getElementById('totalCantidad');
+    const divKgs = document.querySelector('.bg-total-kgs span') || document.getElementById('totalKgs');
 
     if (divQty) divQty.textContent = contadorPartidas;
     if (divKgs) divKgs.textContent = acumuladorKgs.toFixed(2);
+}
+
+// =========================================================================
+// 🔥 NUEVA LÓGICA DE GUARDADO EN BASE DE DATOS E INVENTARIO
+// =========================================================================
+function inicializarBotones() {
+    const btnGuardar = document.querySelector(".btnAplicar");
+    const btnLimpiar = document.querySelector(".btnLimpiar");
+
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener("click", () => window.location.reload());
+    }
+
+    if (btnGuardar) {
+        btnGuardar.addEventListener("click", async function() {
+            const idProveedor = document.getElementById("idProveedor").value;
+            const inputConcepto = document.querySelector("input[placeholder='Ej. Compra, Traspaso, Ajuste...']");
+            const concepto = inputConcepto ? inputConcepto.value : "";
+            const idAlmacen = 1; // Asumimos (01) EMBARQUES según tu HTML
+            
+            if (!idProveedor) {
+                alert("❌ Seleccione un proveedor para guardar la entrada.");
+                return;
+            }
+
+            const filas = document.querySelectorAll('.tablaUsuarios tbody tr');
+            if (filas.length === 0) {
+                alert("❌ No hay productos escaneados en la tabla.");
+                return;
+            }
+
+            // Recolectar datos
+            let detalle = [];
+            let totalKgs = parseFloat(document.getElementById('totalKgs').innerText) || 0;
+            let totalCajas = parseFloat(document.getElementById('totalCantidad').innerText) || 0;
+
+            filas.forEach((fila, index) => {
+                const codigo = fila.querySelector('.partida-codigo').innerText.trim();
+                const kgs = parseFloat(fila.querySelector('.partida-cantidad').innerText);
+                
+                detalle.push({
+                    partida: index + 1,
+                    codigo_producto: codigo,
+                    kgs: kgs,
+                    cantidad_cajas: 1 // Cada escaneo es 1 caja física
+                });
+            });
+
+            const payload = {
+                id_proveedor: idProveedor,
+                id_almacen: idAlmacen,
+                concepto: concepto,
+                total_kgs: totalKgs,
+                total_cajas: totalCajas,
+                detalle: detalle
+            };
+
+            try {
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+                // Enviamos a PHP
+                const response = await fetch("../Controllers/entradasController.php?action=guardarEntrada", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`✅ Entrada guardada correctamente.\nFolio generado: ${result.folio}`);
+                    window.location.reload(); // Recarga para empezar de nuevo
+                } else {
+                    alert(`❌ Error al guardar: ${result.error}`);
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-save"></i> Guardar Entrada';
+                }
+            } catch (error) {
+                console.error("Error en la petición:", error);
+                alert("❌ Ocurrió un error de conexión al guardar.");
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-save"></i> Guardar Entrada';
+            }
+        });
+    }
 }

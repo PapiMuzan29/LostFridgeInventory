@@ -166,4 +166,78 @@ class modeloEntradas {
             return null;
         }
     }
+    /**
+     * 🔥 REGISTRO TRANSACCIONAL Y ACTUALIZACIÓN DE INVENTARIO DIRECTO
+     * Guarda la entrada, el detalle, la bitácora e incrementa el stock en la tabla producto.
+     */
+    public function registrarEntradaTransaccion($datos, $idUsuario, $apodoUsuario) {
+        try {
+            // INICIAMOS TRANSACCIÓN SQL
+            $this->db->consulta("START TRANSACTION");
+
+            // 1. Insertar en tabla `entradas`
+            $queryEntrada = "INSERT INTO entradas (id_almacen, id_proveedor, id_usuario, totalKgs, status) VALUES (?, ?, ?, ?, 'A')";
+            $this->db->consulta($queryEntrada, [
+                $datos['id_almacen'], 
+                $datos['id_proveedor'], 
+                $idUsuario, 
+                $datos['total_kgs']
+            ]);
+            
+            // Obtener el ID insertado
+            $stmtLastId = $this->db->consulta("SELECT LAST_INSERT_ID() as id");
+            $idEntrada = $stmtLastId->fetch(PDO::FETCH_ASSOC)['id'];
+
+            // 2. Procesar cada caja/producto escaneado
+            foreach ($datos['detalle'] as $item) {
+                
+                // A) Buscar ID real del producto por su código
+                $queryProd = "SELECT idProducto FROM producto WHERE codigoProducto = ? LIMIT 1";
+                $stmtProd = $this->db->consulta($queryProd, [$item['codigo_producto']]);
+                $productoBD = $stmtProd->fetch(PDO::FETCH_ASSOC);
+                $idProducto = $productoBD ? $productoBD['idProducto'] : 1; 
+
+                // B) Insertar en entradas_detalle
+                $queryDetalle = "INSERT INTO entradas_detalle (id_entrada, partida, id_producto, cantidad, kgs) VALUES (?, ?, ?, ?, ?)";
+                $this->db->consulta($queryDetalle, [
+                    $idEntrada, 
+                    $item['partida'], 
+                    $idProducto, 
+                    $item['cantidad_cajas'], 
+                    $item['kgs']
+                ]);
+
+                // C) 🔥 ACTUALIZAR EL INVENTARIO EN LA TABLA PRODUCTO 🔥
+                // Usamos IFNULL para que, si el campo está en NULL, lo trate como 0 antes de sumar
+                $queryUpdateStock = "UPDATE producto 
+                                     SET totalCajas = IFNULL(totalCajas, 0) + ?, 
+                                         totalPeso = IFNULL(totalPeso, 0) + ? 
+                                     WHERE idProducto = ?";
+                $this->db->consulta($queryUpdateStock, [
+                    $item['cantidad_cajas'],
+                    $item['kgs'],
+                    $idProducto
+                ]);
+            }
+
+            // 3. Registrar en bitacora_movimientos
+            $desc = "Se registró la entrada Folio {$idEntrada} con {$datos['total_cajas']} cajas ({$datos['total_kgs']} Kgs).";
+            $queryBitacora = "INSERT INTO bitacora_movimientos (tipo, usuarioResponsable, descripcion, moduloAfectado, fecha, hora) VALUES ('entrada', ?, ?, 'Entradas', CURDATE(), CURTIME())";
+            $this->db->consulta($queryBitacora, [
+                $apodoUsuario,
+                $desc
+            ]);
+
+            // CONFIRMAR TRANSACCIÓN
+            $this->db->consulta("COMMIT");
+
+            return ["success" => true, "folio" => $idEntrada];
+
+        } catch (Exception $e) {
+            // Deshacer todo si hubo un fallo
+            $this->db->consulta("ROLLBACK");
+            error_log("Error guardando entrada e inventario: " . $e->getMessage());
+            return ["success" => false, "error" => "Error de base de datos: " . $e->getMessage()];
+        }
+    }
 }

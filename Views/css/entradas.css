@@ -6,26 +6,27 @@
     margin-left: 260px;
     height: calc(100vh - 65px);
     margin-top: 65px;
-    background-color: #f8fafc; /* Fondo gris sutil corporativo */
+    background-color: #f8fafc;
     padding: 24px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 20px;
     overflow-y: auto;
+    transition: background-color 0.3s ease;
 }
 
 .shadow-soft {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
-/* Tarjeta contenedora de la Matriz */
 .card-entrada {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     box-sizing: border-box;
     width: 100%;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* ================================================= */
@@ -40,11 +41,11 @@
 .grupo-campo label {
     font-size: 14px;
     font-weight: 700;
-    color: #475569; /* Gris Slate elegante */
+    color: #475569;
     white-space: nowrap;
+    transition: color 0.3s ease;
 }
 
-/* Estilos de Inputs unificados con Inventario */
 .input-captura, .select-captura {
     width: 100%;
     height: 38px;
@@ -55,7 +56,7 @@
     color: #1e293b;
     outline: none;
     background: #ffffff;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
     box-sizing: border-box;
 }
 
@@ -75,10 +76,11 @@
     background: #f1f5f9;
     outline: none;
     box-sizing: border-box;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .text-success-status {
-    color: #16a34a !important; /* Verde óptimo unificado */
+    color: #16a34a !important;
 }
 
 /* ================================================= */
@@ -90,10 +92,11 @@
     justify-content: space-between;
     gap: 20px;
     padding: 14px 20px;
-    background: #cbd5e1 !important; /* Gris de separación intermedio */
-    border-top: 1px solid #94a3b8;
-    border-bottom: 1px solid #94a3b8;
+    background: #e2e8f0;
+    border-top: 1px solid #cbd5e1;
+    border-bottom: 1px solid #cbd5e1;
     box-sizing: border-box;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .input-with-icon-bar {
@@ -113,6 +116,7 @@
     transform: translateY(-50%);
     color: #64748b;
     font-size: 16px;
+    transition: color 0.3s ease;
 }
 
 .label-inline {
@@ -120,6 +124,7 @@
     font-weight: 700;
     color: #1e293b;
     white-space: nowrap;
+    transition: color 0.3s ease;
 }
 
 .modos-captura-radios {
@@ -135,10 +140,19 @@
     font-weight: 600;
     color: #1e293b;
     cursor: pointer;
+    transition: color 0.3s ease;
 }
 
 .radio-inline input[type="radio"] {
-    accent-color: #1f2f56; /* Azul Rey para los controles */
+    accent-color: #1f2f56;
+}
+
+/* Desactivar pseudoelementos indeseados */
+.input-with-icon-bar::before,
+.input-with-icon-bar::after,
+.tablaUsuarios th::before,
+.tablaUsuarios th::after {
+    content: none !important;
 }
 
 /* ================================================= */
@@ -147,9 +161,9 @@
 .tabla-partidas-container {
     background: #ffffff;
     overflow-x: auto;
+    transition: background-color 0.3s ease;
 }
 
-/* Tabla Maestra heredada de tus módulos */
 .tablaUsuarios {
     width: 100%;
     border-collapse: collapse;
@@ -157,6 +171,7 @@
 
 .tablaUsuarios thead {
     background: #f8fafc;
+    transition: background-color 0.3s ease;
 }
 
 .tablaUsuarios th {
@@ -165,6 +180,7 @@
     font-size: 13px;
     font-weight: 600;
     border-bottom: 1px solid #cbd5e1;
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .tablaUsuarios td {
@@ -172,6 +188,7 @@
     color: #334155;
     font-size: 14px;
     border-bottom: 1px solid #f1f5f9;
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .text-right { text-align: right; }
@@ -180,7 +197,6 @@
 .font-600 { font-weight: 600; }
 .txt-verde { color: #16a34a; }
 
-/* Botón de eliminación de partidas */
 .btn-borrar-partida {
     width: 32px;
     height: 32px;
@@ -200,7 +216,6 @@
     color: #ffffff;
 }
 
-/* Tarjetas Laterales de Totales */
 .panel-totales-entradas {
     display: flex;
     flex-direction: column;
@@ -215,6 +230,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .card-total-indicador h3 {
@@ -222,6 +238,7 @@
     color: #475569;
     margin: 0;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .card-total-indicador span {
@@ -229,12 +246,12 @@
     font-weight: 700;
     color: #1e293b;
     font-family: monospace, sans-serif;
+    transition: color 0.3s ease;
 }
 
-.bg-total-qty { border-left: 4px solid #1f2f56; } /* Franja Azul */
-.bg-total-kgs { border-left: 4px solid #16a34a; } /* Franja Verde */
+.bg-total-qty { border-left: 4px solid #1f2f56; }
+.bg-total-kgs { border-left: 4px solid #16a34a; }
 
-/* Botonera de acciones */
 .grupo-botones-captura {
     display: flex;
     flex-direction: column;
@@ -252,7 +269,19 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: background 0.2s;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.btn-block-matriz:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.15);
+}
+
+.btn-block-matriz:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .btnAplicar.btn-block-matriz {
@@ -273,4 +302,142 @@
 
 .btnLimpiar.btn-block-matriz:hover {
     background: #f8fafc;
+}
+
+
+/* ===================================================================
+   CORRECCIONES EXCLUSIVAS PARA MODO OSCURO (ENTRADAS / MATRIZ)
+=================================================================== */
+
+body.dark-theme .contenedor {
+    background-color: #0a0a0c !important;
+}
+
+body.dark-theme h1,
+body.dark-theme h2 {
+    color: #ffffff !important;
+}
+
+body.dark-theme .card-entrada,
+body.dark-theme .tabla-partidas-container {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .grupo-campo label,
+body.dark-theme .label-inline,
+body.dark-theme .radio-inline,
+body.dark-theme label {
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .input-captura,
+body.dark-theme .select-captura {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+}
+
+body.dark-theme .select-captura option {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .input-readonly {
+    background-color: #0a0a0c !important;
+    border-color: #27272a !important;
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .captura-line-bar {
+    background-color: #18181b !important;
+    border-top-color: #27272a !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme .input-with-icon-bar input {
+    background-color: #0a0a0c !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .input-with-icon-bar i {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .radio-inline input[type="radio"] {
+    accent-color: #2563eb;
+}
+
+/* ENCABEZADOS DE LA TABLA EN MODO OSCURO */
+body.dark-theme .tablaUsuarios thead,
+body.dark-theme .tablaUsuarios thead tr {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .tablaUsuarios th {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+/* FILAS Y CELDAS DINÁMICAS (TBODY) EN MODO OSCURO */
+body.dark-theme .tablaUsuarios tbody tr,
+body.dark-theme .tablaUsuarios tbody td {
+    background-color: #121215 !important;
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme .tablaUsuarios tbody tr:hover,
+body.dark-theme .tablaUsuarios tbody tr:hover td {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .tablaUsuarios tbody td *,
+body.dark-theme .tablaUsuarios tbody td {
+    color: #ffffff !important;
+}
+
+/* EXCEPCIÓN DEL BOTÓN DE BORRAR */
+body.dark-theme .tablaUsuarios tbody td .btn-borrar-partida {
+    background-color: rgba(220, 38, 38, 0.15) !important;
+}
+
+body.dark-theme .tablaUsuarios tbody td .btn-borrar-partida,
+body.dark-theme .tablaUsuarios tbody td .btn-borrar-partida i {
+    color: #f87171 !important;
+}
+
+/* TARJETAS DE TOTALES Y BOTONES */
+body.dark-theme .card-total-indicador {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .card-total-indicador h3 {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .card-total-indicador span {
+    color: #ffffff !important;
+}
+
+body.dark-theme .bg-total-qty { border-left-color: #2563eb !important; }
+body.dark-theme .bg-total-kgs { border-left-color: #22c55e !important; }
+
+body.dark-theme .btnAplicar.btn-block-matriz {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btnLimpiar.btn-block-matriz {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btnLimpiar.btn-block-matriz:hover {
+    background-color: #27272a !important;
 }

@@ -203,5 +203,7 @@ try {
     </div>
     
     <script src="../Services/funcionesEntradas.js"></script>
+        <script src="../Services/tema.js"></script>
+
 </body>
 </html>

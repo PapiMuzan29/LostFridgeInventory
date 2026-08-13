@@ -55,4 +55,11 @@ class entradasServicio {
     public function crearEntrada(array $data) {
         return $this->modelo->crearEntrada($data);
     }
+
+    /**
+     * 🔥 NUEVO: Recibe los datos del controlador y los pasa al modelo
+     */
+    public function registrarEntradaCompleta($datos, $idUsuario, $apodoUsuario) {
+        return $this->modelo->registrarEntradaTransaccion($datos, $idUsuario, $apodoUsuario);
+    }
 }
