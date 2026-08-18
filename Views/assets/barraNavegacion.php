@@ -9,45 +9,47 @@
     }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<div class="sidebar">
 
-        <div class="sidebar-header">
+<!-- NUEVO: Overlay (fondo oscuro) para cuando el menú se abre en móvil -->
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- NUEVO: Se agregó el ID "sidebarDashboard" a la barra -->
+<div class="sidebar" id="sidebarDashboard">
+
+        <div class="sidebar-header" style="position: relative;">
             <img src="../SRC/Logo LFI - copia.png" alt="Logo LFI" class="logo-america">
+            
+            <!-- NUEVO: Botón 'X' para cerrar en móvil -->
+            <button id="btnCloseSidebar" class="btn-close-sidebar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
 
         <ul class="nav-menu">
             <li class="nav-link" onclick="cargarModulo('inicio')">
                 <i class="fa-solid fa-house"></i> INICIO
             </li>
-
             <li class="nav-link" onclick="cargarModulo('inventario')">
                 <i class="fa-solid fa-boxes-stacked"></i> INVENTARIO
             </li>
-
             <li class="nav-link" onclick="cargarModulo('entradas')">
                 <i class="fa-solid fa-arrow-right-to-bracket"></i> ENTRADAS
             </li>
-
             <li class="nav-link" onclick="cargarModulo('salidas')">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> SALIDAS
             </li>
-
             <li class="nav-link" onclick="cargarModulo('ubicaciones')">
                 <i class="fa-solid fa-location-dot"></i> UBICACIONES
             </li>
-
             <li class="nav-link" onclick="cargarModulo('movimientos')">
                 <i class="fa-solid fa-retweet"></i> MOVIMIENTOS
             </li>
-
             <li class="nav-link" onclick="cargarModulo('reportes')">
                 <i class="fa-solid fa-file-lines"></i> REPORTES
             </li>
-
             <li class="nav-link" onclick="cargarModulo('usuarios')">
                 <i class="fa-solid fa-users"></i> USUARIOS
             </li>
-
             <li class="nav-link" onclick="cargarModulo('configuracion')">
                 <i class="fa-solid fa-gear"></i> CONFIGURACION
             </li>
@@ -63,8 +65,12 @@
 </div>
 
 <div class="top-bar-dashboard">
-
         <div class="top-bar-metrics">
+            
+            <!-- NUEVO: Botón Hamburguesa -->
+            <button id="btnToggleSidebar" class="btn-toggle-sidebar">
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
             <div class="titulo-pagina">
                 <h2 id="titulo-modulo-gris" class="modulo-titulo">
@@ -73,8 +79,8 @@
             </div>
 
             <div class="metrics-right-group">
-
-                <div class="metric-item">
+                <!-- Se mantienen tus métricas igual -->
+                <div class="metric-item metric-date">
                     <i class="fa-solid fa-calendar-days icon-blue"></i>
                     <span class="label">Fecha:</span>
                     <span class="value">
@@ -89,7 +95,7 @@
                     </span>
                 </div>
 
-                <div class="metric-item">
+                <div class="metric-item metric-time">
                     <i class="fa-regular fa-clock icon-blue"></i>
                     <span class="label">Hora:</span>
                     <span class="value" id="hora">00:00 PM</span>
@@ -102,41 +108,8 @@
                         <span class="user-role"><?php echo $_SESSION['nombreRol'] ?? 'Sin rol'; ?></span>
                     </div>
                 </div>
-
             </div>
-
         </div>
-
-    </div>
-
-<div class="modal" id="modalCerrarSesion" style="display: none;">
-    <div class="modal-contenido modal-logout" style="max-width: 400px; text-align: center; padding-top: 30px;">
-
-        <span class="globo-texto" id="globoTextoLogout">¡Muuu! ¿Ya te vas?</span>
-
-        <div class="contenedor-animacion-eliminar" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100px; margin-bottom: 15px; overflow: hidden; margin-top: 10px;">
-            <img id="imgAnimacionLogout" src="../SRC/vaca/0.png" alt="Animación de cierre de sesión" class="delete-gif" style="height: 100%; width: auto; object-fit: contain; display: block;">
-        </div>
-
-        <h2>¿Desea cerrar sesión?</h2>
-
-        <p class="mensaje-logout">
-            Su sesión actual se cerrará y volverá a la pantalla de inicio de sesión.
-        </p>
-
-        <div class="acciones-logout">
-            <button type="button" class="btnCancelarLogout" onclick="cerrarModalLogout()">
-                Cancelar
-            </button>
-
-            <form action="../Config/Logouth.php" method="POST">
-                <button type="submit" class="btnConfirmarLogout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    Confirmar
-                </button>
-            </form>
-        </div>
-    </div>
 </div>
 
 <div id="cerditoCursor" style="z-index: 9999">🐷</div>

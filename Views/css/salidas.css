@@ -52,11 +52,12 @@ body {
 }
 
 .logo-lfi {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    margin-bottom: 20px;
-    margin-top: -15px;
+    width: 140px;          /* Ajusta este valor al ancho ideal para tu barra */
+    height: 140px;         /* Manténlo igual al width para que sea un cuadrado perfecto */
+    object-fit: contain;   /* ESTO ES CLAVE: hace que toda la imagen quepa dentro del espacio sin recortar */
+    display: block;
+    margin: 0 auto 20px auto; 
+    margin-top: 10px;      /* Ajusté un poco el margen para que no toque el borde superior */
 }
 
 .titulo-lfi {
@@ -359,4 +360,41 @@ body {
     position: fixed !important;
     pointer-events: none !important;
     z-index: 99999999 !important;
+}
+
+/* ================================================= */
+/* CONTENEDOR DE REJILLA: TABLA + PANEL LATERAL      */
+/* ================================================= */
+.seccion-tabla-totales-grid {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.seccion-tabla-totales-grid > .tabla-partidas-container {
+    flex: 1;
+    overflow-x: auto;
+}
+
+.seccion-tabla-totales-grid > .panel-totales-entradas {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+/* ================================================= */
+/* FORMULARIO SUPERIOR EN GRID (IDÉNTICO A ENTRADAS)  */
+/* ================================================= */
+.formulario-matriz-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 20px;
+}
+
+/* Campos que ocupan las dos columnas completas (como Motivo y Almacén) */
+.text-span-2 {
+    grid-column: span 2;
 }

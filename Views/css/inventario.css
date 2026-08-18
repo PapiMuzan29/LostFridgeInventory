@@ -634,3 +634,105 @@ body.dark-theme .modal-contenido div[style*="border-top: 2px dashed"] {
 body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
     box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15) !important;
 }
+
+/* ===================================================================
+   8. DISEÑO RESPONSIVO / VERSIÓN MÓVIL (NUEVO)
+=================================================================== */
+
+@media screen and (max-width: 768px) {
+    /* 1. Encabezado: Apilar el título y los botones */
+    .inventario-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .header-acciones {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .header-acciones button {
+        flex: 1 1 48%; /* Hace que los botones ocupen la mitad de la pantalla */
+        justify-content: center;
+        text-align: center;
+    }
+
+    /* 2. Tarjetas de Estadísticas: Una debajo de otra */
+    .cards {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    .card {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    /* 3. Filtros y Buscador: Apilar en vertical para que no se aprieten */
+    .inventario-filtro-container {
+        padding: 15px;
+    }
+
+    .inventario-filtro-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .filtro-grupo, 
+    .filtro-grupo.flex-grande {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .filtro-botones {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 5px;
+    }
+
+    .btn-filtrar-inv, 
+    .btn-limpiar-inv {
+        flex: 1;
+        justify-content: center;
+    }
+
+    /* 4. Tabla de Inventario: Desplazamiento horizontal (Swipe) */
+    /* Como las tablas no caben en celular, esto permite deslizarla con el dedo hacia la derecha */
+    .tabla-inventario,
+    .tablaUsuarios {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Desplazamiento suave en iOS */
+        white-space: nowrap; /* Evita que el texto se rompa hacia abajo */
+    }
+
+    .tabla-inventario th,
+    .tabla-inventario td,
+    .tablaUsuarios th,
+    .tablaUsuarios td {
+        padding: 10px; /* Reducimos un poco el padding para que quepa más info */
+    }
+
+    /* 5. Paginación: Centrar los números y el texto */
+    .inventario-paginacion-footer {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        text-align: center;
+        padding-bottom: 20px;
+    }
+}
+
+/* Ajuste extra para teléfonos muy pequeños (ej. iPhone SE) */
+@media screen and (max-width: 480px) {
+    .header-acciones button {
+        flex: 1 1 100%; /* Los botones del header ahora ocupan el 100% del ancho (uno por fila) */
+    }
+    
+    .filtro-botones {
+        flex-direction: column;
+    }
+}
