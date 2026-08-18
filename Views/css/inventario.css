@@ -658,15 +658,38 @@ body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
         text-align: center;
     }
 
-    /* 2. Tarjetas de Estadísticas: Una debajo de otra */
     .cards {
-        flex-direction: column !important;
-        gap: 15px !important;
+        flex-direction: row !important; /* Las mantenemos en fila */
+        flex-wrap: wrap !important;
+        gap: 10px !important; /* Menos espacio entre ellas */
     }
 
     .card {
-        width: 100% !important;
-        flex: 1 1 100% !important;
+        flex: 1 1 45% !important; /* Hacemos que quepan 2 tarjetas por fila */
+        min-width: 130px !important;
+        padding: 12px 15px !important; /* Reducimos el relleno para hacerlas rectangulares */
+        border-radius: 8px !important; /* Bordes un poco más compactos */
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+
+    .card h3 {
+        font-size: 11px !important; /* Título más pequeño */
+        margin-bottom: 4px !important;
+        white-space: nowrap; /* Evita que el título se parta en dos líneas */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card span {
+        font-size: 22px !important; /* Número más pequeño pero legible */
+        line-height: 1 !important;
+    }
+
+    .card-subtexto {
+        font-size: 10px !important;
+        margin-top: 4px !important;
     }
 
     /* 3. Filtros y Buscador: Apilar en vertical para que no se aprieten */
@@ -702,18 +725,23 @@ body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
     /* Como las tablas no caben en celular, esto permite deslizarla con el dedo hacia la derecha */
     .tabla-inventario,
     .tablaUsuarios {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch; /* Desplazamiento suave en iOS */
-        white-space: nowrap; /* Evita que el texto se rompa hacia abajo */
+        display: block !important;
+        width: 100% !important;
+        max-width: 100vw !important; /* Obliga a la tabla a no salirse del contenedor */
+        overflow-x: auto !important; /* Habilita el deslizamiento horizontal con el dedo */
+        -webkit-overflow-scrolling: touch !important; /* Hace que el deslizamiento sea suave en iOS/Android */
+        white-space: nowrap !important; /* Evita que el texto se amontone hacia abajo */
+        visibility: visible !important; /* Fuerza a que no se oculte */
+        border-left: 0 !important; /* Quitar bordes laterales ayuda a evitar desbordes */
+        border-right: 0 !important;
     }
 
     .tabla-inventario th,
     .tabla-inventario td,
     .tablaUsuarios th,
     .tablaUsuarios td {
-        padding: 10px; /* Reducimos un poco el padding para que quepa más info */
+        padding: 10px 12px !important; /* Celdas más compactas */
+        font-size: 13px !important; /* Letra un punto más pequeña */
     }
 
     /* 5. Paginación: Centrar los números y el texto */

@@ -455,15 +455,22 @@ body.dark-theme .btn-toggle-sidebar {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.5);
-    z-index: 1005; /* Justo por debajo del Sidebar (1010) */
+    background-color: rgba(0, 0, 0, 0.65) !important; 
+    backdrop-filter: blur(3px); 
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 1005 !important;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none; 
 }
+
 .sidebar-overlay.activo {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto; /* Reactiva los clics para poder cerrarlo */
 }
 
 /* ==========================================
