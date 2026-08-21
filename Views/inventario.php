@@ -178,13 +178,92 @@ $listaCategorias = $modeloInv->getCategorias();
     </div>
 
 
+    <!-- MODAL EDITAR PRODUCTO -->
+    <div class="modal" id="modalEditarProducto" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); justify-content: center; align-items: center;">
+        <div class="modal-contenido" style="background: white; padding: 24px; border-radius: 12px; width: 100%; max-width: 500px; position: relative;">
+            <span class="cerrar-modal" onclick="cerrarModalEditarProducto()" style="position: absolute; top: 16px; right: 20px; font-size: 24px; color: #ef4444; cursor: pointer;">&times;</span>
+            
+            <h2 style="font-size: 20px; font-weight: 700; color: #1f2f56; margin-bottom: 16px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Editar Producto</h2>
+            
+            <form id="formEditarProducto" onsubmit="actualizarProducto(event)">
+                <input type="hidden" id="editIdProducto" name="idProducto">
+
+                <div class="modal-grid" style="display: grid; grid-template-columns: 1fr; gap: 14px;">
+                    <div class="grupo-input">
+                        <label for="editProdCodigo">Código de Producto *</label>
+                        <input type="text" id="editProdCodigo" name="codigoProducto" required style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px;">
+                    </div>
+                    <div class="grupo-input">
+                        <label for="editProdNombre">Nombre del Producto *</label>
+                        <input type="text" id="editProdNombre" name="nombreProducto" required style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px;">
+                    </div>
+                    <div class="grupo-input">
+                        <label for="editProdProveedor">Proveedor Asociado *</label>
+                        <select id="editProdProveedor" name="idProveedor" required style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; background-color: white;">
+                            <option value="" disabled>Seleccione un proveedor...</option>
+                            <?php 
+                            if (!empty($listaProveedores)) {
+                                foreach ($listaProveedores as $prov) {
+                                    echo '<option value="' . htmlspecialchars((string)$prov['idProveedor']) . '">' . htmlspecialchars($prov['nombreProveedor']) . '</option>';
+                                }
+                            } 
+                            ?>
+                        </select>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="editProdCategoria">Categoría del Producto *</label>
+                        <select id="editProdCategoria" name="idCategoria" required style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; background-color: white;">
+                            <option value="" disabled>Seleccione una categoría...</option>
+                            <?php 
+                            if (!empty($listaCategorias)) {
+                                foreach ($listaCategorias as $cat) {
+                                    echo '<option value="' . htmlspecialchars((string)$cat['idCategoria']) . '">' . htmlspecialchars($cat['nombreCategoria']) . '</option>';
+                                }
+                            } 
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btnGuardarUsuario" style="width: 100%; height: 40px; background: #0284c7; color: white; border: none; border-radius: 8px; margin-top: 20px; font-weight: 600; cursor: pointer;">
+                    <i class="fa-solid fa-floppy-disk"></i> Actualizar Producto
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- MODAL ELIMINAR PRODUCTO -->
+    <div class="modal" id="modalEliminarProducto" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); justify-content: center; align-items: center;">
+        <div class="modal-contenido" style="background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; position: relative;">
+            <span class="cerrar-modal" onclick="cerrarModalEliminarProducto()" style="position: absolute; top: 16px; right: 20px; font-size: 24px; color: #ef4444; cursor: pointer;">&times;</span>
+            
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 48px; color: #f59e0b; margin-bottom: 15px;"></i>
+            
+            <h2 style="font-size: 20px; font-weight: 700; color: #1f2f56; margin-bottom: 10px;">¿Eliminar Producto?</h2>
+            
+            <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
+                Estás a punto de eliminar el producto: <strong id="nombreProductoEliminar" style="color: #0f172a;"></strong>. Esta acción no se puede deshacer.
+            </p>
+
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" onclick="cerrarModalEliminarProducto()" style="padding: 10px 20px; background: #e2e8f0; color: #334155; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    Cancelar
+                </button>
+                <a id="btnConfirmarEliminarProducto" href="#" style="padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block;">
+                    Sí, eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+
+
     <!-- MODAL AGREGAR PROVEEDOR -->
     <div class="modal" id="modalAgregarProveedor" style="display: none;">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModalAgregarProveedor()">&times;</span>
             <h2>Registrar Nuevo Proveedor</h2>
             
-            <form action="../Controllers/inventarioController.php?action=agregarProveedor" method="POST" id="formNuevoProveedor" onsubmit="guardarProveedor(event)">
+            <form method="POST" id="formNuevoProveedor" onsubmit="guardarProveedor(event)">
                 <div class="modal-grid">
                     <div class="grupo-input">
                         <label for="provCodigo">Código de Proveedor *</label>
@@ -226,11 +305,11 @@ $listaCategorias = $modeloInv->getCategorias();
                             <span style="font-size: 12px; font-weight: 700; color: #0d6efd; display: block; margin-bottom: 8px;">Código de Producto</span>
                             <div class="grupo-input" style="margin-bottom: 6px;">
                                 <label style="font-size: 11px;">Posición Inicio</label>
-                                <input type="number" name="codigoBarrasProductosPosicion" value="0" min="0" required style="height: 32px;">
+                                <input type="number" name="codigoBarrasProductosPosicion" value="1" min="0" required style="height: 32px;">
                             </div>
                             <div class="grupo-input">
                                 <label style="font-size: 11px;">Longitud (Letras)</label>
-                                <input type="number" name="codigoBarrasProductosLongitud" value="0" min="0" required style="height: 32px;">
+                                <input type="number" name="codigoBarrasProductosLongitud" value="6" min="0" required style="height: 32px;">
                             </div>
                         </div>
 
@@ -274,7 +353,7 @@ $listaCategorias = $modeloInv->getCategorias();
             <span class="cerrar-modal" onclick="cerrarModalEditarProveedor()">&times;</span>
             <h2>Editar Proveedor Existente</h2>
             
-            <form action="../Controllers/inventarioController.php?action=editarProveedor" method="POST" id="formEditarProveedor" onsubmit="actualizarProveedor(event)">
+            <form method="POST" id="formEditarProveedor" onsubmit="actualizarProveedor(event)">
                 <input type="hidden" id="editProvId" name="idProveedor">
 
                 <div class="modal-grid">
@@ -356,6 +435,31 @@ $listaCategorias = $modeloInv->getCategorias();
                     <i class="fa-solid fa-floppy-disk"></i> Actualizar Proveedor
                 </button>
             </form>
+        </div>
+    </div>
+
+
+    <!-- MODAL ELIMINAR PROVEEDOR -->
+    <div class="modal" id="modalEliminarProveedor" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); justify-content: center; align-items: center;">
+        <div class="modal-contenido" style="background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; position: relative;">
+            <span class="cerrar-modal" onclick="cerrarModalEliminarProveedor()" style="position: absolute; top: 16px; right: 20px; font-size: 24px; color: #ef4444; cursor: pointer;">&times;</span>
+            
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 48px; color: #f59e0b; margin-bottom: 15px;"></i>
+            
+            <h2 style="font-size: 20px; font-weight: 700; color: #1f2f56; margin-bottom: 10px;">¿Eliminar Proveedor?</h2>
+            
+            <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
+                Estás a punto de eliminar al proveedor: <strong id="nombreProveedorEliminar" style="color: #0f172a;"></strong>. Esta acción no se puede deshacer.
+            </p>
+
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" onclick="cerrarModalEliminarProveedor()" style="padding: 10px 20px; background: #e2e8f0; color: #334155; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    Cancelar
+                </button>
+                <a id="btnConfirmarEliminarProveedor" href="#" style="padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block;">
+                    Sí, eliminar
+                </a>
+            </div>
         </div>
     </div>
 

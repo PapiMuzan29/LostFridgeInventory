@@ -1,0 +1,96 @@
+/* Importa los estilos base de la app para mantener consistencia */
+@import url("vendedor.css");
+
+/* Estilos específicos del Módulo de Caja */
+.badge-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.nota-card {
+    border-left: 5px solid #f59e0b;
+    margin-bottom: 15px;
+}
+
+.nota-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.nota-title {
+    font-size: 1.1rem;
+    color: #0f172a;
+}
+
+.nota-date {
+    display: block;
+    color: #64748b;
+}
+
+.nota-info {
+    margin-bottom: 5px;
+}
+
+.detalles-list {
+    font-size: 0.95rem;
+    color: #334155;
+    background-color: #f8fafc;
+    padding: 10px;
+    border-radius: 6px;
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.caja-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.caja-toolbar-title {
+    font-size: 1.1rem;
+    color: #1e293b;
+    margin: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    color: #cbd5e1;
+}
+
+.btn-success {
+    background-color: #16a34a;
+    color: #ffffff;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-success:active {
+    background-color: #15803d;
+}

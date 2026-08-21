@@ -7,10 +7,60 @@
     --navy-header: #1a365d;
     --background: #f8fafc;
     --card-bg: #ffffff;
+    --card-inner-bg: #f8fafc;
     --text-main: #334155;
     --text-muted: #64748b;
     --border-color: #cbd5e1;
+    --input-bg: #ffffff;
     --focus-ring: rgba(37, 92, 208, 0.15);
+    --nav-bg: #ffffff;
+    --nav-border: #e2e8f0;
+}
+
+/* ===================================================================
+   TEMA OSCURO PREMIUM (Alto Contraste y Profundidad)
+=================================================================== */
+body.dark-mode {
+    --primary-color: #3b82f6;
+    --primary-dark: #2563eb;
+    --navy-header: #0b0f19;
+    --background: #090d16;          /* Fondo general oscuro profundo */
+    --card-bg: #151d2a;             /* Tarjeta principal */
+    --card-inner-bg: #1e293b;       /* Tarjeta interna (Producto #1, #2) */
+    --text-main: #f8fafc;           /* Texto blanco brillante */
+    --text-muted: #94a3b8;          /* Texto secundario bien legible */
+    --border-color: #334155;        /* Bordes sutiles para tarjetas */
+    --input-bg: #0f172a;            /* Fondo de las cajas de texto */
+    --focus-ring: rgba(59, 130, 246, 0.4);
+    --nav-bg: #151d2a;
+    --nav-border: #334155;
+}
+
+/* REGLAS ESPECÍFICAS DE CONTRASTE PARA MODO OSCURO */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode select,
+body.dark-mode .form-control {
+    border: 1px solid #475569;     /* Bordes bien visibles en campos */
+    color: #ffffff;                 /* Texto ingresado blanco */
+}
+
+body.dark-mode input::placeholder {
+    color: #64748b;
+    opacity: 1;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode .form-control:focus {
+    border-color: #60a5fa;
+    background-color: #1e293b;
+}
+
+body.dark-mode .btn-secondary-sm {
+    background-color: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+    color: #60a5fa;
 }
 
 /* Reset básico para móviles */
@@ -25,6 +75,7 @@ body {
     background-color: var(--background);
     color: var(--text-main);
     overflow-x: hidden; 
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Cabecera fija en tono azul marino LFI */
@@ -35,7 +86,8 @@ body {
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transition: background-color 0.3s ease;
 }
 
 .app-header h1 {
@@ -60,8 +112,9 @@ body {
     border-radius: 12px;
     padding: 18px;
     margin-bottom: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .card h2,
@@ -69,7 +122,7 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 16px;
-    color: var(--navy-header);
+    color: var(--text-main);
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 8px;
 }
@@ -133,16 +186,16 @@ select,
     color: var(--text-main);
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    background-color: #fff;
+    background-color: var(--input-bg);
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s;
     appearance: none;
 }
 
 input:focus,
 select:focus,
 .form-control:focus {
-    border-color: var(--navy-header);
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
@@ -162,12 +215,12 @@ small {
 /* Contenedor de producto individual con Animación */
 .product-item,
 .producto-item {
-    background-color: #f8fafc;
+    background-color: var(--card-inner-bg);
     padding: 14px;
     border-radius: 8px;
     margin-bottom: 14px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease-out;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
     max-height: 500px;
     opacity: 1;
     transform: translateX(0);
@@ -194,7 +247,7 @@ small {
 
 .product-number {
     font-weight: 700;
-    color: var(--navy-header);
+    color: var(--text-main);
     font-size: 0.95rem;
 }
 
@@ -214,7 +267,7 @@ small {
 
 .btn-secondary-sm:active,
 .btn-outline:active {
-    background-color: #e2e8f0;
+    background-color: var(--border-color);
     color: var(--primary-dark);
 }
 
@@ -293,6 +346,56 @@ small {
     font-size: 1rem;
 }
 
+/* INTERRUPTOR MODO OSCURO (TOGGLE SWITCH) */
+.toggle-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #cbd5e1;
+    transition: .3s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
 /* BARRA DE NAVEGACIÓN INFERIOR MÓVIL */
 .bottom-nav {
     position: fixed;
@@ -300,13 +403,14 @@ small {
     left: 0;
     width: 100%;
     height: 65px;
-    background-color: #ffffff;
-    border-top: 1px solid #e2e8f0;
+    background-color: var(--nav-bg);
+    border-top: 1px solid var(--nav-border);
     display: flex;
     justify-content: space-around;
     align-items: center;
     z-index: 100;
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .nav-item {
@@ -319,7 +423,7 @@ small {
     justify-content: center;
     align-items: center;
     gap: 4px;
-    color: #94a3b8;
+    color: var(--text-muted);
     cursor: pointer;
     transition: color 0.2s, background-color 0.2s;
 }
@@ -338,7 +442,7 @@ small {
 }
 
 .nav-item:active {
-    background-color: #f1f5f9;
+    background-color: var(--border-color);
 }
 
 .spacer {

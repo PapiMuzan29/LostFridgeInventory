@@ -9,7 +9,6 @@ class AuthService {
     private User $userModel;
 
     public function __construct() {
-
         $this->userModel = new User();
     }
 
@@ -18,14 +17,14 @@ class AuthService {
         $user = $this->userModel->findByUsername($username);
 
         if (
-    $user !== null &&
-    isset($user['contrasenaUsuario']) &&
-    isset($user['apodoUsuario']) &&
-    isset($user['nombreRol']) &&
-    isset($user['estado']) &&
-    $user['estado'] == 1 &&
-    $password === $user['contrasenaUsuario']
-) {
+            $user !== null &&
+            isset($user['contrasenaUsuario']) &&
+            isset($user['apodoUsuario']) &&
+            isset($user['nombreRol']) &&
+            isset($user['estado']) &&
+            $user['estado'] == 1 &&
+            $password === $user['contrasenaUsuario']
+        ) {
 
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
@@ -33,6 +32,9 @@ class AuthService {
 
             session_regenerate_id(true);
 
+            // ⚠️ REGISTROS DE SESIÓN ACTUALIZADOS:
+            $_SESSION['idCuenta'] = $user['idCuenta'];       // Se guarda idCuenta para las FK de notas
+            $_SESSION['idRol'] = $user['idRol'] ?? null;     // Se guarda el idRol numérico
             $_SESSION['apodoUsuario'] = $user['apodoUsuario'];
             $_SESSION['nombreRol'] = $user['nombreRol'];
 
@@ -74,7 +76,7 @@ class AuthService {
             session_start();
         }
 
-        return isset($_SESSION['apodoUsuario']);
+        return isset($_SESSION['idCuenta']) || isset($_SESSION['apodoUsuario']);
     }
 }
 

@@ -1,11 +1,22 @@
 // Funciones para abrir y cerrar el Modal de Proveedores
 function abrirModalAgregarProveedor() {
+    const modal = document.getElementById('modalAgregarProveedor');
+    if (!modal) return;
     document.getElementById('formNuevoProveedor').reset(); // Limpia datos anteriores
-    document.getElementById('modalAgregarProveedor').style.display = 'flex';
+    modal.style.display = 'flex';
 }
 
 function cerrarModalAgregarProveedor() {
     document.getElementById('modalAgregarProveedor').style.display = 'none';
+}
+
+function cerrarModalEditarProveedor() {
+    const modal = document.getElementById('modalEditarProveedor');
+    if (modal) {
+        modal.style.display = 'none';
+        const form = document.getElementById('formEditarProveedor');
+        if (form) form.reset();
+    }
 }
 
 // Función para enviar los datos por AJAX
@@ -16,23 +27,32 @@ async function guardarProveedor(event) {
     const formData = new FormData(formulario);
 
     try {
-        const respuesta = await fetch('../Controllers/inventarioController.php?action=crearProveedor', {
+        const respuesta = await fetch('../Controllers/inventarioController.php?action=agregarProveedor', {
             method: 'POST',
             body: formData
         });
 
-        const resultado = await respuesta.json();
+        const textoRespuesta = await respuesta.text();
+        let resultado;
+        try {
+            resultado = JSON.parse(textoRespuesta);
+        } catch (e) {
+            alert("Error: El servidor no devolvió una respuesta válida (JSON).");
+            return;
+        }
 
         if (resultado.status === 'success') {
             alert('¡Proveedor registrado con éxito!');
             cerrarModalAgregarProveedor();
             
-            // Si el buscador actual está en "proveedor", recargamos la tabla para ver el nuevo registro
-            if (document.getElementById('selectTipoBusqueda').value === 'proveedor') {
-                document.getElementById('btnLimpiar').click(); 
+            const selectTipo = document.getElementById('selectTipoBusqueda');
+            if (selectTipo && selectTipo.value === 'proveedor') {
+                if (typeof window.cargarInventario === 'function') {
+                    window.cargarInventario(0);
+                }
             }
         } else {
-            alert('Error: ' + (resultado.message || 'No se pudo guardar el proveedor.'));
+            alert('Error: ' + (resultado.message || resultado.error || 'No se pudo guardar el proveedor.'));
         }
     } catch (error) {
         console.error('Error al guardar:', error);
@@ -46,15 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const selectTipoBusqueda = document.getElementById('selectTipoBusqueda');
     const labelDinamicoBusqueda = document.getElementById('labelDinamicoBusqueda');
-    const inputBusqueda      = document.getElementById('inputBusqueda');
-    const selectEstado       = document.getElementById('selectEstado');
-    const btnLimpiar         = document.getElementById('btnLimpiar');
-    const theadInventario    = document.getElementById('thead-inventario');
-    const tbodyInventario    = document.getElementById('tabla-inventario-tbody');
-    const btnAnterior        = document.getElementById('btnAnterior');
-    const btnSiguiente       = document.getElementById('btnSiguiente');
-    const btnPag1            = document.getElementById('btnPag1');
-    const btnPag2            = document.getElementById('btnPag2');
+    const inputBusqueda        = document.getElementById('inputBusqueda');
+    const selectEstado         = document.getElementById('selectEstado');
+    const btnLimpiar           = document.getElementById('btnLimpiar');
+    const theadInventario      = document.getElementById('thead-inventario');
+    const tbodyInventario      = document.getElementById('tabla-inventario-tbody');
+    const btnAnterior          = document.getElementById('btnAnterior');
+    const btnSiguiente         = document.getElementById('btnSiguiente');
+    const btnPag1              = document.getElementById('btnPag1');
+    const btnPag2              = document.getElementById('btnPag2');
 
     // Función de seguridad XSS
     function escaparHTML(cadena) {
@@ -70,12 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const headersProducto = `<tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Proveedor</th><th>Existencia (cajas)</th><th>Total Peso</th><th>Estado</th><th>Acciones</th></tr>`;
     const headersProveedor = `<tr><th>Código</th><th>Nombre / Empresa</th><th>RFC</th><th>Dirección</th><th>Región / Estado</th><th>Status</th><th>Acciones</th></tr>`;
 
-    inputBusqueda.focus();
-    setTimeout(() => { inputBusqueda.focus(); }, 100);
+    if (inputBusqueda) {
+        inputBusqueda.focus();
+        setTimeout(() => { inputBusqueda.focus(); }, 100);
+    }
 
     function actualizarNumerosPaginacion() {
-        btnPag1.textContent = paginaActual;
-        btnPag2.textContent = paginaActual + 1;
+        if (btnPag1 && btnPag2) {
+            btnPag1.textContent = paginaActual;
+            btnPag2.textContent = paginaActual + 1;
+        }
     }
 
     async function cargarInventario(direccion = 0) {
@@ -84,18 +108,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (paginaActual < 1) paginaActual = 1;
 
-        const tipo   = selectTipoBusqueda.value;
-        const buscar = inputBusqueda.value;
-        const estado = selectEstado.value;
+        const tipo   = selectTipoBusqueda ? selectTipoBusqueda.value : 'producto';
+        const buscar = inputBusqueda ? inputBusqueda.value : '';
+        const estado = selectEstado ? selectEstado.value : '';
 
         if (tipo === 'proveedor') {
-            labelDinamicoBusqueda.textContent = "Buscar proveedor";
-            theadInventario.innerHTML = headersProveedor;
-            inputBusqueda.placeholder = "Nombre, RFC o código de proveedor...";
+            if (labelDinamicoBusqueda) labelDinamicoBusqueda.textContent = "Buscar proveedor";
+            if (theadInventario) theadInventario.innerHTML = headersProveedor;
+            if (inputBusqueda) inputBusqueda.placeholder = "Nombre, RFC o código de proveedor...";
         } else {
-            labelDinamicoBusqueda.textContent = "Buscar producto";
-            theadInventario.innerHTML = headersProducto;
-            inputBusqueda.placeholder = "Nombre, código o descripción...";
+            if (labelDinamicoBusqueda) labelDinamicoBusqueda.textContent = "Buscar producto";
+            if (theadInventario) theadInventario.innerHTML = headersProducto;
+            if (inputBusqueda) inputBusqueda.placeholder = "Nombre, código o descripción...";
         }
 
         try {
@@ -126,58 +150,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Error en el fetch:', error);
-            tbodyInventario.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">Error al conectar con el servidor.</td></tr>';
+            if (tbodyInventario) {
+                tbodyInventario.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">Error al conectar con el servidor.</td></tr>';
+            }
         }
     }
 
-    btnSiguiente.addEventListener('click', () => { cargarInventario(1); });
-    btnAnterior.addEventListener('click', () => { if (paginaActual > 1) { cargarInventario(-1); } });
+    if (btnSiguiente) btnSiguiente.addEventListener('click', () => { cargarInventario(1); });
+    if (btnAnterior) btnAnterior.addEventListener('click', () => { if (paginaActual > 1) { cargarInventario(-1); } });
 
     function renderizarProductos(datos) {
-    if (!Array.isArray(datos) || datos.length === 0) {
-        tbodyInventario.innerHTML = '<tr><td colspan="8" style="text-align:center;">No se encontraron productos.</td></tr>';
-        return;
+        if (!tbodyInventario) return;
+        if (!Array.isArray(datos) || datos.length === 0) {
+            tbodyInventario.innerHTML = '<tr><td colspan="8" style="text-align:center;">No se encontraron productos.</td></tr>';
+            return;
+        }
+        let html = '';
+        datos.forEach(prod => {
+            const cajas = parseInt(prod.totalCajas) || 0; 
+            const pesoDb = parseFloat(prod.pesoProductive) || parseFloat(prod.totalPeso) || 0;
+            const esActivo = parseInt(prod.activo) === 1;
+
+            const categoriaTexto = prod.nombreCategoria 
+                ? `<span style="background: #f1f5f9; color: #334155; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">${escaparHTML(prod.nombreCategoria)}</span>`
+                : '<span style="color: #94a3b8; font-style: italic;">Sin asignar</span>';
+
+            html += `<tr>
+                <td>${escaparHTML(prod.codigoProducto)}</td>
+                <td><strong>${escaparHTML(prod.nombreProducto)}</strong></td>
+                <td>${categoriaTexto}</td>
+                <td>${escaparHTML(prod.nombreProveedor)}</td>
+                <td><span style="font-weight:700; color: #0f172a;">${cajas}</span></td> 
+                <td><strong>${pesoDb.toFixed(2)} kg</strong></td>
+                <td>
+                    <span class="estado ${esActivo ? 'activo' : 'inactivo'}">
+                        ${esActivo ? 'Activo' : 'Inactivo'}
+                    </span>
+                </td>
+                <td>
+                    <div class="acciones">
+                        <button type="button" class="btn-accion editar" onclick="editarProducto(${prod.idProducto})">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button type="button" class="btn-accion eliminar" onclick="eliminarProducto(${prod.idProducto})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+        tbodyInventario.innerHTML = html;
     }
-    let html = '';
-    datos.forEach(prod => {
-        // 🛠️ AQUÍ ESTABA EL DETALLE: Cambiado para que lea exactamente 'totalCajas'
-        const cajas = parseInt(prod.totalCajas) || 0; 
-        
-        const pesoDb = parseFloat(prod.pesoProductive) || parseFloat(prod.totalPeso) || 0;
-        const esActivo = parseInt(prod.activo) === 1;
-
-        const categoriaTexto = prod.nombreCategoria 
-            ? `<span style="background: #f1f5f9; color: #334155; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">${escaparHTML(prod.nombreCategoria)}</span>`
-            : '<span style="color: #94a3b8; font-style: italic;">Sin asignar</span>';
-
-        html += `<tr>
-            <td>${escaparHTML(prod.codigoProducto)}</td>
-            <td><strong>${escaparHTML(prod.nombreProducto)}</strong></td>
-            <td>${categoriaTexto}</td>
-            <td>${escaparHTML(prod.nombreProveedor)}</td>
-            <td><span style="font-weight:700; color: #0f172a;">${cajas}</span></td> 
-            <td><strong>${pesoDb.toFixed(2)} kg</strong></td>
-            <td>
-                <span class="estado ${esActivo ? 'activo' : 'inactivo'}">
-                    ${esActivo ? 'Activo' : 'Inactivo'}
-                </span>
-            </td>
-            <td>
-                <div class="acciones">
-                    <button type="button" class="btn-accion editar" onclick="editarProducto(${prod.idProducto})">
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                    <button type="button" class="btn-accion eliminar" onclick="eliminarProducto(${prod.idProducto})">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>`;
-    });
-    tbodyInventario.innerHTML = html;
-}
 
     function renderizarProveedores(datos) {
+        if (!tbodyInventario) return;
         if (!Array.isArray(datos) || datos.length === 0) {
             tbodyInventario.innerHTML = '<tr><td colspan="7" style="text-align:center;">No se encontraron proveedores.</td></tr>';
             return;
@@ -185,6 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '';
         datos.forEach(prov => {
             const esActivo = parseInt(prov.status) === 1;
+
+            // Guardamos el objeto completo serializado en un atributo seguro de la fila o botón
+            const provJson = encodeURIComponent(JSON.stringify(prov));
 
             html += `<tr>
                 <td>${escaparHTML(prov.codigoProveedor)}</td>
@@ -199,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
                 <td>
                     <div class="acciones">
-                        <button type="button" class="btn-accion editar" onclick="editarProveedor(${prov.idProveedor})">
+                        <button type="button" class="btn-accion editar" onclick="editarProveedor('${provJson}')">
                             <i class="fa-solid fa-pen"></i>
                         </button>
                         <button type="button" class="btn-accion eliminar" onclick="eliminarProveedor(${prov.idProveedor})">
@@ -212,56 +241,214 @@ document.addEventListener('DOMContentLoaded', () => {
         tbodyInventario.innerHTML = html;
     }
 
-    inputBusqueda.addEventListener('input', () => { paginaActual = 1; actualizarNumerosPaginacion(); cargarInventario(0); });
-    selectTipoBusqueda.addEventListener('change', () => { paginaActual = 1; inputBusqueda.value = ''; actualizarNumerosPaginacion(); cargarInventario(0); });
-    selectEstado.addEventListener('change', () => { paginaActual = 1; actualizarNumerosPaginacion(); cargarInventario(0); });
+    if (inputBusqueda) inputBusqueda.addEventListener('input', () => { paginaActual = 1; actualizarNumerosPaginacion(); cargarInventario(0); });
+    if (selectTipoBusqueda) selectTipoBusqueda.addEventListener('change', () => { paginaActual = 1; inputBusqueda.value = ''; actualizarNumerosPaginacion(); cargarInventario(0); });
+    if (selectEstado) selectEstado.addEventListener('change', () => { paginaActual = 1; actualizarNumerosPaginacion(); cargarInventario(0); });
     
-    btnLimpiar.addEventListener('click', () => {
-        inputBusqueda.value = '';
-        selectEstado.value = '';
-        paginaActual = 1;
-        actualizarNumerosPaginacion();
-        cargarInventario(0);
-    });
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', () => {
+            inputBusqueda.value = '';
+            selectEstado.value = '';
+            paginaActual = 1;
+            actualizarNumerosPaginacion();
+            cargarInventario(0);
+        });
+    }
 
+    window.cargarInventario = cargarInventario;
     cargarInventario(0);
 });
 
-function editarProducto(id) { console.log("Editar prod:", id); }
-function eliminarProducto(id) { console.log("Eliminar prod:", id); }
-function editarProveedor(id) { console.log("Editar prov:", id); }
-function eliminarProveedor(id) { console.log("Eliminar prov:", id); }
+// --- FUNCIONES CRUD PARA PRODUCTOS Y PROVEEDORES ---
 
+async function editarProducto(id) {
+    const modal = document.getElementById('modalEditarProducto');
+    if (!modal) return;
+    
+    document.getElementById('editIdProducto').value = id;
+    modal.style.display = 'flex';
+}
 
-// 🛠️ OPTIMIZADO: Eliminado el fetch redundante que vaciaba tus categorías de PHP
+async function actualizarProducto(event) {
+    event.preventDefault();
+    const formulario = document.getElementById('formEditarProducto');
+    const formData = new FormData(formulario);
+
+    try {
+        const respuesta = await fetch('../Controllers/inventarioController.php?action=actualizarProducto', {
+            method: 'POST',
+            body: formData
+        });
+        const resultado = await respuesta.json();
+
+        if (resultado.status === 'success') {
+            alert('¡Producto actualizado con éxito!');
+            cerrarModalEditarProducto();
+            if (typeof window.cargarInventario === 'function') window.cargarInventario(0);
+        } else {
+            alert('Error: ' + (resultado.message || 'No se pudo actualizar.'));
+        }
+    } catch (error) {
+        console.error('Error al actualizar:', error);
+        alert('Ocurrió un error al conectar con el servidor.');
+    }
+}
+
+async function eliminarProducto(id) {
+    if (!confirm("¿Estás seguro de que deseas eliminar este producto del inventario?")) {
+        return;
+    }
+
+    try {
+        const respuesta = await fetch(`../Controllers/inventarioController.php?action=eliminarProducto&id=${id}`, {
+            method: 'POST'
+        });
+
+        const textoRespuesta = await respuesta.text();
+        let resultado;
+        try {
+            resultado = JSON.parse(textoRespuesta);
+        } catch (e) {
+            alert("Error: El servidor no devolvió una respuesta válida.");
+            return;
+        }
+
+        if (resultado.status === 'success') {
+            alert('¡Producto eliminado correctamente!');
+            if (typeof window.cargarInventario === 'function') {
+                window.cargarInventario(0); 
+            }
+        } else {
+            alert('Error: ' + (resultado.message || resultado.error || 'No se pudo eliminar el producto.'));
+        }
+    } catch (error) {
+        console.error('Error al eliminar producto:', error);
+        alert('Ocurrió un error al conectar con el servidor.');
+    }
+}
+
+// 🔥 FUNCIÓN MEJORADA: RECIBE Y LLENA AUTOMÁTICAMENTE LOS DATOS DEL PROVEEDOR
+function editarProveedor(provJsonCodificado) {
+    const modal = document.getElementById('modalEditarProveedor');
+    if (!modal) return;
+
+    try {
+        const prov = JSON.parse(decodeURIComponent(provJsonCodificado));
+
+        // Rellenamos los campos principales con los datos actuales
+        document.getElementById('editProvId').value = prov.idProveedor ?? '';
+        document.getElementById('editProvCodigo').value = prov.codigoProveedor ?? '';
+        document.getElementById('editProvNombre').value = prov.nombreProveedor ?? '';
+        document.getElementById('editProvRfc').value = prov.rfc ?? '';
+        document.getElementById('editProvDireccion').value = prov.direccion ?? '';
+        document.getElementById('editProvColonia').value = prov.colonia ?? '';
+        document.getElementById('editProvCp').value = prov.codigoPostal ?? '';
+        document.getElementById('editProvEstado').value = prov.estadoRepublica ?? '';
+
+        // Si existen los campos de configuración QR en el modal de editar, los rellenamos también
+        if (document.getElementById('editCodigoBarrasProductosPosicion')) {
+            document.getElementById('editCodigoBarrasProductosPosicion').value = prov.codigoBarrasProductosPosicion ?? 0;
+            document.getElementById('editCodigoBarrasProductosLongitud').value = prov.codigoBarrasProductosLongitud ?? 0;
+            document.getElementById('editCodigoBarrasEnterosPosicion').value = prov.codigoBarrasEnterosPosicion ?? 0;
+            document.getElementById('editCodigoBarrasEnterosLongitud').value = prov.codigoBarrasEnterosLongitud ?? 0;
+            document.getElementById('editCodigoBarrasDecimalesPosicion').value = prov.codigoBarrasDecimalesPosicion ?? 0;
+            document.getElementById('editCodigoBarrasDecimalesLongitud').value = prov.codigoBarrasDecimalesLongitud ?? 0;
+        }
+
+        modal.style.display = 'flex';
+    } catch (e) {
+        console.error("Error al decodificar los datos del proveedor:", e);
+        alert("Error al abrir los datos de edición del proveedor.");
+    }
+}
+
+async function actualizarProveedor(event) {
+    event.preventDefault();
+    const formulario = document.getElementById('formEditarProveedor');
+    const formData = new FormData(formulario);
+
+    try {
+        const respuesta = await fetch('../Controllers/inventarioController.php?action=actualizarProveedor', {
+            method: 'POST',
+            body: formData
+        });
+        const resultado = await respuesta.json();
+
+        if (resultado.status === 'success') {
+            alert('¡Proveedor actualizado con éxito!');
+            cerrarModalEditarProveedor();
+            if (typeof window.cargarInventario === 'function') window.cargarInventario(0);
+        } else {
+            alert('Error: ' + (resultado.message || 'No se pudo actualizar el proveedor.'));
+        }
+    } catch (error) {
+        console.error('Error al actualizar proveedor:', error);
+        alert('Ocurrió un error al conectar con el servidor.');
+    }
+}
+
+async function eliminarProveedor(id) {
+    if (!confirm("¿Estás seguro de que deseas eliminar este proveedor?")) {
+        return;
+    }
+
+    try {
+        const respuesta = await fetch(`../Controllers/inventarioController.php?action=eliminarProveedor&id=${id}`, {
+            method: 'POST'
+        });
+
+        const textoRespuesta = await respuesta.text();
+        let resultado;
+        try {
+            resultado = JSON.parse(textoRespuesta);
+        } catch (e) {
+            alert("Error: El servidor no devolvió una respuesta válida.");
+            return;
+        }
+
+        if (resultado.status === 'success') {
+            alert('¡Proveedor eliminado correctamente!');
+            if (typeof window.cargarInventario === 'function') {
+                window.cargarInventario(0); 
+            }
+        } else {
+            alert('Error: ' + (resultado.message || resultado.error || 'No se pudo eliminar el proveedor.'));
+        }
+    } catch (error) {
+        console.error('Error al eliminar proveedor:', error);
+        alert('Ocurrió un error al conectar con el servidor.');
+    }
+}
+
+// 🛠️ Funciones para modales de productos
 function abrirModalAgregarProducto() {
     const modal = document.getElementById('modalAgregarProducto');
     if (!modal) return;
 
-    // Reseteamos campos de texto pero mantenemos las opciones cargadas por PHP intactas
     document.getElementById('formNuevoProducto').reset();
     modal.style.display = 'flex';
 }
 
-function abrirModalEditarProveedor(){
-    const modal = document.getElementById('modalEditarProveedor');
-    if (!modal) return;
-
-    modal.style.display = 'flex';   
-}
-
-function cerrarModalEditarProveedor(){
-    document.getElementById('modalEditarProveedor').style.display = 'none';
-    document.getElementById('modalEditarProveedor').reset();
+function cerrarModalEditarProducto() {
+    const modal = document.getElementById('modalEditarProducto');
+    if (modal) {
+        modal.style.display = 'none';
+        const form = document.getElementById('formEditarProducto');
+        if (form) form.reset();
+    }
 }
 
 function cerrarModalAgregarProducto() {
-    document.getElementById('modalAgregarProducto').style.display = 'none';
+    const modal = document.getElementById('modalAgregarProducto');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Guardar Producto por AJAX
 async function guardarProducto(event) {
-    event.preventDefault();
+    event.preventDefault(); 
+    
     const formulario = document.getElementById('formNuevoProducto');
     const formData = new FormData(formulario);
 
@@ -271,15 +458,12 @@ async function guardarProducto(event) {
             body: formData
         });
         
-        // Capturamos el texto plano primero por si PHP arroja un Warning o Error de sintaxis
         const textoRespuesta = await respuesta.text();
-        console.log("Respuesta bruta del servidor:", textoRespuesta);
-
         let resultado;
         try {
             resultado = JSON.parse(textoRespuesta);
         } catch (e) {
-            alert("El servidor no devolvió un JSON válido. Revisa la consola (F12).");
+            alert("Error: El servidor no devolvió una respuesta válida (JSON).");
             return;
         }
 
@@ -287,15 +471,16 @@ async function guardarProducto(event) {
             alert('¡Producto registrado con éxito!');
             cerrarModalAgregarProducto();
             
-            const kpiProd = document.getElementById('kpi-total-productos');
-            if (kpiProd) kpiProd.textContent = parseInt(kpiProd.textContent) + 1;
+            const inputBusqueda = document.getElementById('inputBusqueda');
+            if (inputBusqueda) {
+                inputBusqueda.value = ''; 
+            }
 
-            if (document.getElementById('selectTipoBusqueda').value === 'producto') {
-                document.getElementById('btnLimpiar').click();
+            if (typeof window.cargarInventario === 'function') {
+                window.cargarInventario(0); 
             }
         } else {
-            // Si no viene 'message', mostramos el resultado completo estructurado
-            alert('Error: ' + (resultado.message || resultado.error || 'Error interno en el controlador.'));
+            alert('Error: ' + (resultado.message || resultado.error || 'No se pudo guardar el producto.'));
         }
     } catch (error) {
         console.error('Error al guardar producto:', error);

@@ -195,32 +195,43 @@ CREATE TABLE Cliente (
 -- ------------------------------------------------------------
 -- 15. Notas  (depende de: Cliente, Cuenta)
 -- ------------------------------------------------------------
-CREATE TABLE Notas (
-    idNotas         INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    idCliente       INT,
-    idCuenta        INT,
-    folioTicketCaja VARCHAR(250) NULL,
-    fechaCreacion   DATETIME DEFAULT CURRENT_TIMESTAMP,
-    estado          ENUM('pendiente','revision','aprobada','rechazada','entregada') DEFAULT 'pendiente',
-    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente),
-    FOREIGN KEY (idCuenta)  REFERENCES Cuenta(idCuenta)
-);
 
--- ------------------------------------------------------------
--- 16. DetalleNotas  (depende de: Notas, Producto, Lote)
--- ------------------------------------------------------------
-CREATE TABLE DetalleNotas (
-    idDetalle INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    idNotas   INT            NOT NULL,
-    idProducto INT           NULL,
-    idLote    INT            NULL,
-    cantidad  INT            NOT NULL,
-    peso      DECIMAL(18,4)  NOT NULL,
-    FOREIGN KEY (idNotas)    REFERENCES Notas(idNotas),
-    FOREIGN KEY (idProducto) REFERENCES Producto(idProducto),
-    FOREIGN KEY (idLote)     REFERENCES Lote(idLote)
-);
+-- 1. Tabla Principal de Notas
+-- 1. Tabla Principal de Notas (Registra Vendedor emisor y Cajero receptor)
+-- 1. Tabla Principal de Notas
+-- 1. Tabla Principal de Notas
+CREATE TABLE IF NOT EXISTS notas (
+    id_nota BIGINT AUTO_INCREMENT PRIMARY KEY,
+    folio VARCHAR(20) NOT NULL UNIQUE,
+    nombre_cliente VARCHAR(150) NOT NULL,
+    id_vendedor INT NOT NULL,
+    id_cajero INT NULL,
+    estado ENUM('PENDIENTE', 'COBRADO', 'CANCELADO') DEFAULT 'PENDIENTE',
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_cobro DATETIME NULL,
+    FOREIGN KEY (id_vendedor) REFERENCES cuenta(idCuenta),
+    FOREIGN KEY (id_cajero) REFERENCES cuenta(idCuenta)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 2. Detalle de Productos por Nota
+CREATE TABLE IF NOT EXISTS detalle_notas (
+    id_detalle BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_nota BIGINT NOT NULL,
+    idProducto INT NOT NULL,
+    kilos DECIMAL(10, 2) NOT NULL,
+    piezas INT DEFAULT 0,
+    FOREIGN KEY (id_nota) REFERENCES notas(id_nota) ON DELETE CASCADE,
+    FOREIGN KEY (idProducto) REFERENCES producto(idProducto)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 3. Estibadores Asignados a la Nota
+CREATE TABLE IF NOT EXISTS nota_estibadores (
+    id_nota BIGINT NOT NULL,
+    id_estibador INT NOT NULL,
+    PRIMARY KEY (id_nota, id_estibador),
+    FOREIGN KEY (id_nota) REFERENCES notas(id_nota) ON DELETE CASCADE,
+    FOREIGN KEY (id_estibador) REFERENCES cuenta(idCuenta)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 -- ------------------------------------------------------------
 -- 17. Mermas  (depende de: Producto, Lote)
 -- ------------------------------------------------------------
