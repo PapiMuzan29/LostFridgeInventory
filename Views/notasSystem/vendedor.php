@@ -174,7 +174,7 @@ if (!isset($productos) || !isset($estibadores)) {
                 <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">Desarrollado para Grupo Cárnico América</p>
                 
                 <div style="margin-top: 20px;">
-                    <a href="../../Controllers/LoginController.php?action=logout" class="btn-danger-block">
+                    <a href="../../Config/Logouth.php" class="btn-danger-block">
                         <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
                     </a>
                 </div>

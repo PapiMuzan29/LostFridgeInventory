@@ -433,3 +433,111 @@ body.dark-theme .globo-texto::after {
 body.dark-theme .globo-texto::before {
     border-color: #334155 transparent !important;
 }
+
+/* ==========================================
+   CONFIGURACIÓN PARA MENÚ MÓVIL (NUEVO)
+========================================== */
+
+/* 1. Botones y Overlay (ocultos por defecto en PC) */
+.btn-toggle-sidebar, .btn-close-sidebar {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-toggle-sidebar {
+    font-size: 24px;
+    color: #1e293b;
+    margin-right: 15px;
+}
+
+.btn-close-sidebar {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    color: white; /* Blanco porque el sidebar es oscuro */
+}
+
+/* Modo oscuro para el botón hamburguesa */
+body.dark-theme .btn-toggle-sidebar {
+    color: #ffffff !important;
+}
+
+/* 2. El Overlay (fondo semi transparente) */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.65) !important; 
+    backdrop-filter: blur(3px); 
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 1005 !important;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none; 
+}
+
+.sidebar-overlay.activo {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto; /* Reactiva los clics para poder cerrarlo */
+}
+
+/* ==========================================
+   MEDIA QUERIES - MODO CELULAR (<= 1024px)
+========================================== */
+@media (max-width: 1024px) {
+    /* Esconder el Sidebar hacia la izquierda */
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+    
+    /* Mostrar Sidebar cuando tiene la clase "abierto" */
+    .sidebar.abierto {
+        transform: translateX(0);
+    }
+
+    /* Ajustar la Top Bar para que ocupe todo el ancho */
+    .top-bar-dashboard {
+        left: 0;
+        padding: 0 15px;
+    }
+
+    /* Mostrar los botones de control */
+    .btn-toggle-sidebar, .btn-close-sidebar {
+        display: block;
+    }
+
+    /* Ajustes visuales para la barra superior en móvil */
+    .top-bar-metrics {
+        justify-content: flex-start;
+    }
+    .titulo-pagina {
+        flex-grow: 1;
+    }
+    .metrics-right-group {
+        gap: 15px;
+    }
+    
+    /* Ocultar algo de texto para que quepa en celulares */
+    .metric-item .label,
+    .metric-date, 
+    .metric-time,
+    .user-badge .user-role {
+        display: none; /* Esconde fecha, hora y rol para no romper la pantalla */
+    }
+    
+    .user-badge {
+        padding-left: 10px;
+        border-left: none;
+    }
+}

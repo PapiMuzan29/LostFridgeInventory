@@ -1,5 +1,5 @@
 /* ===================================================================================
-   HOJA DE ESTILOS EXCLUSIVA PARA EL MÓDULO DE INVENTARIO LFI (VERSIÓN CORREGIDA)
+   HOJA DE ESTILOS EXCLUSIVA PARA EL MÓDULO DE INVENTARIO LFI
 =================================================================================== */
 
 /* --- 1. Encabezado --- */
@@ -46,21 +46,41 @@
     transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
-.btn-exportar { background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b; }
+.btn-exportar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
+}
 .btn-exportar i { color: #107c41; }
 .btn-exportar:hover { background: #f8fafc; }
 
-.btn-imprimir { background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b; }
+.btn-imprimir {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
+}
 .btn-imprimir i { color: #475569; }
 .btn-imprimir:hover { background: #f8fafc; }
 
-.btn-agregar-prod { background: #0d6efd; color: #ffffff; border: none; }
+/* Botones de acción principal */
+.btn-agregar-prod {
+    background: #0d6efd;
+    color: #ffffff;
+    border: none;
+}
 .btn-agregar-prod:hover { background: #0b5ed7; }
 
-.btn-agregar-prov { background: #1e293b; color: #ffffff; border: none; }
+.btn-agregar-prov {
+    background: #1e293b;
+    color: #ffffff;
+    border: none;
+}
 .btn-agregar-prov:hover { background: #0f172a; }
 
-/* --- 2. CARDS DE ESTADÍSTICAS --- */
+
+/* ================================================= */
+/* 2. CARDS DE ESTADÍSTICAS (ESTÁNDAR DEL SISTEMA)   */
+/* ================================================= */
 .cards {
     display: flex !important;
     flex-direction: row !important;
@@ -83,13 +103,38 @@
     transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.card:hover { transform: translateY(-2px); }
-.card h3 { color: #64748b; margin-bottom: 8px; font-size: 14px; font-weight: 600; transition: color 0.3s ease; }
-.card span { font-size: 36px; font-weight: bold; color: #1e293b; display: block; line-height: 1.1; transition: color 0.3s ease; }
-.card-subtexto { font-size: 12px; color: #94a3b8; margin-top: 6px; transition: color 0.3s ease; }
+.card:hover {
+    transform: translateY(-2px);
+}
 
-.general-mov { border-left: 5px solid #1a365d; } 
-.success     { border-left: 5px solid #16a34a; } 
+.card h3 {
+    color: #64748b;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.card span {
+    font-size: 36px;
+    font-weight: bold;
+    color: #1e293b;
+    display: block;
+    line-height: 1.1;
+    transition: color 0.3s ease;
+}
+
+.card-subtexto {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 6px;
+    transition: color 0.3s ease;
+}
+
+/* Bordes laterales indicadores */
+.general-mov { border-left: 5px solid #1a365d; } /* Azul corporativo */
+.success     { border-left: 5px solid #16a34a; } /* Verde */
+
 
 /* --- 3. Filtros --- */
 .inventario-filtro-container {
@@ -108,186 +153,707 @@
     flex-wrap: wrap;
 }
 
-.filtro-grupo { flex: 1; min-width: 140px; }
-.filtro-grupo.flex-grande { flex: 2; min-width: 200px; }
-.filtro-grupo label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px; transition: color 0.3s ease; }
+.filtro-grupo {
+    flex: 1;
+    min-width: 140px;
+}
 
-.inventario-buscador-wrapper { position: relative; width: 100%; }
+.filtro-grupo.flex-grande {
+    flex: 2;
+    min-width: 200px;
+}
+
+.filtro-grupo label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+    transition: color 0.3s ease;
+}
+
+.inventario-buscador-wrapper {
+    position: relative;
+    width: 100%;
+}
+
 .inventario-buscador-wrapper input {
-    width: 100%; padding: 10px 35px 10px 12px; border: 1px solid #cbd5e1;
-    border-radius: 6px; font-size: 14px; outline: none; background: #ffffff; color: #1e293b;
+    width: 100%;
+    padding: 10px 35px 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background: #ffffff;
+    color: #1e293b;
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
-.inventario-buscador-wrapper i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+
+.inventario-buscador-wrapper i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    transition: color 0.3s ease;
+}
 
 .filtro-grupo select {
-    width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;
-    background: #ffffff; color: #1e293b; font-size: 14px; outline: none; cursor: pointer;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-.filtro-botones { display: flex; gap: 10px; }
-.btn-filtrar-inv, .btn-limpiar-inv { padding: 10px 20px; height: 41px; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; transition: background 0.2s, border-color 0.2s, color 0.2s; }
-.btn-filtrar-inv { background: #0d6efd; color: white; border: none; }
+.filtro-botones {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-filtrar-inv, .btn-limpiar-inv {
+    padding: 10px 20px;
+    height: 41px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn-filtrar-inv {
+    background: #0d6efd;
+    color: white;
+    border: none;
+}
 .btn-filtrar-inv:hover { background: #0b5ed7; }
-.btn-limpiar-inv { background: #ffffff; border: 1px solid #cbd5e1; color: #475569; }
+
+.btn-limpiar-inv {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
 .btn-limpiar-inv:hover { background: #f8fafc; }
 
-/* ===================================================================
-   4. NUEVA ESTRUCTURA DE TABLA (A PRUEBA DE FALLOS)
-=================================================================== */
 
-/* El contenedor maneja los bordes y el scroll, NO la tabla */
-.table-responsive-wrapper {
+/* --- 4. Tabla de Inventario --- */
+.tabla-inventario,
+.tablaUsuarios {
     width: 100%;
     margin-top: 25px;
     background: #ffffff;
     border-radius: 8px;
+    overflow: hidden;
     border: 1px solid #e2e8f0;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    border-collapse: collapse;
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Forzamos a la tabla a comportarse como tabla siempre */
-.table-responsive-wrapper table.tabla-inventario,
-.table-responsive-wrapper table.tablaUsuarios {
-    width: 100% !important;
-    min-width: 800px !important; /* Forza el scroll en móviles */
-    border-collapse: collapse !important;
-    margin-top: 0 !important;
-    border: none !important;
-    display: table !important; 
-}
-
-/* Reseteo forzoso de partes internas para evitar colapsos */
-.table-responsive-wrapper thead { display: table-header-group !important; }
-.table-responsive-wrapper tbody { display: table-row-group !important; }
-.table-responsive-wrapper tr { display: table-row !important; }
-
 .tabla-inventario thead tr,
-.tablaUsuarios thead tr { background: #f8fafc; text-align: left; transition: background-color 0.3s ease; }
+.tablaUsuarios thead tr {
+    background: #f8fafc;
+    text-align: left;
+    transition: background-color 0.3s ease;
+}
 
 .tabla-inventario th,
 .tablaUsuarios th {
-    padding: 14px; color: #1f2f56; font-size: 13px; font-weight: 600;
-    border-bottom: 1px solid #e2e8f0; transition: color 0.3s ease, border-color 0.3s ease;
-    white-space: nowrap;
+    padding: 14px;
+    color: #1f2f56;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px solid #e2e8f0;
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .tabla-inventario td,
 .tablaUsuarios td {
-    padding: 14px; color: #334155; font-size: 14px;
-    border-bottom: 1px solid #f1f5f9; transition: color 0.3s ease, border-color 0.3s ease;
-    white-space: nowrap;
+    padding: 14px;
+    color: #334155;
+    font-size: 14px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .tabla-inventario tbody tr:hover,
-.tablaUsuarios tbody tr:hover { background: #f8fafc; }
+.tablaUsuarios tbody tr:hover {
+    background: #f8fafc;
+}
+
 .txt-centro { text-align: center; }
 
-/* Badges */
-.badge-extra, .badge-categoria, .badge-ubicacion { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; text-align: center; }
-.badge-extra, .badge-categoria { background-color: #e0f2fe; color: #0369a1 !important; border: 1px solid #bae6fd; }
-.badge-ubicacion { background: #eff6ff; color: #1e40af !important; border: 1px solid #bfdbfe; font-family: monospace; }
-.estado-optimo { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+/* Badges y Categorías (Modo Claro) */
+.badge-extra,
+.badge-categoria,
+.badge-ubicacion {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.badge-extra,
+.badge-categoria {
+    background-color: #e0f2fe;
+    color: #0369a1 !important;
+    border: 1px solid #bae6fd;
+}
+
+.badge-ubicacion {
+    background: #eff6ff;
+    color: #1e40af !important;
+    border: 1px solid #bfdbfe;
+    font-family: monospace;
+}
+
+.estado-optimo {
+    background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;
+}
+
 
 /* --- 5. Paginación --- */
-.inventario-paginacion-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-bottom: 40px; }
-#txtMostrandoRegistros { color: #64748b; font-size: 14px; transition: color 0.3s ease; }
-.paginacion-controles, .numeros-wrapper { display: flex; gap: 5px; margin: 0; }
-.btn-pagina-inv { background: #ffffff; border: 1px solid #cbd5e1; color: #475569; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
-.btn-pagina-inv:hover { background: #f1f5f9; }
-.btn-pagina-inv.activa { background: #0d6efd; color: white; border-color: #0d6efd; }
+.inventario-paginacion-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-bottom: 40px;
+}
+
+#txtMostrandoRegistros {
+    color: #64748b;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.paginacion-controles {
+    margin: 0;
+    display: flex;
+    gap: 5px;
+}
+
+.numeros-wrapper {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-pagina-inv {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.btn-pagina-inv:hover {
+    background: #f1f5f9;
+}
+
+.btn-pagina-inv.activa {
+    background: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
 
 /* ===================================================================
-   6. REGLAS MODO OSCURO 
+   6. REGLAS MODO OSCURO (EXCLUSIVAS PARA EL MÓDULO DE INVENTARIO)
 =================================================================== */
-body.dark-theme { background-color: #0a0a0c !important; color: #f4f4f5 !important; }
-body.dark-theme .header-titulos h1 { color: #ffffff !important; }
-body.dark-theme .header-titulos p { color: #a1a1aa !important; }
-body.dark-theme .btn-exportar, body.dark-theme .btn-imprimir { background-color: #121215 !important; border-color: #27272a !important; color: #f4f4f5 !important; }
-body.dark-theme .btn-exportar:hover, body.dark-theme .btn-imprimir:hover { background-color: #18181b !important; }
-body.dark-theme .btn-imprimir i { color: #a1a1aa !important; }
-body.dark-theme .btn-agregar-prov { background-color: #27272a !important; color: #ffffff !important; }
-body.dark-theme .btn-agregar-prov:hover { background-color: #3f3f46 !important; }
 
-body.dark-theme .card { background-color: #121215 !important; border: 1px solid #27272a !important; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important; }
-body.dark-theme .card h3 { color: #a1a1aa !important; }
-body.dark-theme .card span { color: #ffffff !important; }
-body.dark-theme .card-subtexto { color: #71717a !important; }
+body.dark-theme {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .header-titulos h1 {
+    color: #ffffff !important;
+}
+
+body.dark-theme .header-titulos p {
+    color: #a1a1aa !important;
+}
+
+/* Botones Exportar / Imprimir */
+body.dark-theme .btn-exportar,
+body.dark-theme .btn-imprimir {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btn-exportar:hover,
+body.dark-theme .btn-imprimir:hover {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .btn-imprimir i {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .btn-agregar-prov {
+    background-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-agregar-prov:hover {
+    background-color: #3f3f46 !important;
+}
+
+/* Tarjetas de Estadísticas en Modo Oscuro */
+body.dark-theme .card {
+    background-color: #121215 !important;
+    border: 1px solid #27272a !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-theme .card h3 {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .card span {
+    color: #ffffff !important;
+}
+
+body.dark-theme .card-subtexto {
+    color: #71717a !important;
+}
+
+/* Bordes Neón en Modo Oscuro */
 body.dark-theme .general-mov { border-left: 5px solid #2563eb !important; }
 body.dark-theme .card.success { border-left: 5px solid #22c55e !important; }
 
-body.dark-theme .inventario-filtro-container { background-color: #121215 !important; border-color: #27272a !important; }
-body.dark-theme .filtro-grupo label { color: #a1a1aa !important; }
-body.dark-theme .inventario-buscador-wrapper input, body.dark-theme .filtro-grupo select { background-color: #18181b !important; border-color: #27272a !important; color: #ffffff !important; color-scheme: dark; }
-body.dark-theme .filtro-grupo select option { background-color: #18181b !important; color: #ffffff !important; }
-body.dark-theme .inventario-buscador-wrapper i { color: #71717a !important; }
-body.dark-theme .btn-limpiar-inv { background-color: #18181b !important; border-color: #27272a !important; color: #f4f4f5 !important; }
-body.dark-theme .btn-limpiar-inv:hover { background-color: #27272a !important; }
-
-/* Tabla Modo Oscuro */
-body.dark-theme .table-responsive-wrapper { background-color: #121215 !important; border-color: #27272a !important; }
-body.dark-theme .tabla-inventario thead tr, body.dark-theme .tablaUsuarios thead tr { background-color: #18181b !important; }
-body.dark-theme .tabla-inventario th, body.dark-theme .tablaUsuarios th { color: #ffffff !important; border-bottom-color: #27272a !important; }
-body.dark-theme .tabla-inventario td, body.dark-theme .tablaUsuarios td { color: #f4f4f5 !important; border-bottom-color: #1f1f23 !important; }
-body.dark-theme .tabla-inventario tbody tr:hover, body.dark-theme .tablaUsuarios tbody tr:hover { background-color: #18181b !important; }
-
-body.dark-theme .badge-extra, body.dark-theme .badge-categoria { background-color: rgba(3, 105, 161, 0.25) !important; color: #38bdf8 !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; }
-body.dark-theme .badge-ubicacion { background-color: rgba(30, 64, 175, 0.3) !important; color: #93c5fd !important; border-color: rgba(147, 197, 253, 0.3) !important; }
-body.dark-theme .estado-optimo { background-color: rgba(22, 163, 74, 0.25) !important; color: #4ade80 !important; border-color: rgba(74, 222, 128, 0.3) !important; }
-
-body.dark-theme #txtMostrandoRegistros { color: #a1a1aa !important; }
-body.dark-theme .btn-pagina-inv, body.dark-theme .btn-pagina { background-color: #121215 !important; border-color: #27272a !important; color: #e4e4e7 !important; }
-body.dark-theme .btn-pagina-inv:hover, body.dark-theme .btn-pagina:hover { background-color: #18181b !important; border-color: #3f3f46 !important; }
-body.dark-theme .btn-pagina-inv.activa, body.dark-theme .btn-pagina.activa { background-color: #0d6efd !important; border-color: #0d6efd !important; color: #ffffff !important; }
-
-/* ===================================================================
-   7. REGLAS MODALES 
-=================================================================== */
-.modal-contenido label::before, .modal-contenido label::after { content: none !important; }
-body.dark-theme .modal-contenido { background-color: #121215 !important; border: 1px solid #27272a !important; color: #ffffff !important; }
-body.dark-theme .modal-contenido h2, body.dark-theme .modal-contenido h3 { color: #ffffff !important; }
-body.dark-theme .modal-contenido div[style*="background: #f8fafc"], body.dark-theme .modal-contenido div[style*="background-color: #f8fafc"] { background-color: #18181b !important; border-color: #27272a !important; }
-body.dark-theme .modal-contenido label { color: #a1a1aa !important; }
-body.dark-theme .modal-contenido input, body.dark-theme .modal-contenido select { background-color: #0a0a0c !important; border-color: #27272a !important; color: #ffffff !important; }
-body.dark-theme .modal-contenido span[style*="color: #0d6efd"] { color: #60a5fa !important; }
-body.dark-theme .modal-contenido div[style*="border-top: 2px dashed"] { border-top-color: #27272a !important; }
-
-.modal-contenido .btnGuardarUsuario { transition: all 0.2s ease-in-out !important; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); cursor: pointer !important; }
-.modal-contenido .btnGuardarUsuario:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); filter: brightness(1.15); }
-.modal-contenido .btnGuardarUsuario:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
-body.dark-theme .modal-contenido .btnGuardarUsuario:hover { box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15) !important; }
-
-/* ===================================================================
-   8. DISEÑO RESPONSIVO / VERSIÓN MÓVIL
-=================================================================== */
-@media screen and (max-width: 768px) {
-    .inventario-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-    .header-acciones { width: 100%; justify-content: flex-start; }
-    .header-acciones button { flex: 1 1 48%; justify-content: center; text-align: center; }
-
-    .cards { flex-direction: row !important; flex-wrap: wrap !important; gap: 10px !important; }
-    .card { flex: 1 1 45% !important; min-width: 130px !important; padding: 12px 15px !important; border-radius: 8px !important; display: flex !important; flex-direction: column !important; justify-content: center !important; }
-    .card h3 { font-size: 11px !important; margin-bottom: 4px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card span { font-size: 22px !important; line-height: 1 !important; }
-    .card-subtexto { font-size: 10px !important; margin-top: 4px !important; }
-
-    .inventario-filtro-container { padding: 15px; }
-    .inventario-filtro-form { flex-direction: column; align-items: stretch; gap: 15px; }
-    .filtro-grupo, .filtro-grupo.flex-grande { width: 100%; min-width: 100%; }
-    .filtro-botones { width: 100%; justify-content: space-between; margin-top: 5px; }
-    .btn-filtrar-inv, .btn-limpiar-inv { flex: 1; justify-content: center; }
-
-    /* Reducción de relleno en celdas de tabla para móvil */
-    .table-responsive-wrapper table th,
-    .table-responsive-wrapper table td { padding: 10px 12px !important; font-size: 13px !important; }
-
-    .inventario-paginacion-footer { flex-direction: column; gap: 15px; align-items: center; text-align: center; padding-bottom: 20px; }
+/* Panel de Filtros */
+body.dark-theme .inventario-filtro-container {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
 }
 
-@media screen and (max-width: 480px) {
-    .header-acciones button { flex: 1 1 100%; }
-    .filtro-botones { flex-direction: column; }
+body.dark-theme .filtro-grupo label {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .inventario-buscador-wrapper input,
+body.dark-theme .filtro-grupo select {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+}
+
+body.dark-theme .filtro-grupo select option {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .inventario-buscador-wrapper i {
+    color: #71717a !important;
+}
+
+body.dark-theme .btn-limpiar-inv {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btn-limpiar-inv:hover {
+    background-color: #27272a !important;
+}
+
+/* Tabla de Inventario y Visibilidad de Números/Existencias */
+body.dark-theme .tabla-inventario,
+body.dark-theme .tablaUsuarios {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .tabla-inventario thead tr,
+body.dark-theme .tablaUsuarios thead tr {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .tabla-inventario th,
+body.dark-theme .tablaUsuarios th {
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme .tabla-inventario td,
+body.dark-theme .tablaUsuarios td {
+    color: #f4f4f5 !important;
+    border-bottom-color: #1f1f23 !important;
+}
+
+body.dark-theme .tabla-inventario tbody tr:hover,
+body.dark-theme .tablaUsuarios tbody tr:hover {
+    background-color: #18181b !important;
+}
+
+/* Badges de Categorías y Ubicación en Modo Oscuro (Legibilidad Corregida) */
+body.dark-theme .badge-extra,
+body.dark-theme .badge-categoria,
+body.dark-theme .tablaUsuarios td span.badge-extra,
+body.dark-theme .tablaUsuarios td span.badge-categoria,
+body.dark-theme .tabla-inventario td span.badge-extra,
+body.dark-theme .tabla-inventario td span.badge-categoria {
+    background-color: rgba(3, 105, 161, 0.25) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.3) !important;
+}
+
+body.dark-theme .badge-ubicacion,
+body.dark-theme .tablaUsuarios td span.badge-ubicacion,
+body.dark-theme .tabla-inventario td span.badge-ubicacion {
+    background-color: rgba(30, 64, 175, 0.3) !important;
+    color: #93c5fd !important;
+    border-color: rgba(147, 197, 253, 0.3) !important;
+}
+
+body.dark-theme .estado-optimo {
+    background-color: rgba(22, 163, 74, 0.25) !important;
+    color: #4ade80 !important;
+    border-color: rgba(74, 222, 128, 0.3) !important;
+}
+
+/* Paginación Footer */
+body.dark-theme #txtMostrandoRegistros {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .btn-pagina-inv,
+body.dark-theme .btn-pagina {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .btn-pagina-inv:hover,
+body.dark-theme .btn-pagina:hover {
+    background-color: #18181b !important;
+    border-color: #3f3f46 !important;
+}
+
+body.dark-theme .btn-pagina-inv.activa,
+body.dark-theme .btn-pagina.activa {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+
+/* ===================================================================
+   7. REGLAS MODALES (AGREGAR / EDITAR PROVEEDOR Y PRODUCTO)
+=================================================================== */
+
+/* Limpieza de íconos o pseudoelementos indeseados en etiquetas del modal */
+.modal-contenido label::before,
+.modal-contenido label::after {
+    content: none !important;
+}
+
+/* Ajuste de contenedor del modal en modo oscuro */
+body.dark-theme .modal-contenido {
+    background-color: #121215 !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .modal-contenido h2,
+body.dark-theme .modal-contenido h3 {
+    color: #ffffff !important;
+}
+
+/* Corrección de recuadros QR para que se adapten al modo oscuro */
+body.dark-theme .modal-contenido div[style*="background: #f8fafc"],
+body.dark-theme .modal-contenido div[style*="background-color: #f8fafc"] {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+}
+
+/* Labels dentro del modal en modo oscuro */
+body.dark-theme .modal-contenido label {
+    color: #a1a1aa !important;
+}
+
+/* Inputs y Selects dentro de modales en modo oscuro */
+body.dark-theme .modal-contenido input,
+body.dark-theme .modal-contenido select {
+    background-color: #0a0a0c !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+/* Títulos de las tarjetas QR */
+body.dark-theme .modal-contenido span[style*="color: #0d6efd"] {
+    color: #60a5fa !important;
+}
+
+/* Línea divisoria punteada */
+body.dark-theme .modal-contenido div[style*="border-top: 2px dashed"] {
+    border-top-color: #27272a !important;
+}
+
+/* ===================================================================
+   EFECTOS HOVER Y FOCO EN BOTONES DE GUARDAR EN MODALES
+=================================================================== */
+
+/* Estado normal del botón guardar en el modal */
+.modal-contenido .btnGuardarUsuario {
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer !important;
+}
+
+/* Efecto al pasar el mouse por encima (Hover) */
+.modal-contenido .btnGuardarUsuario:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    filter: brightness(1.15);
+}
+
+/* Efecto de clic sostenido (Active) */
+.modal-contenido .btnGuardarUsuario:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Adaptación para Tema Oscuro */
+body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15) !important;
+}
+
+@media print {
+    /* Ocultar todo por defecto */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Mostrar únicamente el contenedor principal y la tabla de inventario */
+    .main-content, .main-content *, .tablaUsuarios, .tablaUsuarios * {
+        visibility: visible;
+    }
+
+    .main-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Ocultar barras de navegación, filtros, paginación y botones superiores */
+    .header-acciones, 
+    .inventario-filtro-container, 
+    .botones-paginacion, 
+    .barra-navegacion, 
+    nav,
+    .acciones {
+        display: none !important;
+    }
+
+    .tablaUsuarios {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    .tablaUsuarios th, .tablaUsuarios td {
+        border: 1px solid #cbd5e1 !important;
+        padding: 8px !important;
+        color: #000 !important;
+    }
+}
+@media print {
+    /* Ocultar elementos generales por defecto */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Mostrar contenido principal y tabla */
+    .main-content, .main-content *, .tablaUsuarios, .tablaUsuarios * {
+        visibility: visible;
+    }
+
+    .main-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 5px;
+        background: white !important;
+    }
+
+    /* Ocultar elementos no imprimibles */
+    .header-acciones, 
+    .inventario-filtro-container, 
+    .botones-paginacion, 
+    .barra-navegacion, 
+    nav {
+        display: none !important;
+    }
+
+    
+
+    /* --- OCULTAR COLUMNAS DE ESTADO Y ACCIONES --- */
+    .tablaUsuarios th:nth-last-child(1),
+    .tablaUsuarios td:nth-last-child(1),
+    .tablaUsuarios th:nth-last-child(2),
+    .tablaUsuarios td:nth-last-child(2) {
+        display: none !important;
+    }
+
+    /* --- TABLA EXPANDIDA AL 100% --- */
+    .tablaUsuarios {
+        width: 100% !important;
+        table-layout: fixed !important; /* Fuerza a que respete el ancho total de la página */
+        border-collapse: collapse !important;
+        border: 1px solid #000 !important;
+        margin-top: 5px;
+        box-shadow: none !important;
+    }
+
+    .tablaUsuarios tr {
+        border: 1px solid #000 !important;
+        background: transparent !important;
+    }
+
+    .tablaUsuarios th {
+        background-color: #e2e8f0 !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        font-size: 11px !important;
+        padding: 8px 4px !important;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .tablaUsuarios td {
+        border: 1px solid #000 !important;
+        padding: 7px 6px !important;
+        color: #000 !important;
+        font-size: 11px !important;
+        background: transparent !important;
+        vertical-align: middle;
+        word-wrap: break-word; /* Evita que los textos largos desborden */
+    }
+
+    /* Distribución de porcentajes por columna para llenar todo el ancho */
+    .tablaUsuarios th:nth-child(1), .tablaUsuarios td:nth-child(1) { width: 15%; text-align: center; } /* Código */
+    .tablaUsuarios th:nth-child(2), .tablaUsuarios td:nth-child(2) { width: 30%; } /* Producto */
+    .tablaUsuarios th:nth-child(3), .tablaUsuarios td:nth-child(3) { width: 15%; text-align: center; } /* Categoría */
+    .tablaUsuarios th:nth-child(4), .tablaUsuarios td:nth-child(4) { width: 20%; } /* Proveedor */
+    .tablaUsuarios th:nth-child(5), .tablaUsuarios td:nth-child(5) { width: 10%; text-align: center; } /* Cajas */
+    .tablaUsuarios th:nth-child(6), .tablaUsuarios td:nth-child(6) { width: 10%; text-align: right; }  /* Peso */
+}
+ /* ===================================================================
+   REGLAS DE IMPRESIÓN CORPORATIVA (LFI)
+=================================================================== */
+@media print {
+    /* Ocultar todo por defecto */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Mostrar únicamente el contenedor, el membrete oficial con logo, tarjetas y tabla */
+    .contenedor, .contenedor *, .main-content, .main-content *, .header-impresion-oficial, .header-impresion-oficial *, .cards, .cards *, .tablaUsuarios, .tablaUsuarios * {
+        visibility: visible;
+    }
+
+    .contenedor, .main-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 5px;
+        background: white !important;
+    }
+
+    .header-impresion-oficial {
+        display: block !important;
+    }
+
+    /* Ocultar elementos de la interfaz que no deben imprimirse */
+    .header-acciones,
+    .inventario-header,
+    .inventario-filtro-container,
+    .botones-paginacion,
+    button, 
+    .btn-exportar,
+    .btn-imprimir,
+    .btn-agregar-prod,
+    .btn-agregar-prov,
+    nav, 
+    .barra-navegacion, 
+    .top-bar-dashboard,
+    .acciones {
+        display: none !important;
+    }
+
+    /* Ocultar columnas de acciones o estados al final de la tabla si es necesario */
+    .tablaUsuarios th:nth-last-child(1),
+    .tablaUsuarios td:nth-last-child(1) {
+        display: none !important;
+    }
+
+    /* Estilo para las tarjetas de estadísticas en papel */
+    .cards {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .card {
+        border: 1px solid #cbd5e1 !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+
+    /* Estilo de la tabla de inventario para papel */
+    .tablaUsuarios {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 10px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .tablaUsuarios th {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 10px 12px !important;
+        font-size: 11px !important;
+        text-transform: uppercase;
+        text-align: left;
+    }
+
+    .tablaUsuarios td {
+        border-bottom: 1px solid #cbd5e1 !important;
+        padding: 9px 12px !important;
+        color: #1e293b !important;
+        font-size: 11px !important;
+        background: transparent !important;
+    }
+}
+
+@page {
+    size: auto;
+    margin: 10mm;
 }

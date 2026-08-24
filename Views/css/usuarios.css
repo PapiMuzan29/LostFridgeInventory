@@ -980,8 +980,23 @@ input:checked + .slider:before {
     }
 
     .tablaUsuarios {
-        display: block;
+        display: table; /* Restauramos su comportamiento natural */
+        width: 100%;
+        white-space: nowrap; /* Evita que el texto se apriete hacia abajo */
+    }
+
+    /* Si en la vista de Usuarios no has puesto el div contenedor, 
+       esta regla salvará la tabla dándole scroll al elemento padre automático */
+    .tablaUsuarios {
+        display: block; /* Solo aplica como fallback si no hay contenedor */
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        min-height: 100px; /* Previene el colapso a 0 píxeles */
+    }
+
+    .table-responsive-wrapper .tablaUsuarios {
+        display: table !important;
+        min-width: 800px; /* Fuerza el ancho para que el div se deslice */
     }
 }
 
