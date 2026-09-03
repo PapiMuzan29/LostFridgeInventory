@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 require_once __DIR__ . '/../Models/modeloVendedor.php';
 
 $idCuenta = $_SESSION['idCuenta'] ?? $_SESSION['id_usuario'] ?? $_SESSION['id'] ?? null;
@@ -11,7 +10,6 @@ if (!$idCuenta) {
 }
 
 $modelo = new modeloVendedor();
-
 // =========================================================
 // 1. PROCESAR GUARDADO (POST)
 // =========================================================
@@ -28,16 +26,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        // NUEVO: Validar disponibilidad y la tolerancia de 200 gramos ANTES de guardar
+        $validacion = $modelo->verificarDisponibilidad($productos);
+
+        if (!$validacion['exito']) {
+            $_SESSION['alerta_error'] = $validacion['mensaje'];
+            session_write_close();
+            header("Location: vendedorController.php");
+            exit;
+        }
+
+        // Si pasa la validación, procedemos a guardar la nota y descontar inventario
         $folio = $modelo->obtenerSiguienteFolio();
         $exito = $modelo->guardarNota($folio, $cliente, (int)$idCuenta, $productos, $estibadores);
 
         if ($exito) {
-            $_SESSION['alerta_exito'] = '¡Nota enviada a caja con éxito!';
+            $_SESSION['alerta_exito'] = '¡Nota enviada a caja y el inventario fue actualizado!';
         } else {
             $_SESSION['alerta_error'] = 'Ocurrió un problema al registrar la nota en la base de datos.';
         }
         
-        // Cierre explícito de sesión y redirección limpia
         session_write_close();
         header("Location: vendedorController.php");
         exit;

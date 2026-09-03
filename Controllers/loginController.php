@@ -15,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($usuario && $password) {
         if ($auth->login($usuario, $password)) {
             // 🔔 Login correcto → Registramos la auditoría de acceso antes de redirigir
-            // Usamos $_SESSION['apodoUsuario'] o el parámetro recibido según tu AuthService
             $usuarioResponsable = $_SESSION['apodoUsuario'] ?? $usuario;
             
             $movimientos->registrarMovimiento(
@@ -25,9 +24,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'Autenticación'
             );
 
-            // Redirige al dashboard
-            header("Location: ../Views/inicio.php");
+            // 🔀 REDIRECCIÓN SEGÚN EL ROL DE USUARIO
+            $idRol = (int)($_SESSION['idRol'] ?? 0);
+
+            switch ($idRol) {
+                case 2: // Vendedor
+                    header("Location: ../Views/notasSystem/vendedor.php");
+                    break;
+
+                case 5: // Encargado
+                    header("Location: ../Views/notasSystem/encargado.php");
+                    break;
+
+                case 6: // Cajero
+                    header("Location: ../Views/notasSystem/cajero.php");
+                    break;
+
+                case 1: // Administrador (Opcional: Por si inicia sesión un Admin)
+                    header("Location: ../Views/inicio.php");
+                    break;
+
+                default:
+                    // Si el rol no coincide o no tiene vista asignada, manda a inicio por defecto
+                    header("Location: ../Views/inicio.php");
+                    break;
+            }
             exit;
+
         } else {
             // Login incorrecto → regresa al login con mensaje
             header("Location: ../Views/login.php?error=1");

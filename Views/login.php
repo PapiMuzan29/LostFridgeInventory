@@ -8,6 +8,23 @@
         <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="css/login.css">
         <link rel="stylesheet" href="css/cerdito.css">
+
+
+        <!-- Enlaces relativos subir un nivel desde Views -->
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // Registrar subiendo un nivel hacia la raíz
+      navigator.serviceWorker.register('../sw.js', { scope: '../' })
+        .then((reg) => console.log('PWA lista en Localhost'))
+        .catch((err) => console.error('Error PWA:', err));
+    });
+  }
+</script>
+        
     </head>
     
     <body>

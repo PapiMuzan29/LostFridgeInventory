@@ -111,6 +111,23 @@ CREATE TABLE Producto (
     FOREIGN KEY (idCategoria) REFERENCES Categoria(idCategoria)
 );
 
+CREATE TABLE InventarioTemporalSalida (
+    idSalidaTemporal     INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    idProducto           INT NOT NULL,
+    cantidadCajas        BIGINT DEFAULT 0,
+    cantidadPeso         DECIMAL(18,4) DEFAULT 0.0000,
+    estado               VARCHAR(20) DEFAULT 'Pendiente', -- Cambiado a VARCHAR para mantener los estados de texto
+    fechaAutorizacion    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fechaRetiro          DATETIME DEFAULT NULL,
+    observaciones        VARCHAR(255) DEFAULT NULL,
+    
+    -- Relaciones (Llaves Foráneas)
+    FOREIGN KEY (idProducto) REFERENCES Producto(idProducto) ON DELETE CASCADE ON UPDATE CASCADE,
+
+);
+
+
+
 -- ------------------------------------------------------------
 -- 10. Entradas  (depende de: almacenes, conceptos_entrada, Proveedor, Cuenta)
 -- ------------------------------------------------------------

@@ -9,13 +9,18 @@ class User {
     private BD $db;
 
     public function __construct() {
-
         $this->db = BD::obtenerInstancia();
     }
 
     public function findByUsername(string $username): ?array {
 
-        $query = "SELECT cuenta.idCuenta,cuenta.apodoUsuario,cuenta.contrasenaUsuario,cuenta.estado,rol.nombreRol FROM cuenta INNER JOIN rol ON cuenta.idRol = rol.idRol WHERE cuenta.apodoUsuario = ? LIMIT 1";
+        // 💡 Se agregó cuenta.idRol al SELECT
+        $query = "SELECT cuenta.idCuenta, cuenta.idRol, cuenta.apodoUsuario, cuenta.contrasenaUsuario, cuenta.estado, rol.nombreRol 
+                  FROM cuenta 
+                  INNER JOIN rol ON cuenta.idRol = rol.idRol 
+                  WHERE cuenta.apodoUsuario = ? 
+                  LIMIT 1";
+                  
         $result = $this->db->select($query, [$username]);
 
         return !empty($result) ? $result[0] : null;

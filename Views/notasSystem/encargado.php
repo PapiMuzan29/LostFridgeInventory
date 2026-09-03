@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -26,7 +29,6 @@
             <section class="card sticky-search">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="buscarNota"><i class="fa-solid fa-magnifying-glass"></i> Buscar Nota</label>
-                    <!-- Al escribir, se llama a filtrarNotas() -->
                     <input type="text" id="buscarNota" class="form-control" placeholder="Buscar por folio o cliente..." onkeyup="filtrarNotas()">
                 </div>
             </section>
@@ -34,14 +36,12 @@
             <section class="card">
                 <h2 class="card-title"><i class="fa-solid fa-clipboard-list"></i> Notas por Aprobar</h2>
                 
-                <!-- AQUÍ INYECTARÁ JS LAS NOTAS -->
                 <div id="lista-notas-container">
                     <div style="text-align:center; padding:20px;">
                         <i class="fa-solid fa-spinner fa-spin fa-2x text-muted"></i>
                     </div>
                 </div>
 
-                <!-- Mensaje de no resultados (oculto por defecto) -->
                 <div id="no-notes-results" class="empty-state" style="display: none;">
                     <i class="fa-solid fa-magnifying-glass-minus"></i>
                     <p>No se encontraron notas con esa búsqueda.</p>
@@ -49,12 +49,118 @@
             </section>
         </div>
 
-        <!-- VISTA 2: GESTIÓN (PRODUCTOS) -->
+        <!-- VISTA 2: GESTIÓN Y RESUMEN DE PRODUCTOS -->
         <div id="tab-gestion" class="tab-content">
+            
+            <!-- CONTROLES NAVEGACIÓN DE FECHA -->
+            <div class="date-picker-bar">
+                <button type="button" class="btn-date-nav" onclick="cambiarFecha(-1)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="date-picker-display" onclick="document.getElementById('input-fecha-gestion').showPicker()">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <span id="label-fecha-seleccionada">Cargando fecha...</span>
+                    <input type="date" id="input-fecha-gestion" style="position:absolute; opacity:0; pointer-events:none;" onchange="alSeleccionarFecha(this.value)">
+                </div>
+                <button type="button" class="btn-date-nav" onclick="cambiarFecha(1)">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- TÍTULO DE LA SECCIÓN -->
+            <div class="resumen-section-header">
+                <h3>RESUMEN DEL DÍA</h3>
+            </div>
+
+            <!-- CONTENEDOR DE TARJETAS DE RESUMEN -->
+            <div id="contenedor-resumen-dia">
+                <!-- Pierna -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloPiernas()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/pierna.jpeg" alt="Pierna" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Pierna</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty">124</span> <small>piezas</small>
+                            <span class="metric-dot">•</span>
+                            <span class="weight-qty">987.5 kg</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pecho -->
+                <div class="resumen-card">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/pecho.jpeg" alt="Pecho" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Pecho</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty">350</span> <small>piezas</small>
+                            <span class="metric-dot">•</span>
+                            <span class="weight-qty">1,245.0 kg</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Mazo (REDIRECCIÓN A MAZO.PHP) -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloMazos()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/mazo.jpeg" alt="Mazo" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Mazo</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty">280</span> <small>piezas</small>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Manteca -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloManteca()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/manteca.jpeg" alt="Manteca" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Manteca</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty">86</span> <small>unidades</small>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chuleta ahumada -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloChuletas()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/chuleta.jpeg" alt="Chuleta" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Chuleta ahumada</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty">95</span> <small>piezas</small>
+                            <span class="metric-dot">•</span>
+                            <span class="weight-qty">425.0 kg</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- VISTA 3: CONFIGURACIÓN -->
+        <div id="tab-config" class="tab-content">
+             <section class="card">
+                <h2 class="card-title"><i class="fa-solid fa-user-gear"></i> Perfil de Usuario</h2>
+                <div class="user-info-box">
+                    <p><strong>Usuario Activo:</strong> <?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Encargado') ?></p>
+                    <p><strong>Rol:</strong> <?= htmlspecialchars($_SESSION['nombreRol'] ?? 'Encargado') ?></p>
+                </div>
+            </section>
+
             <section class="card sticky-search">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="buscarProducto"><i class="fa-solid fa-magnifying-glass"></i> Buscar Producto</label>
-                    <!-- Funciona igual para los productos -->
                     <input type="text" id="buscarProducto" class="form-control" placeholder="Nombre de producto..." onkeyup="filtrarProductos()">
                 </div>
             </section>
@@ -70,21 +176,9 @@
 
                 <div id="paginacion-productos" class="pagination-container"></div>
                 
-                <!-- Mensaje de no resultados (oculto por defecto) -->
                 <div id="no-products-results" class="empty-state" style="display: none;">
                     <i class="fa-solid fa-box-open"></i>
                     <p>No se encontraron productos.</p>
-                </div>
-            </section>
-        </div>
-
-        <!-- VISTA 3: CONFIGURACIÓN -->
-        <div id="tab-config" class="tab-content">
-             <section class="card">
-                <h2 class="card-title"><i class="fa-solid fa-user-gear"></i> Perfil de Usuario</h2>
-                <div class="user-info-box">
-                    <p><strong>Usuario Activo:</strong> <?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Encargado') ?></p>
-                    <p><strong>Rol:</strong> <?= htmlspecialchars($_SESSION['nombreRol'] ?? 'Encargado') ?></p>
                 </div>
             </section>
 
@@ -116,9 +210,38 @@
         </button>
     </nav>
 
-    <!-- ==========================================
-         MODAL: EDITAR PRODUCTO
-    ========================================== -->
+    <!-- MODALES -->
+    <div id="modalAprobarNota" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-ticket"></i> Confirmar Salida</h2>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalAprobar()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formAprobarNota">
+                    <input type="hidden" id="modal_aprobar_id_nota" name="id_nota">
+                    
+                    <div class="form-group">
+                        <label>Folio de Ticket (Entregado en Caja) *</label>
+                        <input type="text" id="folio_ticket_1" name="folios[]" class="form-control" required placeholder="Ej. TKT-00123">
+                    </div>
+
+                    <div class="form-group" id="grupo_folio_factura" style="display: none;">
+                        <label class="label-warning"><i class="fa-solid fa-file-invoice"></i> Folio de Factura *</label>
+                        <input type="text" id="folio_ticket_2" name="folios[]" class="form-control" placeholder="Ej. FAC-00456">
+                        <small>Esta nota contiene productos que requieren factura.</small>
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <button type="submit" class="btn-primary" id="btnConfirmarAprobacion">
+                            <i class="fa-solid fa-check-double"></i> Confirmar y Aprobar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="modalEditarProducto" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -128,12 +251,10 @@
             
             <div class="modal-body">
                 <form id="formEditarProducto">
-                    <!-- ID Oculto para mandarlo al controlador -->
                     <input type="hidden" id="modal_id_producto" name="id_producto">
                     
                     <div class="form-group">
                         <label>Nombre del Producto</label>
-                        <!-- disabled para que solo sea de lectura -->
                         <input type="text" id="modal_nombre_producto" class="form-control" disabled style="background-color: #f1f5f9; color: #64748b;">
                     </div>
 
@@ -142,6 +263,14 @@
                         <select id="modal_por_piezas" name="por_piezas" class="form-control">
                             <option value="1">(Contable / Por piezas)</option>
                             <option value="0">(Solo peso / Por kilo)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>¿Requiere Factura? <small>(Para notas y reportes)</small></label>
+                        <select id="modal_factura" name="factura" class="form-control">
+                            <option value="0">No facturar</option>
+                            <option value="1">Sí facturar</option>
                         </select>
                     </div>
 
@@ -154,7 +283,16 @@
             </div>
         </div>
     </div>
-    
+
     <script src="encargado.js"></script>
+    <script>
+        function abrirModuloChuletas() {
+            window.location.href = 'chuleta.php';
+        }
+
+        function abrirModuloMazos() {
+            window.location.href = 'mazo.php';
+        }
+    </script>
 </body>
 </html>

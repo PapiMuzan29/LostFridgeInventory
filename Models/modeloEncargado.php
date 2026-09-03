@@ -5,24 +5,24 @@ class modeloEncargado {
     private $db;
 
     public function __construct() {
-        // Usamos tu método Singleton para reutilizar la conexión y ahorrar memoria
         $this->db = BD::obtenerInstancia(); 
     }
 
     public function obtenerTodos() {
-        $sql = "SELECT idProducto, nombreProducto FROM Producto ORDER BY nombreProducto ASC";
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT idProducto, nombreProducto FROM producto ORDER BY nombreProducto ASC";
         return $this->db->select($sql);
     }
 
-    public function actualizarEstadoContable($idProducto, $porPiezas) {
-        $sql = "UPDATE Producto SET porPiezas = ? WHERE idProducto = ?";
-        $params = [$porPiezas, $idProducto];
-        $filasAfectadas = $this->db->update($sql, $params);
-        return $filasAfectadas > 0;
+    public function actualizarEstadoProducto($idProducto, $porPiezas, $factura) {
+        // 💡 Corrección: Producto -> producto
+        $sql = "UPDATE producto SET porPiezas = ?, factura = ? WHERE idProducto = ?";
+        return $this->db->update($sql, [$porPiezas, $factura, $idProducto]);
     }
-
+    
     public function obtenerTotalProductos($busqueda = '') {
-        $sql = "SELECT COUNT(*) as total FROM Producto";
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT COUNT(*) as total FROM producto";
         $params = [];
         
         if (!empty($busqueda)) {
@@ -35,7 +35,8 @@ class modeloEncargado {
     }
 
     public function obtenerPaginados($limite, $offset, $busqueda = '') {
-        $sql = "SELECT idProducto, nombreProducto, porPiezas FROM Producto";
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT idProducto, nombreProducto, porPiezas, factura FROM producto";
         $params = [];
         
         if (!empty($busqueda)) {
@@ -44,16 +45,11 @@ class modeloEncargado {
         }
     
         $sql .= " ORDER BY nombreProducto ASC LIMIT $limite OFFSET $offset";
-                
         return $this->db->select($sql, $params);
     }
 
-    // ==========================================
-    // FUNCIONES AUXILIARES PARA DETALLES
-    // ==========================================
-    
-    // Traer los productos de una nota específica
     private function obtenerProductosPorNota($idNota) {
+        // 💡 Corrección: Producto -> producto
         $sql = "SELECT 
                     dn.id_detalle,
                     dn.idProducto,
@@ -61,13 +57,12 @@ class modeloEncargado {
                     dn.kilos,
                     dn.piezas
                 FROM detalle_notas dn
-                JOIN Producto p ON dn.idProducto = p.idProducto
+                JOIN producto p ON dn.idProducto = p.idProducto
                 WHERE dn.id_nota = ?";
         
         return $this->db->select($sql, [$idNota]);
     }
 
-    // Traer los estibadores de una nota específica
     private function obtenerEstibadoresPorNota($idNota) {
         $sql = "SELECT 
                     e.id_estibador,
@@ -79,9 +74,6 @@ class modeloEncargado {
         return $this->db->select($sql, [$idNota]);
     }
 
-    // ==========================================
-    // FUNCIÓN PRINCIPAL ACTUALIZADA
-    // ==========================================
     public function obtenerNotasPorEstado($estado, $busqueda = '') {
         $params = [$estado];
         
@@ -104,36 +96,70 @@ class modeloEncargado {
         
         $sql .= " ORDER BY n.fecha_creacion DESC";
                 
-        // Obtenemos las notas base
         $notasBase = $this->db->select($sql, $params);
-        
-        // Arreglo donde guardaremos las notas con todos sus detalles
         $notasCompletas = [];
         
-        // Recorremos cada nota para buscarle sus productos y estibadores
-        foreach ($notasBase as $nota) {
-            $idNota = $nota['id_nota'];
-            
-            // Le agregamos un nuevo campo (arreglo) con sus productos
-            $nota['productos'] = $this->obtenerProductosPorNota($idNota);
-            
-            // Le agregamos un nuevo campo (arreglo) con sus estibadores
-            $nota['estibadores'] = $this->obtenerEstibadoresPorNota($idNota);
-            
-            $notasCompletas[] = $nota;
+        if (!empty($notasBase)) {
+            foreach ($notasBase as $nota) {
+                $idNota = $nota['id_nota'];
+                $nota['productos'] = $this->obtenerProductosPorNota($idNota);
+                $nota['estibadores'] = $this->obtenerEstibadoresPorNota($idNota);
+                $notasCompletas[] = $nota;
+            }
         }
         
         return $notasCompletas;
     }
 
-    public function actualizarEstadoNota($idNota, $nuevoEstado) {
-        $sql = "UPDATE notas SET estado = ?, fecha_salida = ? WHERE id_nota = ?";
+    public function contarNotasPorEstado($estado) {
+        $sql = "SELECT COUNT(*) as total FROM notas WHERE estado = ?";
         
-        $params = [$nuevoEstado, date('Y-m-d H:i:s'), $idNota];
+        $resultado = $this->db->select($sql, [$estado]);
         
-        $filasAfectadas = $this->db->update($sql, $params);
-        
-        return $filasAfectadas > 0;
+        return isset($resultado[0]['total']) ? (int)$resultado[0]['total'] : 0;
     }
 
+    public function requiereFactura($idNota) {
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT COUNT(*) as total_facturables 
+                FROM detalle_notas dn
+                JOIN producto p ON dn.idProducto = p.idProducto
+                WHERE dn.id_nota = ? AND p.factura = 1";
+                
+        $resultado = $this->db->select($sql, [$idNota]);
+        return (isset($resultado[0]['total_facturables']) && (int)$resultado[0]['total_facturables'] > 0);
+    }
+
+    public function aprobarNotaConFolios($idNota, $folios) {
+        try {
+            if (method_exists($this->db, 'beginTransaction')) {
+                $this->db->beginTransaction();
+            }
+
+            date_default_timezone_set('America/Mexico_City'); 
+            $fechaMexico = date('Y-m-d H:i:s');
+            $sqlNota = "UPDATE notas SET estado = 'APROBADO', fecha_salida = ? WHERE id_nota = ?";
+            $this->db->update($sqlNota, [$fechaMexico, $idNota]);
+
+            $sqlFolio = "INSERT INTO folios_tickets (id_nota, folio_ticket) VALUES (?, ?)";
+            
+            foreach ($folios as $folio) {
+                $folioLimpio = trim($folio);
+                if ($folioLimpio !== '') {
+                    $this->db->insert($sqlFolio, [$idNota, $folioLimpio]);
+                }
+            }
+
+            if (method_exists($this->db, 'commit')) {
+                $this->db->commit();
+            }
+            return true;
+
+        } catch (Exception $e) {
+            if (method_exists($this->db, 'rollBack')) {
+                $this->db->rollBack();
+            }
+            throw new Exception("Error en la transacción: " . $e->getMessage());
+        }
+    }
 }

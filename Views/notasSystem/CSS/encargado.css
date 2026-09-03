@@ -1,5 +1,5 @@
 /* ===================================================================
-   VARIABLES DE COLOR LFI (LOST FRIDGE INVENTORY)
+    VARIABLES DE COLOR LFI (LOST FRIDGE INVENTORY)
 =================================================================== */
 :root {
     --primary-color: #255CD0;
@@ -33,17 +33,23 @@ body {
     background-color: var(--background);
     color: var(--text-main);
     overflow-x: hidden; 
+    padding-bottom: 70px; /* Espacio para navegación inferior */
 }
 
-/* Cabecera fija */
+/* ===================================================================
+    ESTILOS GENERALES DE CONTENEDORES Y HEADER
+=================================================================== */
 .app-header {
     background-color: var(--navy-header);
     color: white;
     padding: 16px 20px;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 100;
     box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .app-header h1 {
@@ -57,12 +63,12 @@ body {
     color: #cbd5e1;
 }
 
-/* Contenedor principal */
 .app-content {
     padding: 16px;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-/* Tarjetas (Cards) estilo LFI */
 .card {
     background-color: var(--card-bg);
     border-radius: 12px;
@@ -79,6 +85,9 @@ body {
     color: var(--navy-header);
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .card-inner {
@@ -90,7 +99,10 @@ body {
 }
 
 /* Formularios */
-.form-group { margin-bottom: 16px; }
+.form-group { 
+    margin-bottom: 16px; 
+}
+
 label {
     display: block;
     font-size: 0.9rem;
@@ -98,6 +110,7 @@ label {
     margin-bottom: 6px;
     color: var(--text-main);
 }
+
 .form-control {
     width: 100%;
     min-height: 48px; 
@@ -111,6 +124,7 @@ label {
     transition: border-color 0.2s, box-shadow 0.2s;
     appearance: none;
 }
+
 .form-control:focus {
     border-color: var(--navy-header);
     box-shadow: 0 0 0 3px var(--focus-ring);
@@ -118,23 +132,22 @@ label {
 
 .sticky-search {
     position: sticky; 
-    top: 68px; /* Altura del header */
-    z-index: 5;
+    top: 68px;
+    z-index: 90;
     padding: 12px 18px;
 }
 
 /* ===================================================================
-   TARJETAS DE NOTAS (INICIO / REVISIÓN)
+    TARJETAS DE NOTAS (INICIO / REVISIÓN)
 =================================================================== */
 .note-card {
     transition: all 0.3s ease-out;
-    max-height: 1000px; /* Aumentado a 1000px */
+    max-height: 1000px;
     opacity: 1;
     transform: scale(1);
     overflow: hidden;
 }
 
-/* Animación cuando se aprueba la nota y desaparece */
 .note-card.removing {
     opacity: 0;
     transform: scale(0.9);
@@ -169,6 +182,7 @@ label {
     color: var(--text-muted);
     margin-bottom: 4px;
 }
+
 .note-total {
     font-weight: 600;
     color: var(--text-main);
@@ -180,7 +194,7 @@ label {
 }
 
 /* ===================================================================
-   LISTA DE PRODUCTOS (GESTIÓN)
+    LISTA DE PRODUCTOS (CONFIGURACIÓN)
 =================================================================== */
 .product-list-item {
     display: flex;
@@ -212,7 +226,238 @@ label {
 }
 
 /* ===================================================================
-   BADGES (ETIQUETAS) Y BOTONES
+    VISTA DE RESUMEN Y GESTIÓN (FECHAS, CARRUSEL Y TARJETAS)
+=================================================================== */
+
+/* Selector de fecha superior */
+.date-picker-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    padding: 10px 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.date-picker-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.05rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.date-picker-display i {
+    color: #1e293b;
+    font-size: 1.2rem;
+}
+
+.btn-date-nav {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.btn-date-nav:active {
+    background: #f1f5f9;
+}
+
+/* Carrusel Horizontal de Categorías */
+.categories-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.categories-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.category-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    min-width: 72px;
+    cursor: pointer;
+    gap: 8px;
+    outline: none;
+}
+
+.chip-icon-box {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background-color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #b91c1c;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    padding: 3px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.category-chip span {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.category-chip.active .chip-icon-box {
+    background-color: #eff6ff;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(37, 92, 208, 0.15);
+}
+
+.category-chip.active span {
+    color: var(--primary-color);
+}
+
+/* Encabezado del Resumen del Día */
+.resumen-section-header {
+    margin-bottom: 15px;
+}
+
+.resumen-section-header h3 {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+#contenedor-resumen-dia {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Tarjetas Interactivas de Resumen */
+.resumen-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+    border-left: 4px solid transparent; /* Indicador sutil desactivado */
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.2s ease, 
+                box-shadow 0.2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Animación hover (Escritorio) */
+.resumen-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Animación y borde al presionar (Active) */
+.resumen-card:active {
+    transform: translateY(2px) scale(0.99);
+    border-left-color: var(--primary-color); /* Indicador sutil en el borde izquierdo */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.resumen-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background-color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #dc2626;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+/* Renderizado adaptable de imágenes */
+.img-producto {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.resumen-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.resumen-card-details h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.resumen-metrics {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.highlight-qty {
+    color: #dc2626;
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+.metric-dot {
+    color: #94a3b8;
+    font-weight: bold;
+}
+
+.weight-qty {
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.resumen-card-arrow {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+/* ===================================================================
+    BADGES (ETIQUETAS) Y BOTONES
 =================================================================== */
 .badge {
     display: inline-flex;
@@ -258,12 +503,20 @@ label {
 .btn-outline:active { background-color: #e2e8f0; }
 
 .btn-danger-block {
-    display: flex; justify-content: center; align-items: center; gap: 8px;
-    background-color: #ef4444; color: white; text-decoration: none;
-    width: 100%; min-height: 48px; border-radius: 6px; font-weight: bold;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 8px;
+    background-color: #ef4444; 
+    color: white; 
+    text-decoration: none;
+    width: 100%; 
+    min-height: 48px; 
+    border-radius: 6px; 
+    font-weight: bold;
+    border: none;
 }
 
-/* Elementos vacíos / Sin resultados */
 .empty-state {
     text-align: center;
     padding: 30px 20px;
@@ -276,7 +529,7 @@ label {
 }
 
 /* ===================================================================
-   NAVEGACIÓN DE PESTAÑAS Y BARRA INFERIOR
+    NAVEGACIÓN DE PESTAÑAS Y BARRA INFERIOR
 =================================================================== */
 .tab-content { display: none; }
 .tab-content.active {
@@ -290,26 +543,43 @@ label {
 }
 
 .bottom-nav {
-    position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
-    background-color: #ffffff; border-top: 1px solid #e2e8f0;
-    display: flex; justify-content: space-around; align-items: center;
-    z-index: 100; box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 65px;
+    background-color: #ffffff; 
+    border-top: 1px solid #e2e8f0;
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center;
+    z-index: 1000; 
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .nav-item {
-    background: transparent; border: none; flex: 1; height: 100%;
-    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px;
-    color: #94a3b8; cursor: pointer; transition: color 0.2s, background-color 0.2s;
+    background: transparent; 
+    border: none; 
+    flex: 1; 
+    height: 100%;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 4px;
+    color: #94a3b8; 
+    cursor: pointer; 
+    transition: color 0.2s, background-color 0.2s;
 }
 .nav-item i { font-size: 1.25rem; }
 .nav-item span { font-size: 0.75rem; font-weight: 600; }
-.nav-item.active { color: var(--primary-color); }
+.nav-item.active { color: var(--primary-color); font-weight: 600; }
 .nav-item:active { background-color: #f1f5f9; }
 
 .spacer { height: 75px; }
 
 /* ===================================================================
-   PAGINACIÓN UNIVERSAL
+    PAGINACIÓN UNIVERSAL
 =================================================================== */
 .pagination-container {
     display: flex;
@@ -358,18 +628,17 @@ label {
     padding: 0 5px;
 }
 
-
 /* ===================================================================
-   MODALES (VENTANAS EMERGENTES)
+    MODALES (VENTANAS EMERGENTES)
 =================================================================== */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
-    display: none; /* Oculto por defecto */
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 2000;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -424,24 +693,66 @@ label {
     padding: 20px;
 }
 
+.label-warning {
+    color: #d97706;
+}
+
 /* ===================================================================
-   ANIMACIÓN DE ENTRADA (FADE IN + SLIDE UP)
+    ANIMACIÓN DE ENTRADA Y UTILIDADES
 =================================================================== */
 .fade-in-up {
     animation: fadeInUp 0.4s ease-out forwards;
-    opacity: 0; /* Empieza invisible */
-    transform: translateY(15px); /* Empieza un poco más abajo */
+    opacity: 0;
+    transform: translateY(15px);
 }
 
 @keyframes fadeInUp {
     to {
-        opacity: 1; /* Termina 100% visible */
-        transform: translateY(0); /* Termina en su posición original */
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* Agrega esto en tu CSS */
 .word-break-fix {
-    word-break: break-word; /* Fuerza el salto de línea si la palabra es muy larga */
+    word-break: break-word;
     overflow-wrap: break-word;
 }
+
+/* Evita selección accidental de texto mientras se desliza en el área principal */
+.app-content {
+    touch-action: pan-y; /* Permite scroll vertical normal, pero delega el horizontal a JS */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* 1. Elimina el recuadro azul/gris por defecto al tocar en móviles */
+.bottom-nav .nav-item,
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+/* 2. Feedback táctil suave para los botones del menú inferior */
+.bottom-nav .nav-item {
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* Micro-animación al presionar (presión física) */
+.bottom-nav .nav-item:active {
+    transform: scale(0.92);
+    opacity: 0.8;
+}
+
+/* 3. Animación ligera para el ícono/texto cuando se activa */
+.bottom-nav .nav-item.active i {
+    animation: bounceIcon 0.25s ease-out;
+}
+
+@keyframes bounceIcon {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+

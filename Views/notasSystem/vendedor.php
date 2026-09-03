@@ -1,7 +1,7 @@
 <?php
 // Validar que la vista reciba los datos desde VendedorController.php
 if (!isset($productos) || !isset($estibadores)) {
-    header("Location: ../../Controllers/VendedorController.php");
+    header("Location: ../../Controllers/vendedorController.php");
     exit;
 }
 ?>
@@ -19,6 +19,183 @@ if (!isset($productos) || !isset($estibadores)) {
             document.documentElement.classList.add('dark-mode');
         }
     </script>
+    <style>
+        /* ESTILOS DEL BOTÓN Y WIDGET DE CHAT INTERNO */
+        .chat-widget-container {
+            position: fixed;
+            bottom: 75px; /* Por encima de la barra de navegación inferior */
+            right: 15px;
+            z-index: 1000;
+        }
+
+        .chat-toggle-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background-color: var(--primary-color, #1a365d);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .chat-toggle-btn:active {
+            transform: scale(0.92);
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #e53e3e;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid #ffffff;
+        }
+
+        /* Ventana flotante de Chat */
+        .chat-box {
+            display: none;
+            position: fixed;
+            bottom: 140px;
+            right: 15px;
+            width: calc(100vw - 30px);
+            max-width: 360px;
+            height: 420px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 1001;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .chat-box.open {
+            display: flex;
+        }
+
+        .chat-header {
+            background-color: var(--primary-color, #1a365d);
+            color: #ffffff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-close-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .chat-close-btn:hover {
+            opacity: 1;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            background-color: #f7fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .chat-message.received {
+            background-color: #edf2f7;
+            color: #2d3748;
+            align-self: flex-start;
+        }
+
+        .chat-message.sent {
+            background-color: var(--primary-color, #1a365d);
+            color: #ffffff;
+            align-self: flex-end;
+        }
+
+        .chat-footer {
+            padding: 10px;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-footer input {
+            flex: 1;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .chat-footer button {
+            background-color: var(--primary-color, #1a365d);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+
+        /* Estilos en Modo Oscuro para el Chat */
+        .dark-mode .chat-box {
+            background-color: #1a202c;
+            border-color: #2d3748;
+        }
+
+        .dark-mode .chat-body {
+            background-color: #141923;
+        }
+
+        .dark-mode .chat-message.received {
+            background-color: #2d3748;
+            color: #e2e8f0;
+        }
+
+        .dark-mode .chat-footer {
+            background-color: #1a202c;
+            border-color: #2d3748;
+        }
+
+        .dark-mode .chat-footer input {
+            background-color: #2d3748;
+            border-color: #4a5568;
+            color: #ffffff;
+        }
+    </style>
 </head>
 <body>
 
@@ -90,10 +267,17 @@ if (!isset($productos) || !isset($estibadores)) {
 
                     <!-- Datalist compartido con el catálogo completo de productos -->
                     <datalist id="lista-productos">
-                        <?php foreach ($productos as $producto): ?>
-                            <option value="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" data-id="<?= htmlspecialchars((string)$producto['id_producto']) ?>"></option>
-                        <?php endforeach; ?>
-                    </datalist>
+    <?php foreach ($productos as $producto): ?>
+        <option 
+            value="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" 
+            label="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" 
+            data-id="<?= htmlspecialchars((string)($producto['id_producto'] ?? '')) ?>"
+            data-por-piezas="<?= htmlspecialchars((string)($producto['porPiezas'] ?? '0')) ?>"
+            data-stock-piezas="<?= htmlspecialchars((string)($producto['cantidadPiezas'] ?? '0')) ?>"
+            data-stock-peso="<?= htmlspecialchars((string)($producto['cantidadPeso'] ?? '0')) ?>"
+        ></option>
+    <?php endforeach; ?>
+</datalist>
 
                     <div id="products-container" style="margin-top: 15px;">
                         
@@ -106,21 +290,28 @@ if (!isset($productos) || !isset($estibadores)) {
 
                             <div class="form-group">
                                 <label>Buscar Producto *</label>
-                                <input type="text" list="lista-productos" class="form-control producto-search" placeholder="Escribe para buscar..." onchange="capturarIdProducto(this)" required>
+                                <input type="text" list="lista-productos" class="form-control producto-search" placeholder="Escribe para buscar..." onchange="capturarIdProducto(this)" autocomplete="off" required>
                                 <input type="hidden" name="productos[0][id_producto]" class="producto-id-hidden">
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group col">
-                                    <label>Kilos *</label>
-                                    <input type="number" step="0.01" name="productos[0][kilos]" class="form-control input-kilos" placeholder="0.00" required>
-                                </div>
+    <div class="form-group col">
+        <label>Kilos *</label>
+        <input type="number" step="0.01" name="productos[0][kilos]" class="form-control input-kilos" placeholder="0.00" required>
+    </div>
 
-                                <div class="form-group col">
-                                    <label>Piezas <small>(Opcional)</small></label>
-                                    <input type="number" name="productos[0][piezas]" class="form-control input-piezas" placeholder="0">
-                                </div>
-                            </div>
+    <div class="form-group col">
+        <label>Piezas <small>(Opcional)</small></label>
+        <input type="number" name="productos[0][piezas]" class="form-control input-piezas" placeholder="0">
+    </div>
+</div>
+
+<!-- NUEVO: Botón oculto para abrir caja -->
+<div class="form-group contenedor-abrir-caja" style="display: none; margin-top: 10px;">
+    <button type="button" class="btn-abrir-caja" style="background-color: #d97706; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;" onclick="procesarAperturaCaja(this)">
+        <i class="fa-solid fa-box-open"></i> Abrir Caja y Convertir a Kilos
+    </button>
+</div>
                         </div>
 
                     </div>
@@ -174,7 +365,7 @@ if (!isset($productos) || !isset($estibadores)) {
                 <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">Desarrollado para Grupo Cárnico América</p>
                 
                 <div style="margin-top: 20px;">
-                    <a href="../../Config/Logouth.php" class="btn-danger-block">
+                    <a href="../Config/Logouth.php" class="btn-danger-block">
                         <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
                     </a>
                 </div>
@@ -184,6 +375,32 @@ if (!isset($productos) || !isset($estibadores)) {
         <div class="spacer"></div>
 
     </main>
+
+    <!-- COMPONENTE FLOTANTE DE CHAT INTERNO -->
+    <div class="chat-widget-container">
+        <button class="chat-toggle-btn" onclick="toggleChatWindow()" title="Chat Interno corporativo">
+            <i class="fa-solid fa-comments"></i>
+            <span class="chat-badge">1</span>
+        </button>
+    </div>
+
+    <!-- VENTANA POPUP DEL CHAT -->
+    <div class="chat-box" id="chatBox">
+        <div class="chat-header">
+            <h3><i class="fa-solid fa-user-shield"></i> Chat Interno (Personal)</h3>
+            <button class="chat-close-btn" onclick="toggleChatWindow()">&times;</button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-message received">
+                <strong>Soporte / Caja:</strong><br>
+                Hola <?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Compañero') ?>, recuerda verificar los kilos antes de enviar la nota.
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Escribe un mensaje interno..." onkeypress="handleChatKeyPress(event)">
+            <button type="button" onclick="enviarMensajeChat()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
 
     <!-- BARRA NAVEGACIÓN INFERIOR TIPO APP -->
     <nav class="bottom-nav">
@@ -253,58 +470,134 @@ if (!isset($productos) || !isset($estibadores)) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Mapea el nombre escrito con el idProducto oculto
+        // Mapea el idProducto, valida banderas y bloquea campos
         function capturarIdProducto(inputSearch) {
-            const val = inputSearch.value;
-            const options = document.querySelectorAll('#lista-productos option');
-            const hiddenInput = inputSearch.closest('.form-group').querySelector('.producto-id-hidden');
+    const val = inputSearch.value.trim().toLowerCase();
+    const options = document.querySelectorAll('#lista-productos option');
+    const row = inputSearch.closest('.product-item');
+    const hiddenInput = row.querySelector('.producto-id-hidden');
+    const inputKilos = row.querySelector('.input-kilos');
+    const inputPiezas = row.querySelector('.input-piezas');
+    
+    // NUEVO: Capturar el contenedor del botón
+    const contenedorBotonCaja = row.querySelector('.contenedor-abrir-caja');
+    
+    hiddenInput.value = '';
+    inputKilos.disabled = false;
+    inputPiezas.disabled = false;
+    inputKilos.value = '';
+    inputPiezas.value = '';
+    
+    // NUEVO: Ocultar botón por defecto
+    if (contenedorBotonCaja) contenedorBotonCaja.style.display = 'none';
+
+    let matchFound = false;
+
+    options.forEach(opt => {
+        const optVal = opt.value.trim().toLowerCase();
+        
+        if (optVal === val) {
+            matchFound = true;
+            const idProducto = opt.getAttribute('data-id');
+            hiddenInput.value = idProducto;
             
-            hiddenInput.value = '';
-
-            options.forEach(opt => {
-                if (opt.value === val) {
-                    hiddenInput.value = opt.getAttribute('data-id');
+            const esPorPieza = (opt.getAttribute('data-por-piezas') === "1");
+            const stockKilos = opt.getAttribute('data-stock-peso') || '0';
+            const stockPiezas = opt.getAttribute('data-stock-piezas') || '0';
+            
+            if (esPorPieza) {
+                inputKilos.disabled = true;
+                inputKilos.placeholder = 'N/A';
+                inputKilos.required = false;
+                
+                inputPiezas.required = true;
+                inputPiezas.placeholder = `Max: ${stockPiezas}`;
+                
+                // VALIDACIÓN POR NOMBRE: Más seguro que usar el ID de la base de datos
+                if (optVal === "caja pechos" && contenedorBotonCaja) {
+                    contenedorBotonCaja.style.display = 'block';
+                    inputPiezas.disabled = true; 
+                    inputPiezas.placeholder = 'Caja para abrir';
+                    inputPiezas.required = false;
                 }
-            });
-
-            if (!hiddenInput.value && val !== '') {
-                inputSearch.value = '';
-                alert('Por favor selecciona un producto válido de la lista.');
+            } else {
+                inputPiezas.disabled = true;
+                inputPiezas.placeholder = 'N/A';
+                
+                inputKilos.required = true;
+                inputKilos.placeholder = `Max: ${stockKilos} kg`;
             }
         }
+    });
 
-        // Reordena títulos e índices de productos para el POST
-        function actualizarNumeracionYNombres() {
-            const items = document.querySelectorAll('.product-item');
-            items.forEach((item, index) => {
-                item.querySelector('.product-number').textContent = `Producto #${index + 1}`;
+    if (!matchFound && inputSearch.value !== '') {
+        inputSearch.value = '';
+        alert('Por favor selecciona un producto válido de la lista.');
+    }
+}
 
-                const inputHidden = item.querySelector('.producto-id-hidden');
-                const inputKilos = item.querySelector('.input-kilos');
-                const inputPiezas = item.querySelector('.input-piezas');
+// Reordena títulos e índices de productos para el POST
+function actualizarNumeracionYNombres() {
+    const items = document.querySelectorAll('.product-item');
+    items.forEach((item, index) => {
+        // Actualiza el texto visual (Producto #1, Producto #2, etc.)
+        const titulo = item.querySelector('.product-number');
+        if (titulo) titulo.textContent = `Producto #${index + 1}`;
 
-                inputHidden.name = `productos[${index}][id_producto]`;
-                inputKilos.name = `productos[${index}][kilos]`;
-                inputPiezas.name = `productos[${index}][piezas]`;
-            });
-        }
+        // Actualiza los índices de los inputs (productos[0], productos[1], etc.)
+        const inputHidden = item.querySelector('.producto-id-hidden');
+        const inputKilos = item.querySelector('.input-kilos');
+        const inputPiezas = item.querySelector('.input-piezas');
 
-        // Agregar nuevo producto
-        document.getElementById('btn-add-product').addEventListener('click', function() {
-            const container = document.getElementById('products-container');
-            const firstItem = container.querySelector('.product-item');
-            const newItem = firstItem.cloneNode(true);
+        if (inputHidden) inputHidden.name = `productos[${index}][id_producto]`;
+        if (inputKilos) inputKilos.name = `productos[${index}][kilos]`;
+        if (inputPiezas) inputPiezas.name = `productos[${index}][piezas]`;
+    });
+}
 
-            newItem.classList.remove('removing');
+// Agregar nuevo producto con validación
+document.getElementById('btn-add-product').addEventListener('click', function() {
+    const container = document.getElementById('products-container');
+    const items = container.querySelectorAll('.product-item');
+    
+    // VALIDACIÓN: Verificar si el último producto agregado ya fue llenado
+    const ultimoItem = items[items.length - 1];
+    const ultimoId = ultimoItem.querySelector('.producto-id-hidden').value;
+    
+    if (ultimoId === '') {
+       
+        return; 
+    }
 
-            newItem.querySelector('.producto-search').value = '';
-            newItem.querySelector('.producto-id-hidden').value = '';
-            newItem.querySelector('.input-kilos').value = '';
-            newItem.querySelector('.input-piezas').value = '';
+    // Clonar siempre la primera fila como plantilla
+    const firstItem = items[0];
+    const newItem = firstItem.cloneNode(true);
 
-            container.appendChild(newItem);
-            actualizarNumeracionYNombres();
-        });
+    newItem.classList.remove('removing');
+    newItem.querySelector('.producto-search').value = '';
+    newItem.querySelector('.producto-id-hidden').value = '';
+    
+    // Resetear los inputs de kilos y piezas
+    const nKilos = newItem.querySelector('.input-kilos');
+    const nPiezas = newItem.querySelector('.input-piezas');
+    
+    if (nKilos) {
+        nKilos.value = '';
+        nKilos.disabled = false;
+        nKilos.placeholder = '0.00';
+    }
+    
+    if (nPiezas) {
+        nPiezas.value = '';
+        nPiezas.disabled = false;
+        nPiezas.placeholder = '0';
+    }
+
+    container.appendChild(newItem);
+    actualizarNumeracionYNombres();
+});
+
+
 
         // Eliminar producto con animación y reordenar
         function removeProduct(btn) {
@@ -323,6 +616,71 @@ if (!isset($productos) || !isset($estibadores)) {
                 alert('Debe haber al menos un producto en la nota.');
             }
         }
+
+        // LÓGICA DE CONTROL DEL CHAT INTERNO
+        function toggleChatWindow() {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.classList.toggle('open');
+            
+            // Ocultar notificación de badge al abrir por primera vez
+            const badge = document.querySelector('.chat-badge');
+            if (badge && chatBox.classList.contains('open')) {
+                badge.style.display = 'none';
+            }
+        }
+
+        function handleChatKeyPress(e) {
+            if (e.key === 'Enter') {
+                enviarMensajeChat();
+            }
+        }
+
+        function enviarMensajeChat() {
+            const input = document.getElementById('chatInput');
+            const texto = input.value.trim();
+
+            if (texto !== '') {
+                const chatBody = document.getElementById('chatBody');
+                
+                // Mensaje enviado por el usuario
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-message sent';
+                msgDiv.textContent = texto;
+                chatBody.appendChild(msgDiv);
+
+                input.value = '';
+                chatBody.scrollTop = chatBody.scrollHeight;
+
+                /*
+                  AQUÍ PUEDES INTEGRAR TU SERVICIO O CONTROLADOR EN PHP VÍA AJAX:
+                  fetch('../Controllers/chatController.php', {
+                      method: 'POST',
+                      body: JSON.stringify({ mensaje: texto })
+                  });
+                */
+            }
+        }
+
+        function procesarAperturaCaja(btn) {
+    const kilosConfirmados = prompt("📦 APERTURA DE CAJA\n\nIngresa los kilos EXACTOS que arrojó la báscula al abrir esta caja de pechos:");
+    
+    if (kilosConfirmados === null) {
+        return; // El usuario canceló
+    }
+    
+    const peso = parseFloat(kilosConfirmados);
+    
+    if (isNaN(peso) || peso <= 0) {
+        alert("❌ Error: Debes ingresar un peso válido mayor a 0.");
+        return;
+    }
+    
+    if (confirm(`¿Confirmas que la caja pesó exactamente ${peso} kg? \nEsto descontará 1 caja del inventario y sumará los kilos al producto a granel.`)) {
+        // Redirigir al controlador con parámetros GET para procesar la apertura
+        // Nota: Asegúrate de que la ruta al controlador sea la correcta
+        window.location.href = `../Controllers/vendedorController.php?accion=abrir_caja&id_caja=234&peso=${peso}`;
+    }
+}
     </script>
 </body>
 </html>

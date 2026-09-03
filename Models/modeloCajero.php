@@ -15,7 +15,9 @@ class modeloCajero {
     /**
      * Obtiene las notas pendientes con sus productos y estibadores.
      */
-    public function obtenerNotasPendientes(): array {
+    public function obtenerNotasPendientes($busqueda = ''): array {
+        $params = [];
+        
         $sqlNotas = "
             SELECT 
                 n.id_nota,
@@ -26,10 +28,62 @@ class modeloCajero {
             FROM notas n
             LEFT JOIN cuenta v ON n.id_vendedor = v.idCuenta
             WHERE UPPER(n.estado) = 'PENDIENTE'
-            ORDER BY n.fecha_creacion DESC
         ";
         
-        $notasRaw = $this->db->select($sqlNotas);
+        // Si el cajero escribió algo en el buscador, agregamos el filtro
+        if (!empty($busqueda)) {
+            $sqlNotas .= " AND (n.folio LIKE ? OR n.nombre_cliente LIKE ?)";
+            $termino = "%" . $busqueda . "%";
+            $params[] = $termino; // Para el folio
+            $params[] = $termino; // Para el nombre_cliente
+        }
+
+        $sqlNotas .= " ORDER BY n.fecha_creacion DESC";
+        
+        $notasRaw = $this->db->select($sqlNotas, $params);
+        $notasCompleta = [];
+
+        if (empty($notasRaw)) {
+            return [];
+        }
+
+        foreach ($notasRaw as $nota) {
+            $idNota = (int)$nota['id_nota'];
+
+            $nota['productos'] = $this->obtenerProductosPorNota($idNota);
+            $nota['estibadores'] = $this->obtenerEstibadoresPorNota($idNota);
+
+            $notasCompleta[] = $nota;
+        }
+
+        return $notasCompleta;
+    }
+
+    public function obtenerNotasCobradas($busqueda = ''): array {
+        $params = [];
+        
+        $sqlNotas = "
+            SELECT 
+                n.id_nota,
+                n.folio,
+                n.nombre_cliente AS cliente,
+                n.fecha_creacion AS fecha,
+                COALESCE(CONCAT(v.nombreUsuario, ' ', v.apellidoPaternoUsuario), 'Vendedor General') AS vendedor
+            FROM notas n
+            LEFT JOIN cuenta v ON n.id_vendedor = v.idCuenta
+            WHERE UPPER(n.estado) = 'COBRADO'
+        ";
+        
+        if (!empty($busqueda)) {
+            $sqlNotas .= " AND (n.folio LIKE ? OR n.nombre_cliente LIKE ?)";
+            $termino = "%" . $busqueda . "%";
+            $params[] = $termino; // Para el folio
+            $params[] = $termino; // Para el nombre_cliente
+        }
+
+        $sqlNotas .= " ORDER BY n.fecha_creacion DESC";
+        
+        $notasRaw = $this->db->select($sqlNotas, $params);
         $notasCompleta = [];
 
         if (empty($notasRaw)) {
@@ -91,4 +145,7 @@ class modeloCajero {
             return false;
         }
     }
+
+    
 }
+

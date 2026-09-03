@@ -14,6 +14,7 @@
 .nota-card {
     border-left: 5px solid #f59e0b;
     margin-bottom: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nota-header {
@@ -93,4 +94,34 @@
 
 .btn-success:active {
     background-color: #15803d;
+}
+
+/* --- ANIMACIÓN DE ENTRADA Y DESTELLO PARA NOTA NUEVA --- */
+.nota-nueva-alerta {
+    animation: slideInAlert 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards, resplandorVerde 1.5s ease-out forwards;
+}
+
+@keyframes slideInAlert {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes resplandorVerde {
+    0% {
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+        border-left-color: #16a34a;
+    }
+    50% {
+        box-shadow: 0 0 15px 3px rgba(22, 163, 74, 0.4);
+        border-left-color: #16a34a;
+    }
+    100% {
+        box-shadow: none;
+    }
 }

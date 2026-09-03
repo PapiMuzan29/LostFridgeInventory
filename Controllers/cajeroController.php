@@ -6,7 +6,7 @@ require_once __DIR__ . '/../Models/modeloCajero.php';
 $idCuenta = $_SESSION['idCuenta'] ?? $_SESSION['id_usuario'] ?? $_SESSION['id'] ?? null;
 
 if (!$idCuenta) {
-    header("Location: ../index.php");
+    header("Location: ../Views/login.php");
     exit;
 }
 

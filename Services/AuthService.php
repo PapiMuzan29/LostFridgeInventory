@@ -12,6 +12,9 @@ class AuthService {
         $this->userModel = new User();
     }
 
+    /**
+     * Procesa la autenticación del usuario y registra las variables de sesión
+     */
     public function login(string $username, string $password): bool {
 
         $user = $this->userModel->findByUsername($username);
@@ -21,8 +24,9 @@ class AuthService {
             isset($user['contrasenaUsuario']) &&
             isset($user['apodoUsuario']) &&
             isset($user['nombreRol']) &&
+            isset($user['idRol']) &&
             isset($user['estado']) &&
-            $user['estado'] == 1 &&
+            (int)$user['estado'] === 1 &&
             $password === $user['contrasenaUsuario']
         ) {
 
@@ -30,13 +34,14 @@ class AuthService {
                 session_start();
             }
 
+            // Regenera el ID de la sesión para prevenir Session Hijacking
             session_regenerate_id(true);
 
-            // ⚠️ REGISTROS DE SESIÓN ACTUALIZADOS:
-            $_SESSION['idCuenta'] = $user['idCuenta'];       // Se guarda idCuenta para las FK de notas
-            $_SESSION['idRol'] = $user['idRol'] ?? null;     // Se guarda el idRol numérico
+            // REGISTROS DE SESIÓN CON DATOS Y ROLES DE USUARIO
+            $_SESSION['idCuenta']     = $user['idCuenta'];
+            $_SESSION['idRol']        = (int)$user['idRol'];
             $_SESSION['apodoUsuario'] = $user['apodoUsuario'];
-            $_SESSION['nombreRol'] = $user['nombreRol'];
+            $_SESSION['nombreRol']   = $user['nombreRol'];
 
             return true;
         }
@@ -44,6 +49,9 @@ class AuthService {
         return false;
     }
 
+    /**
+     * Cierra la sesión y destruye la cookie de la app
+     */
     public function logout(): void {
 
         if (session_status() === PHP_SESSION_NONE) {
@@ -53,7 +61,6 @@ class AuthService {
         $_SESSION = [];
 
         if (ini_get("session.use_cookies")) {
-
             $params = session_get_cookie_params();
 
             setcookie(
@@ -70,6 +77,9 @@ class AuthService {
         session_destroy();
     }
 
+    /**
+     * Comprueba si hay una sesión válida iniciada
+     */
     public function isAuthenticated(): bool {
 
         if (session_status() === PHP_SESSION_NONE) {
@@ -77,6 +87,32 @@ class AuthService {
         }
 
         return isset($_SESSION['idCuenta']) || isset($_SESSION['apodoUsuario']);
+    }
+
+    /**
+     * Obtiene el ID del rol de la sesión actual
+     */
+    public function getRoleId(): ?int {
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        return isset($_SESSION['idRol']) ? (int)$_SESSION['idRol'] : null;
+    }
+
+    /**
+     * Valida si el usuario tiene acceso a un módulo específico según su rol
+     */
+    public function hasRole(int ...$allowedRoles): bool {
+
+        $userRole = $this->getRoleId();
+
+        if ($userRole === null) {
+            return false;
+        }
+
+        return in_array($userRole, $allowedRoles, true);
     }
 }
 
