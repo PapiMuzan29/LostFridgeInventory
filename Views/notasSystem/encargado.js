@@ -856,3 +856,11 @@ function abrirModuloPiernas() {
 function abrirModuloManteca() {
     window.location.href = 'manteca.php';
 }
+
+function abrirModuloChuletas() {
+   window.location.href = 'chuleta.php';
+}
+
+function abrirModuloMazos() {
+  window.location.href = 'mazo.php';
+}

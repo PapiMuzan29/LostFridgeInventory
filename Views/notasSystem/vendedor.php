@@ -19,185 +19,8 @@ if (!isset($productos) || !isset($estibadores)) {
             document.documentElement.classList.add('dark-mode');
         }
     </script>
-    <style>
-        /* ESTILOS DEL BOTÓN Y WIDGET DE CHAT INTERNO */
-        .chat-widget-container {
-            position: fixed;
-            bottom: 75px; /* Por encima de la barra de navegación inferior */
-            right: 15px;
-            z-index: 1000;
-        }
-
-        .chat-toggle-btn {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background-color: var(--primary-color, #1a365d);
-            color: #ffffff;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: transform 0.2s ease, background-color 0.2s ease;
-        }
-
-        .chat-toggle-btn:active {
-            transform: scale(0.92);
-        }
-
-        .chat-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            background-color: #e53e3e;
-            color: #ffffff;
-            font-size: 0.7rem;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 10px;
-            border: 2px solid #ffffff;
-        }
-
-        /* Ventana flotante de Chat */
-        .chat-box {
-            display: none;
-            position: fixed;
-            bottom: 140px;
-            right: 15px;
-            width: calc(100vw - 30px);
-            max-width: 360px;
-            height: 420px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-            z-index: 1001;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-        }
-
-        .chat-box.open {
-            display: flex;
-        }
-
-        .chat-header {
-            background-color: var(--primary-color, #1a365d);
-            color: #ffffff;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-header h3 {
-            margin: 0;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .chat-close-btn {
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 1.1rem;
-            cursor: pointer;
-            opacity: 0.8;
-        }
-
-        .chat-close-btn:hover {
-            opacity: 1;
-        }
-
-        .chat-body {
-            flex: 1;
-            padding: 12px;
-            overflow-y: auto;
-            background-color: #f7fafc;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .chat-message {
-            max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            line-height: 1.3;
-        }
-
-        .chat-message.received {
-            background-color: #edf2f7;
-            color: #2d3748;
-            align-self: flex-start;
-        }
-
-        .chat-message.sent {
-            background-color: var(--primary-color, #1a365d);
-            color: #ffffff;
-            align-self: flex-end;
-        }
-
-        .chat-footer {
-            padding: 10px;
-            background-color: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            gap: 8px;
-        }
-
-        .chat-footer input {
-            flex: 1;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
-            outline: none;
-        }
-
-        .chat-footer button {
-            background-color: var(--primary-color, #1a365d);
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 14px;
-            cursor: pointer;
-        }
-
-        /* Estilos en Modo Oscuro para el Chat */
-        .dark-mode .chat-box {
-            background-color: #1a202c;
-            border-color: #2d3748;
-        }
-
-        .dark-mode .chat-body {
-            background-color: #141923;
-        }
-
-        .dark-mode .chat-message.received {
-            background-color: #2d3748;
-            color: #e2e8f0;
-        }
-
-        .dark-mode .chat-footer {
-            background-color: #1a202c;
-            border-color: #2d3748;
-        }
-
-        .dark-mode .chat-footer input {
-            background-color: #2d3748;
-            border-color: #4a5568;
-            color: #ffffff;
-        }
-    </style>
 </head>
-<body>
+<body data-usuario-id="<?= htmlspecialchars((string)($_SESSION['idCuenta'] ?? 0)) ?>">
 
     <header class="app-header">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
@@ -218,37 +41,52 @@ if (!isset($productos) || !isset($estibadores)) {
         <!-- VISTA 1: CAPTURA DE INICIO / NOTAS -->
         <div id="tab-inicio" class="tab-content active">
 
-            <!-- ALERTAS BASADAS EN SESIÓN CON AUTODESTRUCCIÓN -->
-            <?php if (!empty($_SESSION['alerta_exito'])): ?>
-                <div id="alerta-flash" class="alert alert-success" style="background-color: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center; font-weight: bold; transition: opacity 0.5s ease;">
-                    <i class="fa-solid fa-circle-check"></i> <?= htmlspecialchars($_SESSION['alerta_exito']) ?>
-                </div>
-                <?php unset($_SESSION['alerta_exito']); ?>
-            <?php endif; ?>
+            <?php 
+                // 1. PREPARAMOS EL MENSAJE DEL MODAL SI HAY ALERTAS EN LA SESIÓN
+                $mensajeModal = '';
+                $tipoModal = '';
+                if (!empty($_SESSION['alerta_exito'])) {
+                    $mensajeModal = htmlspecialchars($_SESSION['alerta_exito']);
+                    $tipoModal = 'exito';
+                    unset($_SESSION['alerta_exito']);
+                } elseif (!empty($_SESSION['alerta_error'])) {
+                    $mensajeModal = htmlspecialchars($_SESSION['alerta_error']);
+                    $tipoModal = 'error';
+                    unset($_SESSION['alerta_error']);
+                }
 
-            <?php if (!empty($_SESSION['alerta_error'])): ?>
-                <div id="alerta-flash" class="alert alert-danger" style="background-color: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center; font-weight: bold; transition: opacity 0.5s ease;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> <?= htmlspecialchars($_SESSION['alerta_error']) ?>
-                </div>
-                <?php unset($_SESSION['alerta_error']); ?>
-            <?php endif; ?>
+                // 2. RECUPERAMOS LOS DATOS DEL FORMULARIO SI EXISTEN
+                $formData = $_SESSION['form_data'] ?? [];
+                $estibadoresSeleccionados = $formData['estibadores'] ?? [];
+                $productosForm = $formData['productos'] ?? [['id_producto' => '', 'nombre_producto' => '', 'kilos' => '', 'piezas' => '']];
+                unset($_SESSION['form_data']); 
+            ?>
 
-            <form action="../Controllers/vendedorController.php" method="POST" id="formVendedor">
-                
+            <!-- 3. SI HAY UN MENSAJE, DISPARAMOS EL MODAL AUTOMÁTICAMENTE AL CARGAR LA PÁGINA -->
+            <?php if ($mensajeModal !== ''): ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        mostrarAlerta('<?= $mensajeModal ?>', '<?= $tipoModal ?>');
+                    });
+                </script>
+            <?php endif; ?>
+            <form action="../Controllers/vendedorController.php" method="POST" id="formVendedor"> 
                 <!-- Datos del Cliente -->
                 <section class="card">
                     <h2 class="card-title"><i class="fa-solid fa-id-card"></i> 1. Información General</h2>
                     
                     <div class="form-group">
                         <label for="cliente">Nombre del Cliente *</label>
-                        <input type="text" id="cliente" name="nombre_cliente" class="form-control" placeholder="Ej. Taquería El Paisa / Juan Pérez" required>
+                        <input type="text" id="cliente" name="nombre_cliente" class="form-control" placeholder="Ej. Taquería El Paisa / Juan Pérez" value="<?= htmlspecialchars((string)($formData['nombre_cliente'] ?? '')) ?>" required>
                     </div>
 
                     <div class="form-group">
                         <label for="estibadores">Estibador(es) * <small>(Selecciona uno o varios)</small></label>
                         <select id="estibadores" name="estibadores[]" class="form-control" multiple required style="height: 90px;">
-                            <?php foreach ($estibadores as $estibador): ?>
-                                <option value="<?= htmlspecialchars((string)$estibador['id_usuario']) ?>">
+                            <?php foreach ($estibadores as $estibador): 
+                                $isSelected = in_array((string)$estibador['id_usuario'], $estibadoresSeleccionados) ? 'selected' : '';
+                            ?>
+                                <option value="<?= htmlspecialchars((string)$estibador['id_usuario']) ?>" <?= $isSelected ?>>
                                     <?= htmlspecialchars((string)$estibador['nombre']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -267,64 +105,107 @@ if (!isset($productos) || !isset($estibadores)) {
 
                     <!-- Datalist compartido con el catálogo completo de productos -->
                     <datalist id="lista-productos">
-    <?php foreach ($productos as $producto): ?>
-        <option 
-            value="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" 
-            label="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" 
-            data-id="<?= htmlspecialchars((string)($producto['id_producto'] ?? '')) ?>"
-            data-por-piezas="<?= htmlspecialchars((string)($producto['porPiezas'] ?? '0')) ?>"
-            data-stock-piezas="<?= htmlspecialchars((string)($producto['cantidadPiezas'] ?? '0')) ?>"
-            data-stock-peso="<?= htmlspecialchars((string)($producto['cantidadPeso'] ?? '0')) ?>"
-        ></option>
-    <?php endforeach; ?>
-</datalist>
+                        <?php foreach ($productos as $producto): ?>
+                            <option 
+                                value="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" 
+                                label="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" 
+                                data-id="<?= htmlspecialchars((string)($producto['id_producto'] ?? '')) ?>"
+                                data-por-piezas="<?= htmlspecialchars((string)($producto['porPiezas'] ?? '0')) ?>"
+                                data-stock-piezas="<?= htmlspecialchars((string)($producto['cantidadPiezas'] ?? '0')) ?>"
+                                data-stock-cajas="<?= htmlspecialchars((string)($producto['cantidadCajas'] ?? '0')) ?>"
+                                data-stock-peso="<?= htmlspecialchars((string)($producto['cantidadPeso'] ?? '0')) ?>"
+                            ></option>
+                        <?php endforeach; ?>
+                    </datalist>
 
                     <div id="products-container" style="margin-top: 15px;">
-                        
-                        <!-- Fila de Producto -->
+                        <?php 
+                        $contador = 0;
+                        foreach ($productosForm as $index => $prod): 
+                            $contador++;
+                        ?>
                         <div class="product-item card-inner">
                             <div class="product-item-header">
-                                <span class="product-number">Producto #1</span>
+                                <span class="product-number">Producto #<?= $contador ?></span>
                                 <button type="button" class="btn-delete" onclick="removeProduct(this)" title="Eliminar producto">&times;</button>
                             </div>
 
                             <div class="form-group">
                                 <label>Buscar Producto *</label>
-                                <input type="text" list="lista-productos" class="form-control producto-search" placeholder="Escribe para buscar..." onchange="capturarIdProducto(this)" autocomplete="off" required>
-                                <input type="hidden" name="productos[0][id_producto]" class="producto-id-hidden">
+                                <!-- NUEVO: Se agregó el name="productos[x][nombre_producto]" para recuperar el texto -->
+                                <input type="text" list="lista-productos" name="productos[<?= $index ?>][nombre_producto]" class="form-control producto-search" placeholder="Escribe para buscar..." onchange="capturarIdProducto(this)" autocomplete="off" value="<?= htmlspecialchars((string)($prod['nombre_producto'] ?? '')) ?>" required>
+                                <input type="hidden" name="productos[<?= $index ?>][id_producto]" class="producto-id-hidden" value="<?= htmlspecialchars((string)($prod['id_producto'] ?? '')) ?>">
                             </div>
 
                             <div class="form-row">
-    <div class="form-group col">
-        <label>Kilos *</label>
-        <input type="number" step="0.01" name="productos[0][kilos]" class="form-control input-kilos" placeholder="0.00" required>
-    </div>
+                                <div class="form-group col">
+                                    <label>Kilos *</label>
+                                    <input type="number" step="0.01" name="productos[<?= $index ?>][kilos]" class="form-control input-kilos" placeholder="0.00" value="<?= htmlspecialchars((string)($prod['kilos'] ?? '')) ?>" required>
+                                </div>
 
-    <div class="form-group col">
-        <label>Piezas <small>(Opcional)</small></label>
-        <input type="number" name="productos[0][piezas]" class="form-control input-piezas" placeholder="0">
-    </div>
-</div>
+                                <div class="form-group col">
+                                    <label>Piezas <small>(Opcional)</small></label>
+                                    <input type="number" name="productos[<?= $index ?>][piezas]" class="form-control input-piezas" placeholder="0" value="<?= htmlspecialchars((string)($prod['piezas'] ?? '')) ?>">
+                                </div>
+                            </div>
 
-<!-- NUEVO: Botón oculto para abrir caja -->
-<div class="form-group contenedor-abrir-caja" style="display: none; margin-top: 10px;">
-    <button type="button" class="btn-abrir-caja" style="background-color: #d97706; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;" onclick="procesarAperturaCaja(this)">
-        <i class="fa-solid fa-box-open"></i> Abrir Caja y Convertir a Kilos
-    </button>
-</div>
+                            <div class="form-group contenedor-abrir-caja" style="display: none; margin-top: 10px;">
+                                <button type="button" class="btn-abrir-caja" style="background-color: #d97706; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;" onclick="procesarAperturaCaja(this)">
+                                    <i class="fa-solid fa-box-open"></i> Abrir 1 Caja a Granel
+                                </button>
+                            </div>
                         </div>
-
+                        <?php endforeach; ?>
                     </div>
 
                     <!-- Botón Enviar Formulario -->
-                    <div style="margin-top: 20px;">
-                        <button type="submit" class="btn-primary">
+                    <!-- Botones de Acción -->
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button type="submit" name="accion_boton" value="guardar_espera" class="btn-secondary-sm" style="flex: 1; background-color: #4a5568; color: #fff; padding: 12px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer;">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar en Espera
+                        </button>
+                        <button type="submit" name="accion_boton" value="enviar_caja" class="btn-primary" style="flex: 1;">
                             <i class="fa-solid fa-paper-plane"></i> Enviar a Caja
                         </button>
                     </div>
                 </section>
 
             </form>
+        </div>
+
+        <!-- VISTA 3: NOTAS GUARDADAS / EN ESPERA -->
+        <div id="tab-notas" class="tab-content">
+            <section class="card">
+                <h2 class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Notas en Espera y Rechazadas</h2>
+
+                <?php if (empty($notasVendedor)): ?>
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                        <i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>No tienes notas pendientes ni en espera.</p>
+                    </div>
+                <?php else: ?>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <?php foreach ($notasVendedor as $nv): ?>
+                            <div style="background: var(--card-bg, #fff); border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <span style="font-weight: bold; font-size: 0.95rem; color: var(--primary-color, #1a365d);"><?= htmlspecialchars($nv['folio']) ?> - <?= htmlspecialchars($nv['nombre_cliente']) ?></span>
+                                    <span style="font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; font-weight: bold; background: <?= $nv['estado'] === 'RECHAZADA' ? '#ffebee; color: #c62828;' : '#fff3e0; color: #ef6c00;' ?>"><?= $nv['estado'] ?></span>
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;"><strong>Productos:</strong> <?= htmlspecialchars($nv['resumen_productos'] ?? 'Sin productos') ?></p>
+                                
+                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                    <a href="#" onclick="confirmarEditarNota(event, '../Controllers/vendedorController.php?accion=editar_nota&id_nota=<?= $nv['id_nota'] ?>')" class="btn-secondary-sm" style="background-color: #d97706; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem;">
+                                        <i class="fa-solid fa-pen-to-square"></i> Editar / Retomar
+                                    </a>
+                                    <a href="#" onclick="event.preventDefault(); mostrarAlerta('¿Estás seguro de cancelar esta nota? El inventario será devuelto.', 'confirmacion', function(acepta) { if(acepta) window.location.href='../Controllers/vendedorController.php?accion=cancelar_nota&id_nota=<?= $nv['id_nota'] ?>'; });" style="background-color: #e53e3e; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold;">
+                                        <i class="fa-solid fa-trash"></i> Cancelar
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
         </div>
 
         <!-- VISTA 2: CONFIGURACIÓN -->
@@ -376,29 +257,25 @@ if (!isset($productos) || !isset($estibadores)) {
 
     </main>
 
-    <!-- COMPONENTE FLOTANTE DE CHAT INTERNO -->
-    <div class="chat-widget-container">
-        <button class="chat-toggle-btn" onclick="toggleChatWindow()" title="Chat Interno corporativo">
-            <i class="fa-solid fa-comments"></i>
-            <span class="chat-badge">1</span>
-        </button>
-    </div>
 
-    <!-- VENTANA POPUP DEL CHAT -->
-    <div class="chat-box" id="chatBox">
-        <div class="chat-header">
-            <h3><i class="fa-solid fa-user-shield"></i> Chat Interno (Personal)</h3>
-            <button class="chat-close-btn" onclick="toggleChatWindow()">&times;</button>
-        </div>
-        <div class="chat-body" id="chatBody">
-            <div class="chat-message received">
-                <strong>Soporte / Caja:</strong><br>
-                Hola <?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Compañero') ?>, recuerda verificar los kilos antes de enviar la nota.
+
+    <!-- MODAL PARA CAPTURAR PESO DE LA CAJA -->
+    <div id="modal-abrir-caja" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-scale-balanced"></i> Apertura de Caja</h3>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalCaja()">&times;</button>
             </div>
-        </div>
-        <div class="chat-footer">
-            <input type="text" id="chatInput" placeholder="Escribe un mensaje interno..." onkeypress="handleChatKeyPress(event)">
-            <button type="button" onclick="enviarMensajeChat()"><i class="fa-solid fa-paper-plane"></i></button>
+            <div class="modal-body">
+                <p style="margin-bottom: 12px; font-size: 0.95rem;">Ingresa los kilos <strong>exactos</strong> que arrojó la báscula al abrir esta caja de pechos:</p>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <input type="number" id="peso-caja-input" class="form-control" step="0.01" placeholder="Ej. 25.40">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary-sm" onclick="cerrarModalCaja()">Cancelar</button>
+                <button type="button" class="btn-primary" style="background-color: #d97706;" onclick="confirmarAperturaCaja(event)">Convertir a Kilos</button>
+            </div>
         </div>
     </div>
 
@@ -407,6 +284,10 @@ if (!isset($productos) || !isset($estibadores)) {
         <button type="button" class="nav-item active" onclick="switchTab('inicio', this)">
             <i class="fa-solid fa-house"></i>
             <span>Inicio</span>
+        </button>
+        <button type="button" class="nav-item" onclick="switchTab('notas', this)">
+            <i class="fa-solid id-badge fa-receipt"></i>
+            <span>Notas</span>
         </button>
         <button type="button" class="nav-item" onclick="switchTab('config', this)">
             <i class="fa-solid fa-gear"></i>
@@ -429,7 +310,6 @@ if (!isset($productos) || !isset($estibadores)) {
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Sincronizar el checkbox según el estado actual
             const currentTheme = localStorage.getItem('theme');
             const toggleInput = document.getElementById('toggle-dark-mode');
             
@@ -438,14 +318,12 @@ if (!isset($productos) || !isset($estibadores)) {
                 if (toggleInput) toggleInput.checked = true;
             }
 
-            // Ocultar la alerta de pantalla tras 3 segundos
-            const alerta = document.getElementById('alerta-flash');
-            if (alerta) {
-                setTimeout(() => {
-                    alerta.style.opacity = '0';
-                    setTimeout(() => alerta.remove(), 500);
-                }, 3000);
-            }
+
+            document.querySelectorAll('.producto-search').forEach(input => {
+                if (input.value.trim() !== '') {
+                    capturarIdProducto(input, true);
+                }
+            });
         });
 
         // Navegación entre Pestañas
@@ -461,6 +339,9 @@ if (!isset($productos) || !isset($estibadores)) {
             if (tabName === 'inicio') {
                 document.getElementById('tab-inicio').classList.add('active');
                 document.getElementById('header-subtitle').textContent = 'Módulo de Captura de Pedidos';
+            } else if (tabName === 'notas') {
+                document.getElementById('tab-notas').classList.add('active');
+                document.getElementById('header-subtitle').textContent = 'Notas en Espera y Rechazadas';
             } else if (tabName === 'config') {
                 document.getElementById('tab-config').classList.add('active');
                 document.getElementById('header-subtitle').textContent = 'Configuración del Sistema';
@@ -470,136 +351,209 @@ if (!isset($productos) || !isset($estibadores)) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Mapea el idProducto, valida banderas y bloquea campos
-        function capturarIdProducto(inputSearch) {
-    const val = inputSearch.value.trim().toLowerCase();
-    const options = document.querySelectorAll('#lista-productos option');
-    const row = inputSearch.closest('.product-item');
-    const hiddenInput = row.querySelector('.producto-id-hidden');
-    const inputKilos = row.querySelector('.input-kilos');
-    const inputPiezas = row.querySelector('.input-piezas');
-    
-    // NUEVO: Capturar el contenedor del botón
-    const contenedorBotonCaja = row.querySelector('.contenedor-abrir-caja');
-    
-    hiddenInput.value = '';
-    inputKilos.disabled = false;
-    inputPiezas.disabled = false;
-    inputKilos.value = '';
-    inputPiezas.value = '';
-    
-    // NUEVO: Ocultar botón por defecto
-    if (contenedorBotonCaja) contenedorBotonCaja.style.display = 'none';
-
-    let matchFound = false;
-
-    options.forEach(opt => {
-        const optVal = opt.value.trim().toLowerCase();
-        
-        if (optVal === val) {
-            matchFound = true;
-            const idProducto = opt.getAttribute('data-id');
-            hiddenInput.value = idProducto;
+        function procesarAperturaCaja(btn) {
+            const idCaja = btn.getAttribute('data-id');
+            const modal = document.getElementById('modal-abrir-caja');
             
-            const esPorPieza = (opt.getAttribute('data-por-piezas') === "1");
-            const stockKilos = opt.getAttribute('data-stock-peso') || '0';
-            const stockPiezas = opt.getAttribute('data-stock-piezas') || '0';
+            modal.setAttribute('data-id-caja', idCaja);
+            document.getElementById('peso-caja-input').value = '';
+            modal.style.display = 'flex';
+            setTimeout(() => document.getElementById('peso-caja-input').focus(), 100);
+        }
+
+        function cerrarModalCaja() {
+            document.getElementById('modal-abrir-caja').style.display = 'none';
+        }
+
+        // Se le agrega el parámetro fromLoad para evitar que borre los números si viene de una recarga de página
+        function capturarIdProducto(inputSearch, fromLoad = false) {
+            const val = inputSearch.value.trim().toLowerCase();
+            const options = document.querySelectorAll('#lista-productos option');
+            const row = inputSearch.closest('.product-item');
+            const hiddenInput = row.querySelector('.producto-id-hidden');
+            const inputKilos = row.querySelector('.input-kilos');
+            const inputPiezas = row.querySelector('.input-piezas');
+            const contenedorBotonCaja = row.querySelector('.contenedor-abrir-caja');
             
-            if (esPorPieza) {
-                inputKilos.disabled = true;
-                inputKilos.placeholder = 'N/A';
-                inputKilos.required = false;
+            // Si NO venimos de una recarga, borramos los campos para que escriba
+            if (!fromLoad) {
+                hiddenInput.value = '';
+                inputKilos.value = '';
+                inputPiezas.value = '';
+            }
+            
+            inputKilos.disabled = false;
+            inputKilos.readOnly = false;
+            inputPiezas.disabled = false;
+            inputPiezas.readOnly = false;
+            inputPiezas.oninput = null; 
+            
+            if (contenedorBotonCaja) contenedorBotonCaja.style.display = 'none';
+
+            let matchFound = false;
+
+            options.forEach(opt => {
+                const optVal = opt.value.trim().toLowerCase();
                 
-                inputPiezas.required = true;
-                inputPiezas.placeholder = `Max: ${stockPiezas}`;
-                
-                // VALIDACIÓN POR NOMBRE: Más seguro que usar el ID de la base de datos
-                if (optVal === "caja pechos" && contenedorBotonCaja) {
-                    contenedorBotonCaja.style.display = 'block';
-                    inputPiezas.disabled = true; 
-                    inputPiezas.placeholder = 'Caja para abrir';
-                    inputPiezas.required = false;
+                if (optVal === val) {
+                    matchFound = true;
+                    const idProducto = opt.getAttribute('data-id');
+                    hiddenInput.value = idProducto;
+                    
+                    // Formateamos a 2 decimales para que "1.0000" se vea como "1.00"
+                    const pesoCrudo = parseFloat(opt.getAttribute('data-stock-peso') || '0');
+                    const stockKilos = pesoCrudo.toFixed(2); 
+
+                    const stockCajas = parseInt(opt.getAttribute('data-stock-cajas')) || 0;
+                    const stockPiezas = parseInt(opt.getAttribute('data-stock-piezas')) || 0;
+                    const stockUnidades = stockCajas > 0 ? stockCajas : stockPiezas;
+                    
+                    const esMazo = optVal.includes('mazo');
+                    const esManteca = optVal.includes('manteca');
+
+                    if (optVal === "caja pechos") {
+                        inputKilos.readOnly = false;
+                        inputKilos.disabled = false;
+                        inputKilos.placeholder = 'Kilos totales';
+                        inputKilos.required = true; 
+                        
+                        inputPiezas.readOnly = false;
+                        inputPiezas.disabled = false; 
+                        inputPiezas.placeholder = `Max: ${stockUnidades} cajas`;
+                        inputPiezas.required = true;
+
+                        if (contenedorBotonCaja) {
+                            contenedorBotonCaja.style.display = 'block';
+                            const btnAbrir = contenedorBotonCaja.querySelector('.btn-abrir-caja');
+                            btnAbrir.setAttribute('data-id', idProducto);
+                            btnAbrir.innerHTML = '<i class="fa-solid fa-box-open"></i> Abrir 1 Caja a Granel';
+                        }
+                        
+                    } else if (esManteca) {
+                        const matchNumeros = optVal.match(/\d+/);
+                        const kilosPorPieza = matchNumeros ? parseFloat(matchNumeros[0]) : 0;
+
+                        inputKilos.readOnly = true; 
+                        inputKilos.placeholder = 'Auto-calculado';
+                        inputKilos.required = true;
+                        
+                        inputPiezas.disabled = false;
+                        inputPiezas.required = true;
+                        inputPiezas.placeholder = `Max: ${stockUnidades}`;
+
+                        inputPiezas.oninput = function() {
+                            const cantPiezas = parseInt(this.value) || 0;
+                            inputKilos.value = (cantPiezas * kilosPorPieza).toFixed(2);
+                        };
+
+                    } else if (esMazo) {
+                        inputKilos.readOnly = true;
+                        inputKilos.value = '0.00';
+                        inputKilos.required = false;
+                        
+                        inputPiezas.disabled = false;
+                        inputPiezas.required = true;
+                        inputPiezas.placeholder = `Max: ${stockUnidades}`;
+                        
+                    } else {
+                        inputKilos.disabled = false;
+                        inputKilos.required = true;
+                        inputKilos.placeholder = `Max: ${stockKilos} kg`;
+                        
+                        inputPiezas.disabled = false;
+                        inputPiezas.placeholder = 'Piezas físicas';
+                    }
                 }
-            } else {
-                inputPiezas.disabled = true;
-                inputPiezas.placeholder = 'N/A';
-                
-                inputKilos.required = true;
-                inputKilos.placeholder = `Max: ${stockKilos} kg`;
+            });
+
+            if (!matchFound && inputSearch.value !== '' && !fromLoad) {
+                inputSearch.value = '';
+                mostrarAlerta('Por favor selecciona un producto válido de la lista.', 'error');
             }
         }
-    });
 
-    if (!matchFound && inputSearch.value !== '') {
-        inputSearch.value = '';
-        alert('Por favor selecciona un producto válido de la lista.');
-    }
-}
+        function confirmarAperturaCaja(e) {
+            const inputPeso = document.getElementById('peso-caja-input').value;
+            const peso = parseFloat(inputPeso);
+            const idCaja = document.getElementById('modal-abrir-caja').getAttribute('data-id-caja');
+            
+            if (isNaN(peso) || peso <= 0) {
+                mostrarAlerta('Debes ingresar un peso válido mayor a 0.', 'error');
+                return;
+            }
+            
+            const btnTarget = e ? e.target : event.target;
+            btnTarget.disabled = true;
+            btnTarget.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
+            
+            const form = document.getElementById('formVendedor');
+            form.insertAdjacentHTML('beforeend', `<input type="hidden" name="accion_especial" value="abrir_caja">`);
+            form.insertAdjacentHTML('beforeend', `<input type="hidden" name="id_caja" value="${idCaja}">`);
+            form.insertAdjacentHTML('beforeend', `<input type="hidden" name="peso" value="${peso}">`);
+            
+            form.submit();
+        }
+                
+        function actualizarNumeracionYNombres() {
+            const items = document.querySelectorAll('.product-item');
+            items.forEach((item, index) => {
+                const titulo = item.querySelector('.product-number');
+                if (titulo) titulo.textContent = `Producto #${index + 1}`;
 
-// Reordena títulos e índices de productos para el POST
-function actualizarNumeracionYNombres() {
-    const items = document.querySelectorAll('.product-item');
-    items.forEach((item, index) => {
-        // Actualiza el texto visual (Producto #1, Producto #2, etc.)
-        const titulo = item.querySelector('.product-number');
-        if (titulo) titulo.textContent = `Producto #${index + 1}`;
+                const inputSearch = item.querySelector('.producto-search');
+                const inputHidden = item.querySelector('.producto-id-hidden');
+                const inputKilos = item.querySelector('.input-kilos');
+                const inputPiezas = item.querySelector('.input-piezas');
 
-        // Actualiza los índices de los inputs (productos[0], productos[1], etc.)
-        const inputHidden = item.querySelector('.producto-id-hidden');
-        const inputKilos = item.querySelector('.input-kilos');
-        const inputPiezas = item.querySelector('.input-piezas');
+                if (inputSearch) inputSearch.name = `productos[${index}][nombre_producto]`;
+                if (inputHidden) inputHidden.name = `productos[${index}][id_producto]`;
+                if (inputKilos) inputKilos.name = `productos[${index}][kilos]`;
+                if (inputPiezas) inputPiezas.name = `productos[${index}][piezas]`;
+            });
+        }
 
-        if (inputHidden) inputHidden.name = `productos[${index}][id_producto]`;
-        if (inputKilos) inputKilos.name = `productos[${index}][kilos]`;
-        if (inputPiezas) inputPiezas.name = `productos[${index}][piezas]`;
-    });
-}
+        document.getElementById('btn-add-product').addEventListener('click', function() {
+            const container = document.getElementById('products-container');
+            const items = container.querySelectorAll('.product-item');
+            
+            const ultimoItem = items[items.length - 1];
+            const ultimoId = ultimoItem.querySelector('.producto-id-hidden').value;
+            
+            if (ultimoId === '') {
+                mostrarAlerta('Por favor, selecciona un producto en la fila actual antes de agregar uno nuevo.', 'error');
+                return; 
+            }
+            const firstItem = items[0];
+            const newItem = firstItem.cloneNode(true);
 
-// Agregar nuevo producto con validación
-document.getElementById('btn-add-product').addEventListener('click', function() {
-    const container = document.getElementById('products-container');
-    const items = container.querySelectorAll('.product-item');
-    
-    // VALIDACIÓN: Verificar si el último producto agregado ya fue llenado
-    const ultimoItem = items[items.length - 1];
-    const ultimoId = ultimoItem.querySelector('.producto-id-hidden').value;
-    
-    if (ultimoId === '') {
-       
-        return; 
-    }
+            newItem.classList.remove('removing');
+            newItem.querySelector('.producto-search').value = '';
+            newItem.querySelector('.producto-id-hidden').value = '';
+            
+            const nKilos = newItem.querySelector('.input-kilos');
+            const nPiezas = newItem.querySelector('.input-piezas');
+            
+            if (nKilos) {
+                nKilos.value = '';
+                nKilos.disabled = false;
+                nKilos.placeholder = '0.00';
+            }
+            
+            if (nPiezas) {
+                nPiezas.value = '';
+                nPiezas.disabled = false;
+                nPiezas.placeholder = '0';
+            }
+            
+            const nBotonCaja = newItem.querySelector('.contenedor-abrir-caja');
+            if (nBotonCaja) {
+                nBotonCaja.style.display = 'none';
+            }
 
-    // Clonar siempre la primera fila como plantilla
-    const firstItem = items[0];
-    const newItem = firstItem.cloneNode(true);
+            container.appendChild(newItem);
+            actualizarNumeracionYNombres();
+        });
 
-    newItem.classList.remove('removing');
-    newItem.querySelector('.producto-search').value = '';
-    newItem.querySelector('.producto-id-hidden').value = '';
-    
-    // Resetear los inputs de kilos y piezas
-    const nKilos = newItem.querySelector('.input-kilos');
-    const nPiezas = newItem.querySelector('.input-piezas');
-    
-    if (nKilos) {
-        nKilos.value = '';
-        nKilos.disabled = false;
-        nKilos.placeholder = '0.00';
-    }
-    
-    if (nPiezas) {
-        nPiezas.value = '';
-        nPiezas.disabled = false;
-        nPiezas.placeholder = '0';
-    }
-
-    container.appendChild(newItem);
-    actualizarNumeracionYNombres();
-});
-
-
-
-        // Eliminar producto con animación y reordenar
         function removeProduct(btn) {
             const items = document.querySelectorAll('.product-item');
             if (items.length > 1) {
@@ -613,74 +567,114 @@ document.getElementById('btn-add-product').addEventListener('click', function() 
                 }, 300);
 
             } else {
-                alert('Debe haber al menos un producto en la nota.');
+                mostrarAlerta('Debe haber al menos un producto en la nota.', 'error');
             }
         }
 
-        // LÓGICA DE CONTROL DEL CHAT INTERNO
-        function toggleChatWindow() {
-            const chatBox = document.getElementById('chatBox');
-            chatBox.classList.toggle('open');
+        // FUNCIÓN DE SEGURIDAD PARA EDITAR NOTAS SIN PERDER EL PROGRESO ACTUAL
+       function confirmarEditarNota(event, urlEditar) {
+            event.preventDefault(); // Evitamos que abra el enlace de inmediato
             
-            // Ocultar notificación de badge al abrir por primera vez
-            const badge = document.querySelector('.chat-badge');
-            if (badge && chatBox.classList.contains('open')) {
-                badge.style.display = 'none';
+            const inputCliente = document.getElementById('cliente').value.trim();
+            const primerProductoInput = document.querySelector('.product-item .producto-search');
+            const tieneProducto = primerProductoInput && primerProductoInput.value.trim() !== '';
+
+            // Verificamos si hay información activa en el formulario actual
+            if (inputCliente !== '' || tieneProducto) {
+                // USAMOS EL MODAL PERSONALIZADO
+                mostrarAlerta(
+                    "Tienes una nota activa en el formulario actual que no has guardado.\n\n¿Deseas guardarla automáticamente en espera antes de abrir la otra nota?",
+                    'confirmacion',
+                    function(acepta) {
+                        if (acepta) {
+                            const form = document.getElementById('formVendedor');
+                            
+                            const inputAccion = document.createElement('input');
+                            inputAccion.type = 'hidden';
+                            inputAccion.name = 'accion_boton';
+                            inputAccion.value = 'guardar_espera';
+                            form.appendChild(inputAccion);
+
+                            const inputRedireccion = document.createElement('input');
+                            inputRedireccion.type = 'hidden';
+                            inputRedireccion.name = 'redirigir_a';
+                            inputRedireccion.value = urlEditar;
+                            form.appendChild(inputRedireccion);
+
+                            form.submit();
+                        } else {
+                            window.location.href = urlEditar;
+                        }
+                    }
+                );
+            } else {
+                window.location.href = urlEditar;
             }
         }
 
-        function handleChatKeyPress(e) {
-            if (e.key === 'Enter') {
-                enviarMensajeChat();
-            }
-        }
 
-        function enviarMensajeChat() {
-            const input = document.getElementById('chatInput');
-            const texto = input.value.trim();
+        // FUNCIONES PARA MOSTRAR ALERTAS BONITAS EN MODAL
+        function mostrarAlerta(mensaje, tipo = 'error', callbackAceptar = null) {
+            const modal = document.getElementById('modal-alerta-global');
+            const mensajeEl = document.getElementById('modal-alerta-mensaje');
+            const tituloEl = document.getElementById('modal-alert-title');
+            const iconEl = document.getElementById('modal-alert-icon-container');
+            const footerEl = document.getElementById('modal-alert-footer-buttons');
 
-            if (texto !== '') {
-                const chatBody = document.getElementById('chatBody');
+            mensajeEl.textContent = mensaje;
+            window._callbackAlertaAceptar = callbackAceptar;
+
+            if (tipo === 'error') {
+                tituloEl.textContent = 'Atención';
+                iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: #e53e3e;"></i>';
+            } else if (tipo === 'exito') {
+                tituloEl.textContent = '¡Éxito!';
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #38a169;"></i>';
+            } else if (tipo === 'confirmacion') {
+                tituloEl.textContent = 'Confirmación';
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-question" style="color: #d97706;"></i>';
                 
-                // Mensaje enviado por el usuario
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'chat-message sent';
-                msgDiv.textContent = texto;
-                chatBody.appendChild(msgDiv);
+                // Si es confirmación, cambiamos los botones para tener Sí / No
+                footerEl.innerHTML = `
+                    <button type="button" class="btn-secondary-sm" style="flex:1;" onclick="cerrarAlertaGlobal(false)">Cancelar</button>
+                    <button type="button" class="btn-primary" style="flex:1; background-color: #d97706;" onclick="cerrarAlertaGlobal(true)">Sí, continuar</button>
+                `;
+                modal.style.display = 'flex';
+                return;
+            }
 
-                input.value = '';
-                chatBody.scrollTop = chatBody.scrollHeight;
+            // Botón estándar de aceptar
+            footerEl.innerHTML = `<button type="button" class="btn-primary" style="width: 100%; padding: 10px;" onclick="cerrarAlertaGlobal(true)">Aceptar</button>`;
+            modal.style.display = 'flex';
+        }
 
-                /*
-                  AQUÍ PUEDES INTEGRAR TU SERVICIO O CONTROLADOR EN PHP VÍA AJAX:
-                  fetch('../Controllers/chatController.php', {
-                      method: 'POST',
-                      body: JSON.stringify({ mensaje: texto })
-                  });
-                */
+        function cerrarAlertaGlobal(resultado) {
+            const modal = document.getElementById('modal-alerta-global');
+            modal.style.display = 'none';
+
+            if (window._callbackAlertaAceptar && typeof window._callbackAlertaAceptar === 'function') {
+                window._callbackAlertaAceptar(resultado);
+                window._callbackAlertaAceptar = null;
             }
         }
 
-        function procesarAperturaCaja(btn) {
-    const kilosConfirmados = prompt("📦 APERTURA DE CAJA\n\nIngresa los kilos EXACTOS que arrojó la báscula al abrir esta caja de pechos:");
-    
-    if (kilosConfirmados === null) {
-        return; // El usuario canceló
-    }
-    
-    const peso = parseFloat(kilosConfirmados);
-    
-    if (isNaN(peso) || peso <= 0) {
-        alert("❌ Error: Debes ingresar un peso válido mayor a 0.");
-        return;
-    }
-    
-    if (confirm(`¿Confirmas que la caja pesó exactamente ${peso} kg? \nEsto descontará 1 caja del inventario y sumará los kilos al producto a granel.`)) {
-        // Redirigir al controlador con parámetros GET para procesar la apertura
-        // Nota: Asegúrate de que la ruta al controlador sea la correcta
-        window.location.href = `../Controllers/vendedorController.php?accion=abrir_caja&id_caja=234&peso=${peso}`;
-    }
-}
     </script>
+
+
+<!-- MODAL DE ALERTAS GENERALES -->
+    <div id="modal-alerta-global" class="modal-alert-overlay">
+        <div class="modal-alert-content">
+            <div class="modal-alert-header">
+                <div id="modal-alert-icon-container" class="modal-alert-icon">⚠️</div>
+                <h3 id="modal-alert-title" class="modal-alert-title">Aviso del Sistema</h3>
+            </div>
+            <div id="modal-alerta-mensaje" class="modal-alert-body">
+                Mensaje de la alerta...
+            </div>
+            <div class="modal-alert-footer" id="modal-alert-footer-buttons">
+                <button type="button" class="btn-primary" style="width: 100%; padding: 10px;" onclick="cerrarAlertaGlobal()">Aceptar</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

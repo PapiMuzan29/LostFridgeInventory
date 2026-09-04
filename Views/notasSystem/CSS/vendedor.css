@@ -471,3 +471,258 @@ input:checked + .slider:before {
         .dark-mode .modal-content { background: #1a202c; border: 1px solid #2d3748; color: #e2e8f0; }
         .dark-mode .modal-body { color: #e2e8f0; }
         .dark-mode .modal-footer { border-color: #2d3748; }
+
+.chat-widget-container {
+            position: fixed;
+            bottom: 75px; /* Por encima de la barra de navegación inferior */
+            right: 15px;
+            z-index: 1000;
+        }
+
+        .chat-toggle-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background-color: var(--primary-color, #1a365d);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .chat-toggle-btn:active {
+            transform: scale(0.92);
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #e53e3e;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid #ffffff;
+            display: none;
+        }
+
+        /* Ventana flotante de Chat */
+        .chat-box {
+            display: none;
+            position: fixed;
+            bottom: 140px;
+            right: 15px;
+            width: calc(100vw - 30px);
+            max-width: 360px;
+            height: 420px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 1001;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .chat-box.open {
+            display: flex;
+        }
+
+        .chat-header {
+            background-color: var(--primary-color, #1a365d);
+            color: #ffffff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-close-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .chat-close-btn:hover {
+            opacity: 1;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            background-color: #f7fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            word-wrap: break-word;
+        }
+
+        .chat-message.received {
+            background-color: #edf2f7;
+            color: #2d3748;
+            align-self: flex-start;
+        }
+
+        .chat-message.sent {
+            background-color: var(--primary-color, #1a365d);
+            color: #ffffff;
+            align-self: flex-end;
+        }
+
+        .chat-message .sender-name {
+            font-weight: bold;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .chat-footer {
+            padding: 10px;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-footer input {
+            flex: 1;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .chat-footer button {
+            background-color: var(--primary-color, #1a365d);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+
+        /* Estilos en Modo Oscuro para el Chat */
+        .dark-mode .chat-box {
+            background-color: #1a202c;
+            border-color: #2d3748;
+        }
+
+        .dark-mode .chat-body {
+            background-color: #141923;
+        }
+
+        .dark-mode .chat-message.received {
+            background-color: #2d3748;
+            color: #e2e8f0;
+        }
+
+        .dark-mode .chat-footer {
+            background-color: #1a202c;
+            border-color: #2d3748;
+        }
+
+        .dark-mode .chat-footer input {
+            background-color: #2d3748;
+            border-color: #4a5568;
+            color: #ffffff;
+        }
+
+        /* ESTILOS DEL MODAL DE APERTURA */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #ffffff; border-radius: 12px; width: 90%; max-width: 380px;
+            overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            background: #d97706; color: #ffffff; padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.1rem; }
+        .btn-close-modal { background: none; border: none; color: #ffffff; font-size: 1.5rem; cursor: pointer; opacity: 0.8; }
+        .btn-close-modal:hover { opacity: 1; }
+        .modal-body { padding: 16px; color: #2d3748; }
+        .modal-footer { padding: 12px 16px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #e2e8f0; }
+        
+        .dark-mode .modal-content { background: #1a202c; border: 1px solid #2d3748; color: #e2e8f0; }
+        .dark-mode .modal-body { color: #e2e8f0; }
+        .dark-mode .modal-footer { border-color: #2d3748; }
+
+/* ========================================================= */
+        /* ESTILOS DEL MODAL DE ALERTAS PERSONALIZADO                */
+        /* ========================================================= */
+        .modal-alert-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6); z-index: 3000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-alert-content {
+            background: #ffffff; border-radius: 12px; width: 90%; max-width: 380px;
+            overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center; animation: modalPop 0.2s ease-out;
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-alert-header {
+            padding: 20px 20px 10px 20px;
+        }
+        .modal-alert-icon {
+            font-size: 2.5rem; margin-bottom: 8px;
+        }
+        .modal-alert-title {
+            margin: 0; font-size: 1.2rem; font-weight: bold; color: #2d3748;
+        }
+        .modal-alert-body {
+            padding: 0 20px 20px 20px; color: #4a5568; font-size: 0.95rem; line-height: 1.4;
+        }
+        .modal-alert-footer {
+            padding: 12px 20px; background: #f7fafc; display: flex; justify-content: center; gap: 10px; border-top: 1px solid #e2e8f0;
+        }
+        .dark-mode .modal-alert-content { background: #1a202c; border: 1px solid #2d3748; color: #e2e8f0; }
+        .dark-mode .modal-alert-title { color: #ffffff; }
+        .dark-mode .modal-alert-body { color: #cbd5e0; }
+        .dark-mode .modal-alert-footer { background: #141923; border-color: #2d3748; }
+
+        /* ========================================================= */
+        /* ESTILOS DEL MODAL DE ALERTAS PERSONALIZADO                */
+        /* ========================================================= */
+        .modal-alert-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6); z-index: 3000;
+            display: none; /* <--- ESTO ES LO QUE FALTABA */
+            align-items: center; justify-content: center;
+        }

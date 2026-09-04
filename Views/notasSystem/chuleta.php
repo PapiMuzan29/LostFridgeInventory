@@ -12,123 +12,73 @@ $fechaActual = date('Y-m-d');
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Módulo Chuleta Ahumada - Grupo Cárnico América</title>
     
-    <!-- Hojas de Estilos coincidentes con Mazos y Manteca -->
-    <link rel="stylesheet" href="../notasSystem/CSS/cajero.css">
-    <link rel="stylesheet" href="../notasSystem/CSS/manteca.css">
+    <!-- CSS del proyecto -->
     <link rel="stylesheet" href="../notasSystem/CSS/chuleta.css">
-    <link rel="stylesheet" href="CSS/encargado.css">
+    <link rel="stylesheet" href="../notasSystem/CSS/encargado.css">
     
     <!-- FontAwesome -->
     <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
 
     <style>
-        /* Estilos purpura específicos para el resumen de Chuleta Ahumada */
-        .card-total-dia-chuleta {
-            background-color: #f3e8ff;
-            border-radius: 18px;
-            padding: 18px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .card-total-dia-chuleta .info h3 {
-            margin: 0;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #6b21a8;
-            font-weight: 800;
-            letter-spacing: 0.3px;
-        }
-
-        .card-total-dia-chuleta .info .val {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #3b0764;
-            margin-top: 4px;
-        }
-
-        .card-total-dia-chuleta .icon {
-            font-size: 2.2rem;
-            color: #7e22ce;
-        }
-
-        .venta-card-item-chuleta {
-            border-left: 4px solid #7e22ce;
-        }
-
-        .venta-badge-pzs-chuleta {
-            background-color: #f3e8ff;
-            color: #6b21a8;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 800;
-            font-size: 0.95rem;
-        }
-
-        /* Ocultar input date nativo para evitar solapamientos */
-        .input-date-hidden-custom {
+        /* Ocultar el input tipo date sin afectar el flujo */
+        .input-date-hidden {
             position: absolute;
-            top: 0;
-            left: 0;
+            opacity: 0;
             width: 0;
             height: 0;
-            opacity: 0;
             pointer-events: none;
-            border: none;
-            padding: 0;
-            margin: 0;
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER UNIFICADO -->
-    <header class="manteca-header">
-        <div class="manteca-header-left">
-            <button type="button" class="btn-back" onclick="volverPantallaAnterior()">
-                <i class="fa-solid fa-arrow-left"></i> Volver
-            </button>
-            <h1><i class="fa-solid fa-drumstick-bite"></i> Chuleta Ahumada</h1>
-        </div>
-        <div class="date-badge">
+    <!-- HEADER ESTILO CHULETA -->
+    <header class="chuleta-header">
+        <button type="button" class="btn-volver" onclick="volverPantallaAnterior()">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+        </button>
+        <h1 class="header-title">
+            <i class="fa-solid fa-drumstick-bite"></i> Chuleta Ahumada
+        </h1>
+        <div class="user-badge">
             <i class="fa-solid fa-user"></i>
             <span><?= htmlspecialchars($nombreUsuario) ?></span>
         </div>
     </header>
 
-    <!-- NAVEGADOR DE FECHA / CALENDARIO -->
-    <div class="sticky-date-bar">
-        <div class="date-picker-bar date-picker-bar-inline">
-            <button type="button" class="btn-date-nav" onclick="cambiarFecha(-1)">
+    <main class="container">
+
+        <!-- SELECTOR DE FECHA FLOTANTE (ESTILO MANTECA EXACTO) -->
+        <div class="date-picker-card">
+            <button type="button" class="btn-date-arrow" onclick="cambiarFecha(-1)">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <div class="date-picker-display" style="position: relative;" onclick="abrirCalendario()">
+
+            <div class="date-display" onclick="abrirCalendario()">
                 <i class="fa-regular fa-calendar-days"></i>
                 <span id="label-fecha-seleccionada">Cargando fecha...</span>
-                <input type="date" id="input-fecha-chuleta" class="input-date-hidden-custom" value="<?= $fechaActual ?>" onchange="alSeleccionarFecha(this.value)">
+                <input type="date" id="input-fecha-chuleta" class="input-date-hidden" value="<?= $fechaActual ?>" onchange="alSeleccionarFecha(this.value)">
             </div>
-            <button type="button" class="btn-date-nav" onclick="cambiarFecha(1)">
+
+            <button type="button" class="btn-date-arrow" onclick="cambiarFecha(1)">
                 <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
-    </div>
-
-    <main class="container">
 
         <!-- TOTAL DEL DÍA EN TARJETA SUPERIOR -->
-        <div class="card-total-dia-chuleta">
+        <div class="card-total-dia">
             <div class="info">
                 <h3>TOTAL DEL DÍA</h3>
-                <div class="val" id="total-banner-superior">0 piezas (0.00 kg)</div>
+                <div class="val-piezas" id="total-banner-superior">0 piezas (0.00 kg)</div>
             </div>
             <i class="fa-solid fa-drumstick-bite icon"></i>
         </div>
 
-        <!-- LISTADO DE VENTAS -->
-        <div class="section-title"><i class="fa-solid fa-list-check"></i> Ventas Chuleta Ahumada</div>
-        <div id="contenedor-ventas-chuleta" class="contenedor-tarjetas-ventas"></div>
+        <!-- REGISTROS Y VENTAS DEL DÍA -->
+        <div class="section-title">
+            <i class="fa-solid fa-list-check"></i> VENTAS CHULETA AHUMADA
+        </div>
+        <div id="contenedor-ventas-chuleta" class="ventas-list"></div>
 
     </main>
 
@@ -178,7 +128,7 @@ $fechaActual = date('Y-m-d');
             document.getElementById('label-fecha-seleccionada').textContent = fechaFormateada;
         }
 
-        // CARGA DE DATOS DESDE EL CONTROLADOR
+        // CONSULTA DE DATOS AL CONTROLADOR
         function cargarDatosChuletaPorFecha(fecha) {
             const rutaControlador = `../../Controllers/chuletaController.php?accion=consultarPorFecha&fecha=${fecha}`;
 
@@ -197,30 +147,33 @@ $fechaActual = date('Y-m-d');
 
                     if (!data.ventas || data.ventas.length === 0) {
                         contenedor.innerHTML = `
-                            <div class="empty-state-card">
+                            <div class="empty-state-card" style="text-align: center; padding: 20px; color: #94a3b8;">
                                 <i class="fa-solid fa-inbox fa-2x"></i>
-                                <p class="empty-state-text">Sin ventas registradas en Chuleta Ahumada</p>
+                                <p style="margin-top: 8px;">Sin ventas registradas en Chuleta Ahumada</p>
                             </div>`;
                     } else {
                         contenedor.innerHTML = data.ventas.map(v => `
-                            <div class="venta-card-item venta-card-item-chuleta">
-                                <div class="venta-card-main">
-                                    <div class="venta-cliente"><i class="fa-solid fa-user-tag"></i> Cliente: ${v.cliente}</div>
-                                    <div class="venta-ticket"><i class="fa-solid fa-receipt"></i> Ticket: ${v.ticket} • ${parseFloat(v.kilos).toFixed(2)} kg</div>
+                            <div class="venta-item">
+                                <div class="venta-info">
+                                    <div class="cliente-nombre">
+                                        <i class="fa-solid fa-user-tag"></i> Cliente: ${v.cliente}
+                                    </div>
+                                    <div class="venta-sub">
+                                        <i class="fa-solid fa-receipt"></i> Ticket: ${v.ticket} • ${parseFloat(v.kilos).toFixed(2)} kg
+                                    </div>
                                 </div>
-                                <div class="venta-badge-pzs-chuleta">
-                                    <span>${v.piezas}</span> <small>pzs</small>
+                                <div class="badge-cantidad">
+                                    <span class="val">${v.piezas}</span>
+                                    <span class="unit">pzs</span>
                                 </div>
                             </div>
                         `).join('');
                     }
 
-                    // Actualizar Totales
+                    // Actualización del Total Superior
                     const totPiezas = data.total_general_piezas || 0;
                     const totKilos = parseFloat(data.total_general_kilos || 0).toFixed(2);
-                    const textoTotal = `${totPiezas} piezas (${totKilos} kg)`;
-
-                    document.getElementById('total-banner-superior').textContent = textoTotal;
+                    document.getElementById('total-banner-superior').textContent = `${totPiezas} piezas (${totKilos} kg)`;
                 })
                 .catch(err => console.error("Error al obtener datos de chuleta:", err));
         }

@@ -104,7 +104,7 @@ session_start();
                     </div>
                 </div>
 
-                <!-- Mazo (REDIRECCIÓN A MAZO.PHP) -->
+                <!-- Mazo -->
                 <div class="resumen-card clickable-card" onclick="abrirModuloMazos()">
                     <div class="resumen-card-icon">
                         <img src="../../SRC/productos/mazo.jpeg" alt="Mazo" class="img-producto">
@@ -198,6 +198,7 @@ session_start();
         <div class="spacer"></div>
     </main>
 
+    <!-- NAVEGACIÓN INFERIOR -->
     <nav class="bottom-nav">
         <button type="button" class="nav-item active" onclick="switchTab('inicio', this, 'Revisión de Notas')">
             <i class="fa-solid fa-clipboard-check"></i><span>Inicio</span>
@@ -285,14 +286,6 @@ session_start();
     </div>
 
     <script src="encargado.js"></script>
-    <script>
-        function abrirModuloChuletas() {
-            window.location.href = 'chuleta.php';
-        }
-
-        function abrirModuloMazos() {
-            window.location.href = 'mazo.php';
-        }
-    </script>
+    
 </body>
 </html>
