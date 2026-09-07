@@ -2,6 +2,9 @@
 // chuleta.php
 session_start();
 
+// Configurar la zona horaria correcta para evitar desfase de día
+date_default_timezone_set('America/Mexico_City');
+
 $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Usuario';
 $fechaActual = date('Y-m-d');
 ?>
@@ -48,7 +51,7 @@ $fechaActual = date('Y-m-d');
 
     <main class="container">
 
-        <!-- SELECTOR DE FECHA FLOTANTE (ESTILO MANTECA EXACTO) -->
+        <!-- SELECTOR DE FECHA FLOTANTE -->
         <div class="date-picker-card">
             <button type="button" class="btn-date-arrow" onclick="cambiarFecha(-1)">
                 <i class="fa-solid fa-chevron-left"></i>
@@ -83,108 +86,113 @@ $fechaActual = date('Y-m-d');
     </main>
 
     <script>
-        let fechaSeleccionadaObj = new Date();
+    // Inicializar la fecha leyendo estrictamente lo que devolvió PHP
+    const inputFechaElem = document.getElementById('input-fecha-chuleta');
+    const partesFecha = (inputFechaElem && inputFechaElem.value) ? inputFechaElem.value.split('-') : [];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const inputFecha = document.getElementById('input-fecha-chuleta');
-            if (inputFecha && inputFecha.value) {
-                const partes = inputFecha.value.split('-');
-                fechaSeleccionadaObj = new Date(partes[0], partes[1] - 1, partes[2]);
-            }
-            actualizarInterfazFecha();
-            cargarDatosChuletaPorFecha(inputFecha.value);
-        });
+    // Crear el objeto fecha con año, mes (indexado en 0) y día exactos
+    let fechaSeleccionadaObj = partesFecha.length === 3 
+        ? new Date(parseInt(partesFecha[0]), parseInt(partesFecha[1]) - 1, parseInt(partesFecha[2]))
+        : new Date();
 
-        function abrirCalendario() {
-            const input = document.getElementById('input-fecha-chuleta');
-            if (input.showPicker) {
-                input.showPicker();
-            } else {
-                input.click();
-            }
+    document.addEventListener('DOMContentLoaded', () => {
+        actualizarInterfazFecha();
+        if (inputFechaElem) {
+            cargarDatosChuletaPorFecha(inputFechaElem.value);
         }
+    });
 
-        function cambiarFecha(dias) {
-            fechaSeleccionadaObj.setDate(fechaSeleccionadaObj.getDate() + dias);
-            const yyyy = fechaSeleccionadaObj.getFullYear();
-            const mm = String(fechaSeleccionadaObj.getMonth() + 1).padStart(2, '0');
-            const dd = String(fechaSeleccionadaObj.getDate()).padStart(2, '0');
-            
-            const fechaString = `${yyyy}-${mm}-${dd}`;
-            document.getElementById('input-fecha-chuleta').value = fechaString;
-            alSeleccionarFecha(fechaString);
+    function abrirCalendario() {
+        const input = document.getElementById('input-fecha-chuleta');
+        if (input.showPicker) {
+            input.showPicker();
+        } else {
+            input.click();
         }
+    }
 
-        function alSeleccionarFecha(fechaString) {
-            const partes = fechaString.split('-');
-            fechaSeleccionadaObj = new Date(partes[0], partes[1] - 1, partes[2]);
-            actualizarInterfazFecha();
-            cargarDatosChuletaPorFecha(fechaString);
-        }
+    function cambiarFecha(dias) {
+        fechaSeleccionadaObj.setDate(fechaSeleccionadaObj.getDate() + dias);
+        const yyyy = fechaSeleccionadaObj.getFullYear();
+        const mm = String(fechaSeleccionadaObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(fechaSeleccionadaObj.getDate()).padStart(2, '0');
+        
+        const fechaString = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('input-fecha-chuleta').value = fechaString;
+        alSeleccionarFecha(fechaString);
+    }
 
-        function actualizarInterfazFecha() {
-            const opciones = { day: 'numeric', month: 'short' };
-            const fechaFormateada = fechaSeleccionadaObj.toLocaleDateString('es-ES', opciones);
-            document.getElementById('label-fecha-seleccionada').textContent = fechaFormateada;
-        }
+    function alSeleccionarFecha(fechaString) {
+        if (!fechaString) return;
+        const partes = fechaString.split('-');
+        fechaSeleccionadaObj = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+        actualizarInterfazFecha();
+        cargarDatosChuletaPorFecha(fechaString);
+    }
 
-        // CONSULTA DE DATOS AL CONTROLADOR
-        function cargarDatosChuletaPorFecha(fecha) {
-            const rutaControlador = `../../Controllers/chuletaController.php?accion=consultarPorFecha&fecha=${fecha}`;
+    function actualizarInterfazFecha() {
+        const opciones = { day: 'numeric', month: 'short' };
+        const fechaFormateada = fechaSeleccionadaObj.toLocaleDateString('es-ES', opciones);
+        document.getElementById('label-fecha-seleccionada').textContent = fechaFormateada;
+    }
 
-            fetch(rutaControlador)
-                .then(res => res.text())
-                .then(texto => {
-                    let data;
-                    try {
-                        data = JSON.parse(texto);
-                    } catch (e) {
-                        console.error("Respuesta no válida del servidor:", texto);
-                        return;
-                    }
+    // CONSULTA DE DATOS AL CONTROLADOR
+    function cargarDatosChuletaPorFecha(fecha) {
+        const rutaControlador = `../../Controllers/chuletaController.php?accion=consultarPorFecha&fecha=${fecha}`;
 
-                    const contenedor = document.getElementById('contenedor-ventas-chuleta');
+        fetch(rutaControlador)
+            .then(res => res.text())
+            .then(texto => {
+                let data;
+                try {
+                    data = JSON.parse(texto);
+                } catch (e) {
+                    console.error("Respuesta no válida del servidor:", texto);
+                    return;
+                }
 
-                    if (!data.ventas || data.ventas.length === 0) {
-                        contenedor.innerHTML = `
-                            <div class="empty-state-card" style="text-align: center; padding: 20px; color: #94a3b8;">
-                                <i class="fa-solid fa-inbox fa-2x"></i>
-                                <p style="margin-top: 8px;">Sin ventas registradas en Chuleta Ahumada</p>
-                            </div>`;
-                    } else {
-                        contenedor.innerHTML = data.ventas.map(v => `
-                            <div class="venta-item">
-                                <div class="venta-info">
-                                    <div class="cliente-nombre">
-                                        <i class="fa-solid fa-user-tag"></i> Cliente: ${v.cliente}
-                                    </div>
-                                    <div class="venta-sub">
-                                        <i class="fa-solid fa-receipt"></i> Ticket: ${v.ticket} • ${parseFloat(v.kilos).toFixed(2)} kg
-                                    </div>
+                const contenedor = document.getElementById('contenedor-ventas-chuleta');
+
+                if (!data.ventas || data.ventas.length === 0) {
+                    contenedor.innerHTML = `
+                        <div class="empty-state-card" style="text-align: center; padding: 20px; color: #94a3b8;">
+                            <i class="fa-solid fa-inbox fa-2x"></i>
+                            <p style="margin-top: 8px;">Sin ventas registradas en Chuleta Ahumada</p>
+                        </div>`;
+                } else {
+                    contenedor.innerHTML = data.ventas.map(v => `
+                        <div class="venta-item">
+                            <div class="venta-info">
+                                <div class="cliente-nombre">
+                                    <i class="fa-solid fa-user-tag"></i> Cliente: ${v.cliente}
                                 </div>
-                                <div class="badge-cantidad">
-                                    <span class="val">${v.piezas}</span>
-                                    <span class="unit">pzs</span>
+                                <div class="venta-sub">
+                                    <i class="fa-solid fa-receipt"></i> Ticket: ${v.ticket} • ${parseFloat(v.kilos).toFixed(2)} kg
                                 </div>
                             </div>
-                        `).join('');
-                    }
+                            <div class="badge-cantidad">
+                                <span class="val">${v.piezas}</span>
+                                <span class="unit">pzs</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
 
-                    // Actualización del Total Superior
-                    const totPiezas = data.total_general_piezas || 0;
-                    const totKilos = parseFloat(data.total_general_kilos || 0).toFixed(2);
-                    document.getElementById('total-banner-superior').textContent = `${totPiezas} piezas (${totKilos} kg)`;
-                })
-                .catch(err => console.error("Error al obtener datos de chuleta:", err));
-        }
+                // Actualización del Total Superior
+                const totPiezas = data.total_general_piezas || 0;
+                const totKilos = parseFloat(data.total_general_kilos || 0).toFixed(2);
+                document.getElementById('total-banner-superior').textContent = `${totPiezas} piezas (${totKilos} kg)`;
+            })
+            .catch(err => console.error("Error al obtener datos de chuleta:", err));
+    }
 
-        function volverPantallaAnterior() {
-            if (document.referrer) {
-                window.location.href = document.referrer;
-            } else {
-                window.location.href = 'encargado.php';
-            }
+    function volverPantallaAnterior() {
+        if (document.referrer) {
+            window.location.href = document.referrer;
+        } else {
+            window.location.href = 'encargado.php';
         }
-    </script>
+    }
+</script>
 </body>
 </html>
