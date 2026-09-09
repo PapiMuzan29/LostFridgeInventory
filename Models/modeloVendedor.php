@@ -33,6 +33,7 @@ class modeloVendedor {
                     i.idProducto AS id_producto,
                     p.nombreProducto,
                     p.porPiezas,
+                    p.precio,
                     i.cantidadCajas,
                     i.cantidadPeso,
                     i.cantidadPiezas,

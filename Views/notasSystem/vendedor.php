@@ -110,6 +110,7 @@ if (!isset($productos) || !isset($estibadores)) {
                                 value="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" 
                                 label="<?= htmlspecialchars((string)$producto['nombreProducto']) ?>" 
                                 data-id="<?= htmlspecialchars((string)($producto['id_producto'] ?? '')) ?>"
+                                data-precio="<?= htmlspecialchars((string)($producto['precio'] ?? '0')) ?>"
                                 data-por-piezas="<?= htmlspecialchars((string)($producto['porPiezas'] ?? '0')) ?>"
                                 data-stock-piezas="<?= htmlspecialchars((string)($producto['cantidadPiezas'] ?? '0')) ?>"
                                 data-stock-cajas="<?= htmlspecialchars((string)($producto['cantidadCajas'] ?? '0')) ?>"
@@ -156,6 +157,26 @@ if (!isset($productos) || !isset($estibadores)) {
                             </div>
                         </div>
                         <?php endforeach; ?>
+                    </div>
+
+                    <!-- TICKET / CALCULADORA EN TIEMPO REAL -->
+                    <div class="ticket-container" style="background-color: #f8fafc; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 15px; margin-top: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                        <h3 style="margin-top: 0; font-size: 1rem; color: #2d3748; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-receipt"></i> Resumen de Venta (Aprox)
+                        </h3>
+                        
+                        <div id="ticket-items" style="font-size: 0.9rem; color: #4a5568; margin-top: 10px; min-height: 40px; display: flex; flex-direction: column; gap: 6px;">
+                            <span style="color: #a0aec0; font-style: italic;">Agrega productos para ver el estimado...</span>
+                        </div>
+                        
+                        <div style="border-top: 2px dashed #cbd5e0; margin-top: 12px; padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="font-size: 1.1rem; color: #2d3748;">Total Estimado:</strong>
+                            <strong id="ticket-total" style="font-size: 1.25rem; color: #38a169;">$0.00</strong>
+                        </div>
+                        
+                        <p style="font-size: 0.75rem; color: #6b6b6b; margin-top: 12px; margin-bottom: 0; text-align: center; font-style: italic; font-weight: 600;">
+                            El total es una estimación. Los precios pueden variar en caja y no estar actualizados en tiempo real.
+                        </p>
                     </div>
 
                     <!-- Botón Enviar Formulario -->
@@ -324,6 +345,18 @@ if (!isset($productos) || !isset($estibadores)) {
                     capturarIdProducto(input, true);
                 }
             });
+
+
+            // Escucha global: si se escribe en cualquier input de kilos, piezas o buscador, se recalcula el ticket
+            document.getElementById('products-container').addEventListener('input', function(e) {
+                if (e.target.classList.contains('input-kilos') || 
+                    e.target.classList.contains('input-piezas') || 
+                    e.target.classList.contains('producto-search')) {
+                    calcularTicket();
+                }
+            });
+            
+            calcularTicket();
         });
 
         // Navegación entre Pestañas
@@ -444,6 +477,7 @@ if (!isset($productos) || !isset($estibadores)) {
                         inputPiezas.oninput = function() {
                             const cantPiezas = parseInt(this.value) || 0;
                             inputKilos.value = (cantPiezas * kilosPorPieza).toFixed(2);
+                            calcularTicket();
                         };
 
                     } else if (esMazo) {
@@ -564,6 +598,7 @@ if (!isset($productos) || !isset($estibadores)) {
                 setTimeout(() => {
                     itemToRemove.remove();
                     actualizarNumeracionYNombres();
+                    calcularTicket();
                 }, 300);
 
             } else {
@@ -656,6 +691,85 @@ if (!isset($productos) || !isset($estibadores)) {
                 window._callbackAlertaAceptar(resultado);
                 window._callbackAlertaAceptar = null;
             }
+        }
+
+        function calcularTicket() {
+            const items = document.querySelectorAll('.product-item');
+            const ticketContainer = document.getElementById('ticket-items');
+            const totalContainer = document.getElementById('ticket-total');
+            const options = document.querySelectorAll('#lista-productos option');
+            
+            let htmlTicket = '';
+            let granTotal = 0;
+
+            items.forEach(row => {
+                const inputSearch = row.querySelector('.producto-search').value.trim().toLowerCase();
+                const inputKilos = parseFloat(row.querySelector('.input-kilos').value) || 0;
+                const inputPiezas = parseInt(row.querySelector('.input-piezas').value) || 0;
+                
+                if (inputSearch !== '') {
+                    // Extraer el precio del Datalist
+                    let precio = 0;
+                    let nombreReal = inputSearch;
+                    
+                    for(let opt of options) {
+                        if (opt.value.trim().toLowerCase() === inputSearch) {
+                            precio = parseFloat(opt.getAttribute('data-precio')) || 0;
+                            nombreReal = opt.value;
+                            break;
+                        }
+                    }
+
+                    const esMazo = inputSearch.includes('mazo');
+                    
+                    // Condición: Mostrar el producto si ya escribieron Kilos o Piezas
+                    const tieneCantidad = esMazo ? (inputPiezas > 0) : (inputKilos > 0 || inputPiezas > 0);
+
+                    if (tieneCantidad) {
+                        if (precio <= 0) {
+                            // ESCENARIO A: PRODUCTO SIN PRECIO EN BD
+                            const cantTexto = esMazo ? `${inputPiezas} pzas` : `${inputKilos.toFixed(2)} kg`;
+                            htmlTicket += `
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #edf2f7; padding-bottom: 4px;">
+                                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500;">${nombreReal}</span>
+                                    <span style="color: #e53e3e; font-size: 0.8rem; text-align: right; font-weight: bold;">
+                                        ${cantTexto} <i class="fa-solid fa-circle-exclamation"></i> Sin precio
+                                    </span>
+                                </div>
+                            `;
+                        } else {
+                            // ESCENARIO B: PRODUCTO CON PRECIO NORMAL
+                            let subtotal = 0;
+                            let textoCalculo = '';
+
+                            if (esMazo) {
+                                subtotal = inputPiezas * precio;
+                                textoCalculo = `${inputPiezas} pzas x $${precio.toFixed(2)}`;
+                            } else {
+                                subtotal = inputKilos * precio;
+                                textoCalculo = `${inputKilos.toFixed(2)} kg x $${precio.toFixed(2)}`;
+                            }
+
+                            granTotal += subtotal;
+
+                            htmlTicket += `
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #edf2f7; padding-bottom: 4px;">
+                                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500;">${nombreReal}</span>
+                                    <span style="color: #718096; font-size: 0.8rem; width: 120px; text-align: right; padding-right: 10px;">${textoCalculo}</span>
+                                    <strong style="width: 80px; text-align: right; color: #2d3748;">$${subtotal.toFixed(2)}</strong>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+            });
+
+            if (htmlTicket === '') {
+                htmlTicket = '<span style="color: #a0aec0; font-style: italic;">Agrega pesos o piezas para calcular...</span>';
+            }
+
+            ticketContainer.innerHTML = htmlTicket;
+            totalContainer.textContent = `$${granTotal.toFixed(2)}`;
         }
 
     </script>
