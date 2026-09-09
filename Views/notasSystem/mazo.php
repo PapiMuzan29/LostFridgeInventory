@@ -2,6 +2,9 @@
 // mazo.php
 session_start();
 
+// 1. Forzar la zona horaria correcta de México
+date_default_timezone_set('America/Mexico_City');
+
 $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Usuario';
 $fechaActual = date('Y-m-d');
 ?>
@@ -112,7 +115,8 @@ $fechaActual = date('Y-m-d');
             const inputFecha = document.getElementById('input-fecha-mazo');
             if (inputFecha && inputFecha.value) {
                 const partes = inputFecha.value.split('-');
-                fechaSeleccionadaObj = new Date(partes[0], partes[1] - 1, partes[2]);
+                // Parsear fecha exactamente como números enteros
+                fechaSeleccionadaObj = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
             }
             actualizarInterfazFecha();
             cargarDatosMazoPorFecha(inputFecha.value);
@@ -139,8 +143,9 @@ $fechaActual = date('Y-m-d');
         }
 
         function alSeleccionarFecha(fechaString) {
+            if (!fechaString) return;
             const partes = fechaString.split('-');
-            fechaSeleccionadaObj = new Date(partes[0], partes[1] - 1, partes[2]);
+            fechaSeleccionadaObj = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
             actualizarInterfazFecha();
             cargarDatosMazoPorFecha(fechaString);
         }
