@@ -125,33 +125,34 @@ class modeloVendedor {
                     $idTemp = $resInv[0]['idSalidaTemporal'];
                     $esPorPieza = intval($resInv[0]['porPiezas']) === 1;
                     
+                    $cajasActuales = intval($resInv[0]['cantidadCajas']);
+                    $piezasActuales = intval($resInv[0]['cantidadPiezas']);
+                    $pesoActual = floatval($resInv[0]['cantidadPeso']);
+
+                    // 1. Restar lo correspondiente según el tipo
                     if ($esPorPieza) {
-                        $cajasActuales = intval($resInv[0]['cantidadCajas']);
-                        $piezasActuales = intval($resInv[0]['cantidadPiezas']);
-                        
                         if ($cajasActuales > 0) {
-                            $nuevoCajas = $cajasActuales - $piezas;
-                            if ($nuevoCajas <= 0 && $piezasActuales <= 0) {
-                                $this->db->delete("DELETE FROM InventarioTemporalSalida WHERE idSalidaTemporal = ?", [$idTemp]);
-                            } else {
-                                $this->db->update("UPDATE InventarioTemporalSalida SET cantidadCajas = ? WHERE idSalidaTemporal = ?", [$nuevoCajas, $idTemp]);
-                            }
+                            $cajasActuales -= $piezas;
                         } else {
-                            $nuevoPiezas = $piezasActuales - $piezas;
-                            if ($nuevoPiezas <= 0 && $cajasActuales <= 0) {
-                                $this->db->delete("DELETE FROM InventarioTemporalSalida WHERE idSalidaTemporal = ?", [$idTemp]);
-                            } else {
-                                $this->db->update("UPDATE InventarioTemporalSalida SET cantidadPiezas = ? WHERE idSalidaTemporal = ?", [$nuevoPiezas, $idTemp]);
-                            }
+                            $piezasActuales -= $piezas;
                         }
                     } else {
-                        $pesoActual = floatval($resInv[0]['cantidadPeso']);
-                        $nuevoPeso = $pesoActual - $kilos;
-                        if ($nuevoPeso <= 0) {
-                            $this->db->delete("DELETE FROM InventarioTemporalSalida WHERE idSalidaTemporal = ?", [$idTemp]);
-                        } else {
-                            $this->db->update("UPDATE InventarioTemporalSalida SET cantidadPeso = ? WHERE idSalidaTemporal = ?", [$nuevoPeso, $idTemp]);
-                        }
+                        $pesoActual -= $kilos;
+                        $piezasActuales -= $piezas; // Descuenta piezas físicas si el vendedor las anotó
+                    }
+
+                    // 2. Prevenir números negativos en caso de decimales extraños
+                    $cajasActuales = max(0, $cajasActuales);
+                    $piezasActuales = max(0, $piezasActuales);
+                    $pesoActual = max(0, $pesoActual);
+
+                    // 3. REGLA UNIVERSAL DE ELIMINACIÓN
+                    // Solo se borra si TODO el inventario de esa fila se agotó
+                    if ($cajasActuales <= 0 && $piezasActuales <= 0 && $pesoActual <= 0) {
+                        $this->db->delete("DELETE FROM InventarioTemporalSalida WHERE idSalidaTemporal = ?", [$idTemp]);
+                    } else {
+                        // Si sobró algo en cualquier columna, simplemente actualizamos
+                        $this->db->update("UPDATE InventarioTemporalSalida SET cantidadCajas = ?, cantidadPiezas = ?, cantidadPeso = ? WHERE idSalidaTemporal = ?", [$cajasActuales, $piezasActuales, $pesoActual, $idTemp]);
                     }
                 }
             }

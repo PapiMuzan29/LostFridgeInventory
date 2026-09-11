@@ -72,7 +72,7 @@ if (empty($notas)): ?>
 
             <!-- Mostrar el botón de cobrar SOLO si estamos en la pestaña de pendientes -->
             <?php if ($tipo !== 'historial'): ?>
-                <form action="../Controllers/cajeroController.php" method="POST" style="margin: 0;" onsubmit="return confirm('¿Confirmar el cobro de la Nota <?= htmlspecialchars((string)$nota['folio']) ?>?');">
+                <form action="../Controllers/cajeroController.php" method="POST" style="margin: 0;" onsubmit="event.preventDefault(); const form = this; mostrarAlerta('¿Confirmar el cobro de la Nota <?= htmlspecialchars((string)$nota['folio']) ?>?', 'confirmacion', function(acepta) { if(acepta) form.submit(); });">
                     <input type="hidden" name="accion" value="pagar">
                     <input type="hidden" name="id_nota" value="<?= (int)$nota['id_nota'] ?>">
                     <button type="submit" class="btn-success">

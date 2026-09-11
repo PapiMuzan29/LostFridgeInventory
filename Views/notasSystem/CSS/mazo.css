@@ -1,11 +1,65 @@
 /* ==========================================================================
-   MÓDULO MAZOS - HOJA DE ESTILOS UNIFICADA (TEMA AZUL SLATE)
+   MÓDULO MAZOS - HOJA DE ESTILOS DEDICADA (PALETA AZUL MARINO / OSCURO)
    ========================================================================== */
 
-/* 1. NAVEGADOR DE FECHAS Y BARRA INLINE */
+/* 1. MODO CLARO (VALORES POR DEFECTO CON ACENTOS EN AZUL MARINO) */
+:root {
+    --mazo-bg: #f8fafc;
+    --mazo-card-bg: #ffffff;
+    --mazo-card-border: #e2e8f0;
+    --mazo-text-main: #0f172a;
+    --mazo-text-muted: #64748b;
+    
+    --mazo-btn-bg: #ffffff;
+    --mazo-btn-text: #475569;
+    --mazo-btn-hover: #f1f5f9;
+    
+    --mazo-total-bg: #f8fafc;
+    --mazo-total-border: #cbd5e1;
+    
+    --mazo-badge-bg: #e2e8f0;
+    --mazo-badge-text: #0f172a;
+
+    --mazo-accent: #0f172a;       /* Azul marino corporativo */
+    --mazo-accent-hover: #1e293b;
+    --mazo-accent-text: #ffffff;  /* Texto en blanco cuando el botón está activo */
+}
+
+/* 2. MODO OSCURO (SE ACTIVA SOLO SI EXISTE LA CLASE .dark-mode) */
+body.dark-mode {
+    --mazo-bg: #090d16;
+    --mazo-card-bg: #151d2a;
+    --mazo-card-border: #1e293b;
+    --mazo-text-main: #f8fafc;
+    --mazo-text-muted: #94a3b8;
+    
+    --mazo-btn-bg: #1e293b;
+    --mazo-btn-text: #cbd5e1;
+    --mazo-btn-hover: #2d3748;
+    
+    --mazo-total-bg: #111827;
+    --mazo-total-border: #1f2937;
+    
+    --mazo-badge-bg: #1e293b;
+    --mazo-badge-text: #38bdf8;
+
+    --mazo-accent: #38bdf8;       /* Azul brillante para contrastar en modo oscuro */
+    --mazo-accent-hover: #0284c7;
+    --mazo-accent-text: #0f172a;
+}
+
+/* 3. APLICACIÓN GLOBAL AL BODY */
+body {
+    background-color: var(--mazo-bg);
+    color: var(--mazo-text-main);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 4. ESTRUCTURA Y NAVEGADOR DE FECHA */
 .date-picker-bar-inline {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
+    background-color: var(--mazo-card-bg);
+    border-bottom: 1px solid var(--mazo-card-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .input-date-hidden {
@@ -16,11 +70,11 @@
     height: 0;
 }
 
-/* 2. GRID DE PRESENTACIONES (BOTONES NACIONAL / IMPORTADO) */
+/* 5. GRID DE PRESENTACIONES (BOTONES NACIONAL / IMPORTADO CON MÁS SEPARACIÓN) */
 .grid-presentaciones-mazo {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 16px; /* Separación amplia entre botones */
     margin-bottom: 16px;
 }
 
@@ -30,10 +84,10 @@
     justify-content: center;
     gap: 8px;
     padding: 12px 16px;
-    background-color: #ffffff;
-    border: 1px solid #cbd5e1;
+    background-color: var(--mazo-btn-bg);
+    border: 1px solid var(--mazo-card-border);
     border-radius: 8px;
-    color: #475569;
+    color: var(--mazo-btn-text);
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
@@ -41,35 +95,36 @@
 }
 
 .btn-presentacion:hover {
-    background-color: #f8fafc;
+    background-color: var(--mazo-btn-hover);
 }
 
 .btn-presentacion.active {
-    background-color: #1e293b;
-    color: #ffffff;
-    border-color: #1e293b;
-    box-shadow: 0 2px 6px rgba(30, 41, 59, 0.2);
+    background-color: var(--mazo-accent);
+    color: var(--mazo-accent-text);
+    border-color: var(--mazo-accent);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);
 }
 
-/* 3. TARJETA DE TOTAL DEL DÍA (Azul Claro Elegante) */
+/* 6. TARJETA DE TOTAL DEL DÍA */
 .card-total-dia {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px;
-    background-color: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    border-left: 5px solid #1e293b;
+    background-color: var(--mazo-total-bg);
+    border: 1px solid var(--mazo-total-border);
+    border-left: 5px solid var(--mazo-accent);
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
     margin-bottom: 20px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .card-total-dia .info h3 {
     margin: 0 0 4px 0;
     font-size: 0.85rem;
     font-weight: 700;
-    color: #334155;
+    color: var(--mazo-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -77,16 +132,16 @@
 .card-total-dia .info .val {
     font-size: 1.35rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--mazo-text-main);
 }
 
 .card-total-dia .icon {
     font-size: 2.2rem;
-    color: #334155;
+    color: var(--mazo-text-muted);
     opacity: 0.85;
 }
 
-/* 4. SECCIONES Y CONTENEDORES DE TARJETAS DINÁMICAS */
+/* 7. SECCIONES Y CONTENEDORES DE TARJETAS DINÁMICAS */
 .presentacion-section {
     display: none;
 }
@@ -99,7 +154,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding-bottom: 90px; /* Espacio libre para no tapar contenido con la tarjeta fija inferior */
+    padding-bottom: 90px;
 }
 
 /* Tarjetas de ventas individuales */
@@ -107,11 +162,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
+    background-color: var(--mazo-card-bg);
+    border: 1px solid var(--mazo-card-border);
+    border-left: 4px solid var(--mazo-accent);
     border-radius: 8px;
     padding: 12px 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .venta-card-main {
@@ -122,28 +179,28 @@
 
 .venta-cliente {
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mazo-text-main);
     font-size: 0.95rem;
 }
 
 .venta-ticket {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--mazo-text-muted);
 }
 
 .venta-badge-pzs {
-    background-color: #f1f5f9;
+    background-color: var(--mazo-badge-bg);
     padding: 6px 12px;
-    border-radius: 6px;
-    color: #0f172a;
-    font-weight: 700;
+    border-radius: 8px;
+    color: var(--mazo-badge-text);
+    font-weight: 800;
     font-size: 1rem;
 }
 
 .venta-badge-pzs small {
-    font-weight: 400;
+    font-weight: 600;
     font-size: 0.75rem;
-    color: #64748b;
+    color: var(--mazo-text-muted);
 }
 
 /* Estado vacío sin registros */
@@ -153,12 +210,13 @@
     align-items: center;
     justify-content: center;
     padding: 32px 16px;
-    background-color: #ffffff;
-    border: 1px dashed #cbd5e1;
+    background-color: var(--mazo-card-bg);
+    border: 1px dashed var(--mazo-card-border);
     border-radius: 8px;
-    color: #94a3b8;
+    color: var(--mazo-text-muted);
     text-align: center;
     gap: 8px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .empty-state-text {
@@ -167,17 +225,18 @@
     font-weight: 600;
 }
 
-/* 5. TARJETA DEL TOTAL GENERAL (Azul Oscuro / Header Fijo) */
+/* 8. TARJETA DEL TOTAL GENERAL (BARRA FLOTANTE INFERIOR) */
 .fixed-bottom-total-container {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     padding: 12px 16px;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: var(--mazo-bg);
     backdrop-filter: blur(8px);
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--mazo-card-border);
     z-index: 100;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .total-general-card {
@@ -191,12 +250,12 @@
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .total-general-val {
     font-size: 1.4rem;
     font-weight: 800;
-    color: #38bdf8; /* Azul cyan brillante para resaltar las cifras sobre fondo oscuro */
+    color: #38bdf8;
     margin-top: 2px;
 }

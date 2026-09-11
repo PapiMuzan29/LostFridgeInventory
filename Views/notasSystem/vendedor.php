@@ -1,4 +1,8 @@
 <?php
+
+$rolesPermitidos = [1, 2, 5];
+require_once __DIR__ . '/../../Config/cadenero.php';
+
 // Validar que la vista reciba los datos desde VendedorController.php
 if (!isset($productos) || !isset($estibadores)) {
     header("Location: ../../Controllers/vendedorController.php");
@@ -21,7 +25,7 @@ if (!isset($productos) || !isset($estibadores)) {
     </script>
 </head>
 <body data-usuario-id="<?= htmlspecialchars((string)($_SESSION['idCuenta'] ?? 0)) ?>">
-
+    
     <header class="app-header">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
             <div>

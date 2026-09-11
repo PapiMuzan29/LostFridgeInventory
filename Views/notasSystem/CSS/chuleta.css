@@ -1,3 +1,6 @@
+/* ===================================================================
+   VARIABLES DE COLOR - MÓDULO CHULETA
+=================================================================== */
 :root {
     --primary-chuleta: #6b46c1;
     --primary-chuleta-dark: #553c9a;
@@ -5,13 +8,41 @@
     --primary-chuleta-soft: #e9d5ff;
     --bg-dark-header: #0b1329;
     --text-dark: #1e293b;
+
+    /* Variables dinámicas (Modo Claro por defecto) */
+    --chuleta-bg: #f8fafc;
+    --chuleta-card-bg: #ffffff;
+    --chuleta-card-border: #f1f5f9;
+    --chuleta-text-main: #0f172a;
+    --chuleta-text-muted: #94a3b8;
+    --chuleta-total-bg: var(--primary-chuleta-light);
+    --chuleta-total-border: var(--primary-chuleta-soft);
+    --chuleta-badge-bg: var(--primary-chuleta-light);
+    --chuleta-badge-text: var(--primary-chuleta-dark);
+}
+
+/* ===================================================================
+   SOPORTE MODO OSCURO (CUANDO SE ACTIVA EL BOTÓN DE ENCARGADO)
+=================================================================== */
+body.dark-mode, html.dark-mode body {
+    --chuleta-bg: #090d16;
+    --chuleta-card-bg: #151d2a;
+    --chuleta-card-border: #334155;
+    --chuleta-text-main: #f8fafc;
+    --chuleta-text-muted: #94a3b8;
+    --chuleta-total-bg: rgba(107, 70, 193, 0.15);
+    --chuleta-total-border: rgba(107, 70, 193, 0.3);
+    --chuleta-badge-bg: rgba(107, 70, 193, 0.25);
+    --chuleta-badge-text: #e9d5ff;
 }
 
 body {
-    background-color: #f8fafc;
+    background-color: var(--chuleta-bg);
+    color: var(--chuleta-text-main);
     font-family: system-ui, -apple-system, sans-serif;
     margin: 0;
     padding-bottom: 40px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* HEADER ESTILO MANTECA */
@@ -65,9 +96,9 @@ body {
     margin: 0 auto;
 }
 
-/* SELECTOR DE FECHA FLOTANTE (TARJETA BLANCA COMO MANTECA) */
+/* SELECTOR DE FECHA FLOTANTE */
 .date-picker-card {
-    background: #ffffff;
+    background: var(--chuleta-card-bg);
     border-radius: 14px;
     padding: 10px 16px;
     display: flex;
@@ -75,13 +106,14 @@ body {
     align-items: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     margin-bottom: 20px;
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--chuleta-card-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .btn-date-arrow {
     background: transparent;
     border: none;
-    color: #475569;
+    color: var(--chuleta-text-muted);
     font-size: 1rem;
     cursor: pointer;
     padding: 6px 10px;
@@ -94,31 +126,32 @@ body {
     gap: 10px;
     font-weight: 800;
     font-size: 1.05rem;
-    color: #0f172a;
+    color: var(--chuleta-text-main);
     cursor: pointer;
 }
 
 .date-display i {
-    color: #334155;
+    color: var(--chuleta-text-muted);
     font-size: 1.1rem;
 }
 
 /* TARJETA TOTAL DEL DÍA */
 .card-total-dia {
-    background: var(--primary-chuleta-light);
+    background: var(--chuleta-total-bg);
     border-radius: 16px;
     padding: 18px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
-    border: 1px solid var(--primary-chuleta-soft);
+    border: 1px solid var(--chuleta-total-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .card-total-dia .info h3 {
     margin: 0 0 6px 0;
     font-size: 0.75rem;
-    color: var(--primary-chuleta);
+    color: #a855f7;
     font-weight: 800;
     letter-spacing: 0.5px;
 }
@@ -126,26 +159,26 @@ body {
 .card-total-dia .info .val-piezas {
     font-size: 1.6rem;
     font-weight: 900;
-    color: #0f172a;
+    color: var(--chuleta-text-main);
 }
 
 .card-total-dia .info .val-kilos {
     font-size: 1.3rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--chuleta-text-main);
     margin-top: 2px;
 }
 
 .card-total-dia .icon {
     font-size: 2.8rem;
-    color: var(--primary-chuleta);
+    color: #a855f7;
 }
 
 /* REGISTROS DEL DÍA */
 .section-title {
     font-size: 0.78rem;
     font-weight: 800;
-    color: #475569;
+    color: var(--chuleta-text-muted);
     letter-spacing: 0.5px;
     margin-bottom: 12px;
     display: flex;
@@ -160,15 +193,16 @@ body {
 }
 
 .venta-item {
-    background: #ffffff;
+    background: var(--chuleta-card-bg);
     border-radius: 12px;
     padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--chuleta-card-border);
     border-left: 4px solid var(--primary-chuleta);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .venta-info {
@@ -180,27 +214,27 @@ body {
 .cliente-nombre {
     font-weight: 800;
     font-size: 0.95rem;
-    color: #0f172a;
+    color: var(--chuleta-text-main);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .cliente-nombre i {
-    color: #334155;
+    color: var(--chuleta-text-muted);
 }
 
 .venta-sub {
     font-size: 0.78rem;
-    color: #94a3b8;
+    color: var(--chuleta-text-muted);
     display: flex;
     align-items: center;
     gap: 4px;
 }
 
-/* BADGE LATERAL (PZS/KG) COMO MANTECA */
+/* BADGE LATERAL (PZS/KG) */
 .badge-cantidad {
-    background: var(--primary-chuleta-light);
+    background: var(--chuleta-badge-bg);
     border-radius: 12px;
     padding: 6px 14px;
     text-align: center;
@@ -209,18 +243,19 @@ body {
     justify-content: center;
     align-items: center;
     min-width: 45px;
+    transition: background-color 0.3s ease;
 }
 
 .badge-cantidad .val {
     font-weight: 900;
     font-size: 1.1rem;
-    color: var(--primary-chuleta-dark);
+    color: var(--chuleta-badge-text);
     line-height: 1;
 }
 
 .badge-cantidad .unit {
     font-size: 0.68rem;
     font-weight: 700;
-    color: var(--primary-chuleta);
+    color: #a855f7;
     margin-top: 2px;
 }

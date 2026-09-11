@@ -2,6 +2,9 @@
 // manteca.php
 session_start();
 
+$rolesPermitidos = [1, 5];
+require_once __DIR__ . '/../../Config/cadenero.php';
+
 // 1. Forzar zona horaria correcta de México
 date_default_timezone_set('America/Mexico_City');
 
@@ -17,11 +20,22 @@ $fechaActual = date('Y-m-d');
     
     <!-- Hojas de Estilos -->
     <link rel="stylesheet" href="../notasSystem/CSS/cajero.css">
-    <link rel="stylesheet" href="../notasSystem/CSS/manteca.css">
+    <link rel="stylesheet" href="../notasSystem/CSS/manteca.css?v=<?= filemtime('../notasSystem/CSS/manteca.css') ?>">
     <link rel="stylesheet" href="CSS/encargado.css">
     
     <!-- FontAwesome -->
     <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
+
+    <!-- DETECCIÓN RÁPIDA DE TEMA EN EL HEAD (EVITA PARPADEO BLANCO) -->
+    <script>
+        (function() {
+            const temaGuardado = localStorage.getItem("theme_mode");
+            const prefiereOscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            if (temaGuardado === "dark" || (!temaGuardado && prefiereOscuro)) {
+                document.documentElement.classList.add("dark-mode");
+            }
+        })();
+    </script>
 
     <style>
         /* Ajustes globales */
@@ -35,10 +49,11 @@ $fechaActual = date('Y-m-d');
             position: sticky;
             top: 0;
             z-index: 999;
-            background-color: #f8fafc;
+            background-color: var(--manteca-bg, #f8fafc);
             padding: 10px 15px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             margin-bottom: 15px;
+            transition: background-color 0.3s ease;
         }
 
         /* Estilos de las secciones dinámicas */
@@ -58,7 +73,7 @@ $fechaActual = date('Y-m-d');
         }
 
         .venta-card-item {
-            background: #ffffff;
+            background: var(--manteca-card-bg, #ffffff);
             border-radius: 10px;
             padding: 12px 15px;
             display: flex;
@@ -70,18 +85,18 @@ $fechaActual = date('Y-m-d');
 
         .venta-cliente {
             font-weight: 700;
-            color: #1e293b;
+            color: var(--manteca-text-main, #1e293b);
             font-size: 0.95rem;
         }
 
         .venta-ticket {
             font-size: 0.85rem;
-            color: #64748b;
+            color: var(--manteca-text-muted, #64748b);
         }
 
         .venta-badge-pzs {
-            background-color: #fef3c7;
-            color: #b45309;
+            background-color: var(--manteca-badge-bg, #fef3c7);
+            color: var(--manteca-badge-text, #b45309);
             padding: 6px 12px;
             border-radius: 20px;
             font-weight: 800;
@@ -91,11 +106,11 @@ $fechaActual = date('Y-m-d');
         .empty-state-card {
             text-align: center;
             padding: 20px;
-            color: #94a3b8;
+            color: var(--manteca-text-muted, #94a3b8);
             font-size: 0.9rem;
-            background: #ffffff;
+            background: var(--manteca-empty-bg, #ffffff);
             border-radius: 8px;
-            border: 1px dashed #cbd5e1;
+            border: 1px dashed var(--manteca-card-border, #cbd5e1);
         }
 
         /* CARD DE TOTAL GENERAL PEGADA ABAJO DEL TODO */
@@ -104,10 +119,11 @@ $fechaActual = date('Y-m-d');
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: #ffffff;
+            background-color: var(--manteca-card-bg, #ffffff);
             padding: 10px 15px 15px 15px;
             box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
             z-index: 1000;
+            transition: background-color 0.3s ease;
         }
 
         .fixed-bottom-total-container .total-general-card {
@@ -212,10 +228,21 @@ $fechaActual = date('Y-m-d');
         let datosCargadosActuales = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            // --- APLICAR MODO OSCURO SEGÚN ENCARGADO (theme_mode) ---
+            const temaGuardado = localStorage.getItem("theme_mode");
+            const prefiereOscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+            if (temaGuardado === "dark" || (!temaGuardado && prefiereOscuro)) {
+                document.body.classList.add("dark-mode");
+            } else {
+                document.body.classList.remove("dark-mode");
+            }
+
+            // --- LÓGICA DE INICIALIZACIÓN ---
             const inputFecha = document.getElementById('input-fecha-manteca');
             if (inputFecha && inputFecha.value) {
                 const partes = inputFecha.value.split('-');
-                // Parsear números estrictamente
+                // Parsear números strictly
                 fechaSeleccionadaObj = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
             }
             actualizarInterfazFecha();

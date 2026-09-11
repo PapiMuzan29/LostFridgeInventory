@@ -1,40 +1,22 @@
 <?php
+// seguridad_roles.php
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['id_Usuario'])) {
-    header("Location: /LostFridgeInventory/Views/login.php");
-    exit();
+// 1. Si a la vista se le olvidó definir la variable de roles, bloqueamos por seguridad
+if (!isset($rolesPermitidos) || !is_array($rolesPermitidos)) {
+    header("Location: /LostFridgeInventory/Controllers/LoginController.php?action=logout");
+    exit;
 }
 
-$rolUsuario = $_SESSION['nombreRol'] ?? '';
+// 2. Verificamos si existe un usuario logueado con un rol
+$rolUsuario = (int)($_SESSION['idRol'] ?? 0); 
 
-$archivoActual = basename($_SERVER['PHP_SELF']);
-
-$paginasSoloAdmin = [
-    //LostFridge
-    'configuracion.php',
-    'inicio.php',
-    'movimientos.php',
-    'reportes.php',
-    'ubicaciones.php',
-    'usuarios.php',
-];
-
-switch ($rolUsuario) {
-    case 'Administrador':
-        header("Location: /LostFridgeInventory/Views/notasSystem.php");
-        exit();
-        break;
-    case 'Vendedor':
-        header("Location: /LostFridgeInventory/Views/notasSystem.php");
-        exit();
-        break;
-           
-    default:
-        # code...
-        break;
+// 3. Si no tiene el rol correcto o no está logueado, lo expulsamos
+if (!in_array($rolUsuario, $rolesPermitidos, true)) {
+    header("Location: /LostFridgeInventory/Controllers/LoginController.php?action=logout");
+    exit;
 }
-
 ?>

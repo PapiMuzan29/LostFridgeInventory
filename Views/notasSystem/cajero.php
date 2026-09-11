@@ -1,11 +1,20 @@
 <?php
+
+$rolesPermitidos = [1, 6];
+require_once __DIR__ . '/../../Config/cadenero.php';
+
+
 if (!isset($notasPendientes)) {
     header("Location: ../../Controllers/cajeroController.php");
     exit;
 }
 
 $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Cajero';
+
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,7 +26,7 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
     <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
 </head>
 <body>
-
+     
     <header class="app-header">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div>
@@ -34,19 +43,27 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
 
     <main class="app-content">
 
-        <!-- ALERTAS DE SESIÓN -->
-        <?php if (!empty($_SESSION['alerta_exito'])): ?>
-            <div id="alerta-flash" class="alert alert-success" style="background-color: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 8px; margin: 10px 0; text-align: center; font-weight: bold;">
-                <i class="fa-solid fa-circle-check"></i> <?= htmlspecialchars($_SESSION['alerta_exito']) ?>
-            </div>
-            <?php unset($_SESSION['alerta_exito']); ?>
-        <?php endif; ?>
+        <!-- 1. PREPARAMOS EL MENSAJE DEL MODAL -->
+        <?php 
+            $mensajeModal = '';
+            $tipoModal = '';
+            if (!empty($_SESSION['alerta_exito'])) {
+                $mensajeModal = htmlspecialchars($_SESSION['alerta_exito']);
+                $tipoModal = 'exito';
+                unset($_SESSION['alerta_exito']);
+            } elseif (!empty($_SESSION['alerta_error'])) {
+                $mensajeModal = htmlspecialchars($_SESSION['alerta_error']);
+                $tipoModal = 'error';
+                unset($_SESSION['alerta_error']);
+            }
+        ?>
 
-        <?php if (!empty($_SESSION['alerta_error'])): ?>
-            <div id="alerta-flash" class="alert alert-danger" style="background-color: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin: 10px 0; text-align: center; font-weight: bold;">
-                <i class="fa-solid fa-triangle-exclamation"></i> <?= htmlspecialchars($_SESSION['alerta_error']) ?>
-            </div>
-            <?php unset($_SESSION['alerta_error']); ?>
+        <?php if ($mensajeModal !== ''): ?>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    mostrarAlerta('<?= $mensajeModal ?>', '<?= $tipoModal ?>');
+                });
+            </script>
         <?php endif; ?>
 
         <!-- VISTA 1: NOTAS RECIBIDAS -->
@@ -108,7 +125,7 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
                                 <?php endif; ?>
                             </div>
 
-                            <form action="../Controllers/cajeroController.php" method="POST" style="margin: 0;" onsubmit="return confirm('¿Confirmar el cobro de la Nota <?= htmlspecialchars((string)$nota['folio']) ?>?');">
+                            <form action="../Controllers/cajeroController.php" method="POST" style="margin: 0;" onsubmit="event.preventDefault(); const form = this; mostrarAlerta('¿Confirmar el cobro de la Nota <?= htmlspecialchars((string)$nota['folio']) ?>?', 'confirmacion', function(acepta) { if(acepta) form.submit(); });">
                                 <input type="hidden" name="accion" value="pagar">
                                 <input type="hidden" name="id_nota" value="<?= (int)$nota['id_nota'] ?>">
                                 <button type="submit" class="btn-success">
@@ -135,7 +152,7 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
             <!-- contenedor-historial -->
             <div id="contenedor-historial">
                 <div style="text-align:center; padding:20px;">
-                    <p style="color: var(--text-muted);">Cargando historial...</p>
+                    <p style="color: var(--caja-text-muted);">Cargando historial...</p>
                 </div>
             </div>
 
@@ -159,6 +176,17 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
                         <option>Recepción y Cobro Directo</option>
                     </select>
                 </div>
+
+                <!-- SWITCH DE MODO OSCURO ESTRUCTURADO -->
+                <div class="toggle-control">
+                    <label for="toggle-dark-mode" style="margin: 0; cursor: pointer;">
+                        <i class="fa-solid fa-moon"></i> Modo Oscuro
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-dark-mode" onchange="toggleDarkMode(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div> 
             </section>
 
             <section class="card">
@@ -194,6 +222,21 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
     </nav>
 
     <script>
+        // ==========================================
+        // CONTROL Y PERSISTENCIA DE MODO OSCURO
+        // ==========================================
+        function toggleDarkMode(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                document.documentElement.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.documentElement.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
         function obtenerIdsActuales() {
             const tarjetas = document.querySelectorAll('#contenedor-notas .nota-card');
             return Array.from(tarjetas).map(t => t.getAttribute('data-id')).filter(Boolean);
@@ -249,17 +292,66 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const alerta = document.getElementById('alerta-flash');
-            if (alerta) {
-                setTimeout(() => {
-                    alerta.style.transition = 'opacity 0.5s ease';
-                    alerta.style.opacity = '0';
-                    setTimeout(() => alerta.remove(), 500);
-                }, 3000);
+            // Cargar preferencia del Tema Oscuro Guardado
+            const savedTheme = localStorage.getItem('theme');
+            const toggleInput = document.getElementById('toggle-dark-mode');
+            
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.documentElement.classList.add('dark-mode');
+                if (toggleInput) toggleInput.checked = true;
             }
 
+            // Mantenemos solo la recarga automática de notas
             setInterval(fetchNotas, 4000);
         });
+
+        // ==========================================
+        // FUNCIONES PARA MOSTRAR ALERTAS BONITAS EN MODAL
+        // ==========================================
+        function mostrarAlerta(mensaje, tipo = 'error', callbackAceptar = null) {
+            const modal = document.getElementById('modal-alerta-global');
+            const mensajeEl = document.getElementById('modal-alerta-mensaje');
+            const tituloEl = document.getElementById('modal-alert-title');
+            const iconEl = document.getElementById('modal-alert-icon-container');
+            const footerEl = document.getElementById('modal-alert-footer-buttons');
+
+            mensajeEl.textContent = mensaje;
+            window._callbackAlertaAceptar = callbackAceptar;
+
+            if (tipo === 'error') {
+                tituloEl.textContent = 'Atención';
+                iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: #e53e3e;"></i>';
+            } else if (tipo === 'exito') {
+                tituloEl.textContent = '¡Éxito!';
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #38a169;"></i>';
+            } else if (tipo === 'confirmacion') {
+                tituloEl.textContent = 'Confirmación';
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-question" style="color: #d97706;"></i>';
+                
+                footerEl.innerHTML = `
+                    <button type="button" class="btn-secondary-sm" style="flex:1;" onclick="cerrarAlertaGlobal(false)">Cancelar</button>
+                    <button type="button" class="btn-success" style="flex:1;" onclick="cerrarAlertaGlobal(true)">
+                        <i class="fa-solid fa-cash-register"></i> Sí, cobrar
+                    </button>
+                `;
+                modal.style.display = 'flex';
+                return;
+            }
+
+            footerEl.innerHTML = `<button type="button" class="btn-primary" style="width: 100%; padding: 10px;" onclick="cerrarAlertaGlobal(true)">Aceptar</button>`;
+            modal.style.display = 'flex';
+        }
+
+        function cerrarAlertaGlobal(resultado) {
+            const modal = document.getElementById('modal-alerta-global');
+            modal.style.display = 'none';
+
+            if (window._callbackAlertaAceptar && typeof window._callbackAlertaAceptar === 'function') {
+                window._callbackAlertaAceptar(resultado);
+                window._callbackAlertaAceptar = null;
+            }
+        }
 
         function switchTab(tabName, btnElement) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -321,5 +413,21 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
             }, 400);
         }
     </script>
+
+    <!-- MODAL DE ALERTAS GENERALES -->
+    <div id="modal-alerta-global" class="modal-alert-overlay" style="display: none;">
+        <div class="modal-alert-content">
+            <div class="modal-alert-header">
+                <div id="modal-alert-icon-container" class="modal-alert-icon">⚠️</div>
+                <h3 id="modal-alert-title" class="modal-alert-title">Aviso</h3>
+            </div>
+            <div id="modal-alerta-mensaje" class="modal-alert-body">
+                Mensaje...
+            </div>
+            <div class="modal-alert-footer" id="modal-alert-footer-buttons">
+                <button type="button" class="btn-primary" style="width: 100%; padding: 10px;" onclick="cerrarAlertaGlobal()">Aceptar</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

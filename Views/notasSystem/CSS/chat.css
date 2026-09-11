@@ -2,7 +2,7 @@
    CHAT SYSTEM STYLES (chat.css) - Tamaño Compacto + Transiciones Suaves
    ========================================================================== */
 
-/* Botón Flotante Global (Reducido a la mitad: 58px) */
+/* Botón Flotante Global */
 .chat-float-btn {
     position: fixed;
     bottom: 20px;
@@ -25,6 +25,7 @@
     user-select: none;
     touch-action: none;
     transition: transform 0.2s ease, background-color 0.2s ease;
+    pointer-events: auto; /* Garantiza interacción única en el botón */
 }
 
 .chat-float-btn:hover {
@@ -50,21 +51,24 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.25);
 }
 
-/* Modal Contenedor Flotante (380px x 520px) con Transición Suave */
+/* Modal Contenedor Flotante (Aislado completamente del DOM del módulo) */
 .chat-modal-container {
     position: fixed;
+    bottom: 90px; /* Posicionado por defecto arriba del botón flotante */
+    right: 20px;
     width: 380px;
     max-width: calc(100vw - 32px);
     height: 520px;
-    max-height: calc(100vh - 32px);
+    max-height: calc(100vh - 110px);
     background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
     z-index: 9999;
-    display: none; /* Oculto inicialmente para no interferir en el layout */
+    display: none; 
     flex-direction: column;
     overflow: hidden;
     border: 1px solid #cbd5e1;
+    pointer-events: auto; /* Solo el modal recibe clics, no lo de su alrededor */
 
     /* Propiedades para la transición suave */
     opacity: 0;
@@ -72,7 +76,7 @@
     transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Clase de despliegue en bloque */
+/* Clase de despliegue */
 .chat-modal-container.show {
     display: flex !important;
 }

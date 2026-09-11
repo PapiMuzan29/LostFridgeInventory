@@ -263,6 +263,8 @@ document.addEventListener("DOMContentLoaded", () => {
           if (data.success) {
             cerrarModalAprobar();
 
+            actualizarVistaFechaGestion();
+
             const inputId = document.getElementById("modal_aprobar_id_nota");
             const idNotaAprobada = inputId ? inputId.value : null;
             const card = document.getElementById(`nota-${idNotaAprobada}`);
@@ -341,6 +343,18 @@ window.switchTab = function (tabName, btnElement, subtitleText) {
 function aprobarNota(idNota, btnElement) {
   const originalText = btnElement.innerHTML;
 
+  // Contamos cuántos productos tiene esta nota leyendo los <li> de la tarjeta
+  const card = btnElement.closest('.note-card');
+  let cantidadProductos = 1; 
+  if (card) {
+      const itemsLista = card.querySelectorAll('ul li');
+      if (itemsLista.length === 1 && itemsLista[0].innerText.includes('Sin productos')) {
+          cantidadProductos = 0;
+      } else {
+          cantidadProductos = itemsLista.length;
+      }
+  }
+
   btnElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
   btnElement.disabled = true;
 
@@ -348,7 +362,8 @@ function aprobarNota(idNota, btnElement) {
     .then((res) => res.json())
     .then((data) => {
       if (data.success) {
-        abrirModalAprobar(idNota, data.requiere_factura);
+        // Le enviamos también la cantidad de productos al modal
+        abrirModalAprobar(idNota, data.requiere_factura, cantidadProductos);
       } else {
         alert("Error al verificar nota: " + data.message);
       }
@@ -366,24 +381,42 @@ function aprobarNota(idNota, btnElement) {
 // ==========================================
 // MODALES DE APROBACIÓN Y EDICIÓN
 // ==========================================
-function abrirModalAprobar(idNota, requiereFactura) {
+function abrirModalAprobar(idNota, requiereFactura, cantidadProductos = 1) {
   const inputId = document.getElementById("modal_aprobar_id_nota");
-  const inputTicket1 = document.getElementById("folio_ticket_1");
-  const inputTicket2 = document.getElementById("folio_ticket_2");
+  const inputTicket1 = document.getElementById("folio_ticket_1"); // Ticket normal
+  const inputTicket2 = document.getElementById("folio_ticket_2"); // Factura
+  
+  const divTicket = document.getElementById("grupo_folio_ticket");
+  const divFactura = document.getElementById("grupo_folio_factura");
   
   if (inputId) inputId.value = idNota;
   if (inputTicket1) inputTicket1.value = "";
   if (inputTicket2) inputTicket2.value = "";
 
-  const divFactura = document.getElementById("grupo_folio_factura");
-  if (divFactura && inputTicket2) {
-    if (requiereFactura) {
-      divFactura.style.display = "block";
-      inputTicket2.required = true;
-    } else {
-      divFactura.style.display = "none";
-      inputTicket2.required = false;
-    }
+  // REGLAS LÓGICAS DE VISIBILIDAD
+  if (requiereFactura) {
+      if (cantidadProductos === 1) {
+          // Caso A: Solo 1 producto y requiere factura -> Se oculta el ticket normal
+          if (divTicket) divTicket.style.display = "none";
+          if (inputTicket1) inputTicket1.required = false;
+
+          if (divFactura) divFactura.style.display = "block";
+          if (inputTicket2) inputTicket2.required = true;
+      } else {
+          // Caso B: Más de 1 producto y alguno requiere factura -> Se muestran AMBOS
+          if (divTicket) divTicket.style.display = "block";
+          if (inputTicket1) inputTicket1.required = true;
+
+          if (divFactura) divFactura.style.display = "block";
+          if (inputTicket2) inputTicket2.required = true;
+      }
+  } else {
+      // Caso C: Ningún producto requiere factura -> Se muestra SOLO el ticket normal
+      if (divTicket) divTicket.style.display = "block";
+      if (inputTicket1) inputTicket1.required = true;
+
+      if (divFactura) divFactura.style.display = "none";
+      if (inputTicket2) inputTicket2.required = false;
   }
 
   const modal = document.getElementById("modalAprobarNota");
@@ -487,14 +520,19 @@ function alSeleccionarFecha(valorFecha) {
   actualizarVistaFechaGestion();
 }
 
+// ==========================================
+// CONTROLADORES DE FECHA Y RESUMEN DEL DÍA
+// ==========================================
 function actualizarVistaFechaGestion() {
   const yyyy = fechaActualGestion.getFullYear();
   const mm = String(fechaActualGestion.getMonth() + 1).padStart(2, '0');
   const dd = String(fechaActualGestion.getDate()).padStart(2, '0');
   
+  const fechaString = `${yyyy}-${mm}-${dd}`;
+  
   const inputFecha = document.getElementById('input-fecha-gestion');
   if (inputFecha) {
-    inputFecha.value = `${yyyy}-${mm}-${dd}`;
+    inputFecha.value = fechaString;
   }
 
   const opciones = { day: 'numeric', month: 'short' };
@@ -502,6 +540,87 @@ function actualizarVistaFechaGestion() {
   if (label) {
     label.innerText = fechaActualGestion.toLocaleDateString('es-ES', opciones);
   }
+
+  // Ejecutamos la recarga de las tarjetas cada que cambia la fecha
+  cargarResumenDelDia(fechaString);
+}
+
+function cargarResumenDelDia(fechaString) {
+  const endpoints = [
+      { id: 'pierna', url: `/LostFridgeInventory/Controllers/piernasController.php?accion=consultarPorFecha&fecha=${fechaString}` },
+      { id: 'pecho', url: `/LostFridgeInventory/Controllers/pechoController.php?accion=consultarPorFecha&fecha=${fechaString}` },
+      { id: 'mazo', url: `/LostFridgeInventory/Controllers/mazoController.php?accion=consultarPorFecha&fecha=${fechaString}` },
+      { id: 'manteca', url: `/LostFridgeInventory/Controllers/mantecaController.php?accion=consultarPorFecha&fecha=${fechaString}` },
+      { id: 'chuleta', url: `/LostFridgeInventory/Controllers/chuletaController.php?accion=consultarPorFecha&fecha=${fechaString}` }
+  ];
+
+  // Ponemos los valores en "..." mientras el servidor responde
+  endpoints.forEach(ep => {
+      if (ep.id === 'pecho') {
+          const elPzsSuelto = document.getElementById('resumen-pecho-suelto-pzs');
+          const elKgSuelto = document.getElementById('resumen-pecho-suelto-kg');
+          const elPzsCaja = document.getElementById('resumen-pecho-caja-pzs');
+          const elKgCaja = document.getElementById('resumen-pecho-caja-kg');
+          if (elPzsSuelto) elPzsSuelto.textContent = '...';
+          if (elKgSuelto) elKgSuelto.textContent = '... kg';
+          if (elPzsCaja) elPzsCaja.textContent = '...';
+          if (elKgCaja) elKgCaja.textContent = '... kg';
+      } else {
+          const elPzs = document.getElementById(`resumen-${ep.id}-pzs`);
+          const elKg = document.getElementById(`resumen-${ep.id}-kg`);
+          if (elPzs) elPzs.textContent = '...';
+          if (elKg) elKg.textContent = '... kg';
+      }
+  });
+
+  // Hacemos fetch a cada controlador
+  endpoints.forEach(ep => {
+      fetch(ep.url)
+          .then(res => res.json())
+          .then(data => {
+              if (ep.id === 'pecho') {
+                  // Llenamos el doble renglón de Pecho
+                  const elPzsSuelto = document.getElementById('resumen-pecho-suelto-pzs');
+                  const elKgSuelto = document.getElementById('resumen-pecho-suelto-kg');
+                  const elPzsCaja = document.getElementById('resumen-pecho-caja-pzs');
+                  const elKgCaja = document.getElementById('resumen-pecho-caja-kg');
+
+                  if (elPzsSuelto) elPzsSuelto.textContent = data.total_suelto_piezas || 0;
+                  if (elKgSuelto) elKgSuelto.textContent = parseFloat(data.total_suelto_kilos || 0).toFixed(2) + ' kg';
+                  
+                  if (elPzsCaja) elPzsCaja.textContent = data.total_caja_piezas || 0;
+                  if (elKgCaja) elKgCaja.textContent = parseFloat(data.total_caja_kilos || 0).toFixed(2) + ' kg';
+              } else {
+                  // Lógica general para los demás productos
+                  const elPzs = document.getElementById(`resumen-${ep.id}-pzs`);
+                  const elKg = document.getElementById(`resumen-${ep.id}-kg`);
+                  
+                  if (elPzs) elPzs.textContent = data.total_general_piezas || 0;
+                  if (elKg && data.total_general_kilos !== undefined) {
+                      elKg.textContent = parseFloat(data.total_general_kilos || 0).toFixed(2) + ' kg';
+                  }
+              }
+          })
+          .catch(err => {
+              console.error(`Error cargando resumen de ${ep.id}:`, err);
+              if (ep.id === 'pecho') {
+                  const elPzsSuelto = document.getElementById('resumen-pecho-suelto-pzs');
+                  const elKgSuelto = document.getElementById('resumen-pecho-suelto-kg');
+                  const elPzsCaja = document.getElementById('resumen-pecho-caja-pzs');
+                  const elKgCaja = document.getElementById('resumen-pecho-caja-kg');
+                  
+                  if (elPzsSuelto) elPzsSuelto.textContent = '0';
+                  if (elKgSuelto) elKgSuelto.textContent = '0.00 kg';
+                  if (elPzsCaja) elPzsCaja.textContent = '0';
+                  if (elKgCaja) elKgCaja.textContent = '0.00 kg';
+              } else {
+                  const elPzs = document.getElementById(`resumen-${ep.id}-pzs`);
+                  const elKg = document.getElementById(`resumen-${ep.id}-kg`);
+                  if (elPzs) elPzs.textContent = '0';
+                  if (elKg) elKg.textContent = '0.00 kg';
+              }
+          });
+  });
 }
 
 // ==========================================
@@ -758,23 +877,41 @@ function registrarModalEnHistorial() {
 }
 
 const originalAbrirAprobar = window.abrirModalAprobar;
-window.abrirModalAprobar = function (idNota, requiereFactura) {
+window.abrirModalAprobar = function (idNota, requiereFactura, cantidadProductos = 1) {
   registrarModalEnHistorial();
+  
   if (typeof originalAbrirAprobar === "function") {
-    originalAbrirAprobar(idNota, requiereFactura);
+    originalAbrirAprobar(idNota, requiereFactura, cantidadProductos);
   } else {
+    // Respaldo de seguridad en caso de fallo del original
     const inputId = document.getElementById("modal_aprobar_id_nota");
     const inputTicket1 = document.getElementById("folio_ticket_1");
     const inputTicket2 = document.getElementById("folio_ticket_2");
+    
+    const divTicket = document.getElementById("grupo_folio_ticket");
+    const divFactura = document.getElementById("grupo_folio_factura");
 
     if (inputId) inputId.value = idNota;
     if (inputTicket1) inputTicket1.value = "";
     if (inputTicket2) inputTicket2.value = "";
 
-    const divFactura = document.getElementById("grupo_folio_factura");
-    if (divFactura && inputTicket2) {
-      divFactura.style.display = requiereFactura ? "block" : "none";
-      inputTicket2.required = requiereFactura;
+    if (requiereFactura) {
+        if (cantidadProductos === 1) {
+            if (divTicket) divTicket.style.display = "none";
+            if (inputTicket1) inputTicket1.required = false;
+            if (divFactura) divFactura.style.display = "block";
+            if (inputTicket2) inputTicket2.required = true;
+        } else {
+            if (divTicket) divTicket.style.display = "block";
+            if (inputTicket1) inputTicket1.required = true;
+            if (divFactura) divFactura.style.display = "block";
+            if (inputTicket2) inputTicket2.required = true;
+        }
+    } else {
+        if (divTicket) divTicket.style.display = "block";
+        if (inputTicket1) inputTicket1.required = true;
+        if (divFactura) divFactura.style.display = "none";
+        if (inputTicket2) inputTicket2.required = false;
     }
 
     const modal = document.getElementById("modalAprobarNota");
@@ -844,11 +981,9 @@ window.addEventListener("popstate", (e) => {
 
 
 
-function abrirModuloPiernas() {
-    // Redirige completamente la ventana hacia piernas.php
-    window.location.href = 'piernas.php';
-}
-
+// ==========================================
+// REDIRECCIONES A MÓDULOS ESPECÍFICOS
+// ==========================================
 function abrirModuloPiernas() {
     window.location.href = 'piernas.php';
 }
@@ -864,3 +999,49 @@ function abrirModuloChuletas() {
 function abrirModuloMazos() {
   window.location.href = 'mazo.php';
 }
+
+function abrirModuloPecho() {
+  window.location.href = 'pecho.php';
+}
+
+// ==========================================
+// CONTROL Y PERSISTENCIA DE MODO OSCURO
+// ==========================================
+
+// Función global que activa o desactiva la clase en el body
+window.toggleDarkMode = function (isDark) {
+  if (isDark) {
+    document.body.classList.add("dark-mode");
+    localStorage.setItem("theme_mode", "dark");
+  } else {
+    document.body.classList.remove("dark-mode");
+    localStorage.setItem("theme_mode", "light");
+  }
+};
+
+// Autoejecutable para inicializar el estado al cargar la página
+(function inicializarModoOscuro() {
+  const temaGuardado = localStorage.getItem("theme_mode");
+  const toggleInput = document.getElementById("toggle-dark-mode");
+
+  // Si no hay nada guardado, valida la preferencia del sistema operativo
+  const prefiereOscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const esOscuro = temaGuardado === "dark" || (!temaGuardado && prefiereOscuro);
+
+  if (esOscuro) {
+    document.body.classList.add("dark-mode");
+  } else {
+    document.body.classList.remove("dark-mode");
+  }
+
+  // Sincroniza el estado del checkbox si ya existe en el DOM
+  if (toggleInput) {
+    toggleInput.checked = esOscuro;
+  } else {
+    // Si la carga del DOM es posterior, espera a que esté listo el elemento
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("toggle-dark-mode");
+      if (input) input.checked = esOscuro;
+    });
+  }
+})();

@@ -17,7 +17,7 @@ class modeloMazo {
                 FROM detalle_notas dn
                 INNER JOIN notas n ON dn.id_nota = n.id_nota
                 INNER JOIN producto p ON dn.idProducto = p.idProducto
-                LEFT JOIN folios_tickets ft ON n.id_nota = ft.id_nota
+                INNER JOIN folios_tickets ft ON n.id_nota = ft.id_nota
                 WHERE p.nombreProducto LIKE '%Mazo%' 
                   AND DATE(n.fecha_creacion) = :fecha
                 GROUP BY dn.id_detalle, p.nombreProducto, n.nombre_cliente";

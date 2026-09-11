@@ -1,4 +1,10 @@
 <?php
+session_start();
+
+
+$rolesPermitidos = [1, 5];
+require_once __DIR__ . '/../../Config/cadenero.php';
+
 // piernas.php
 $fechaActual = isset($_GET['fecha']) && !empty($_GET['fecha']) ? $_GET['fecha'] : date('Y-m-d');
 $comboActual = isset($_GET['combo']) ? $_GET['combo'] : 'todos';

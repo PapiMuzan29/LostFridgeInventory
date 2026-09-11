@@ -2,7 +2,10 @@
 // mazo.php
 session_start();
 
-// 1. Forzar la zona horaria correcta de México
+$rolesPermitidos = [1, 5];
+require_once __DIR__ . '/../../Config/cadenero.php';
+
+// 1. Forzar zona horaria correcta de México
 date_default_timezone_set('America/Mexico_City');
 
 $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Usuario';
@@ -17,12 +20,24 @@ $fechaActual = date('Y-m-d');
     
     <!-- Hojas de Estilos -->
     <link rel="stylesheet" href="../notasSystem/CSS/cajero.css">
-    <link rel="stylesheet" href="../notasSystem/CSS/manteca.css">
-    <link rel="stylesheet" href="../notasSystem/CSS/mazo.css">
+    <link rel="stylesheet" href="../notasSystem/CSS/manteca.css?v=<?= filemtime('../notasSystem/CSS/manteca.css') ?>">
+    <link rel="stylesheet" href="../notasSystem/CSS/mazo.css?v=<?= filemtime('../notasSystem/CSS/mazo.css') ?>">
     <link rel="stylesheet" href="CSS/encargado.css">
     
     <!-- FontAwesome -->
     <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
+
+    <!-- DETECCIÓN RÁPIDA DE TEMA EN EL HEAD (EVITA PARPADEO BLANCO) -->
+    <script>
+        (function() {
+            const temaGuardado = localStorage.getItem("theme_mode");
+            const prefiereOscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            if (temaGuardado === "dark" || (!temaGuardado && prefiereOscuro)) {
+                document.documentElement.classList.add("dark-mode");
+            }
+        })();
+    </script>
+
 </head>
 <body>
 
@@ -32,7 +47,7 @@ $fechaActual = date('Y-m-d');
             <button type="button" class="btn-back" onclick="volverPantallaAnterior()">
                 <i class="fa-solid fa-arrow-left"></i> Volver
             </button>
-            <h1><i class="fa-solid fa-drumstick-bite"></i>Mazos</h1>
+            <h1><i class="fa-solid fa-drumstick-bite"></i> Mazos</h1>
         </div>
         <div class="date-badge">
             <i class="fa-solid fa-user"></i>
@@ -42,14 +57,14 @@ $fechaActual = date('Y-m-d');
 
     <!-- NAVEGADOR DE FECHA / CALENDARIO -->
     <div class="sticky-date-bar">
-        <div class="date-picker-bar date-picker-bar-inline">
+        <div class="date-picker-bar" style="margin: 0;">
             <button type="button" class="btn-date-nav" onclick="cambiarFecha(-1)">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
             <div class="date-picker-display" onclick="abrirCalendario()">
                 <i class="fa-regular fa-calendar-days"></i>
                 <span id="label-fecha-seleccionada">Cargando fecha...</span>
-                <input type="date" id="input-fecha-mazo" class="input-date-hidden" value="<?= $fechaActual ?>" onchange="alSeleccionarFecha(this.value)">
+                <input type="date" id="input-fecha-mazo" value="<?= $fechaActual ?>" style="position:absolute; opacity:0; pointer-events:none;" onchange="alSeleccionarFecha(this.value)">
             </div>
             <button type="button" class="btn-date-nav" onclick="cambiarFecha(1)">
                 <i class="fa-solid fa-chevron-right"></i>
@@ -61,7 +76,7 @@ $fechaActual = date('Y-m-d');
 
         <!-- 1. SELECCIONAR PRESENTACIÓN -->
         <div class="section-title">Selecciona Presentación</div>
-        <div class="grid-presentaciones-mazo">
+        <div class="grid-presentaciones">
             <button type="button" class="btn-presentacion active" id="btn-nacional" onclick="seleccionarPresentacion('nacional')">
                 <i class="fa-solid fa-flag"></i> NACIONAL
             </button>
@@ -71,7 +86,7 @@ $fechaActual = date('Y-m-d');
         </div>
 
         <!-- 2. TOTAL DEL DÍA SEGÚN PRESENTACIÓN -->
-        <div class="card-total-dia card-total-dia-spacing">
+        <div class="card-total-dia" style="margin-top: 10px;">
             <div class="info">
                 <h3 id="label-total-presentacion">TOTAL DEL DÍA (NACIONAL)</h3>
                 <div class="val" id="val-total-presentacion">0 piezas</div>
@@ -80,7 +95,7 @@ $fechaActual = date('Y-m-d');
         </div>
 
         <!-- 3. ÁREA DE TARJETAS DINÁMICAS POR PRESENTACIÓN -->
-        <div class="content-cards-wrapper content-cards-wrapper-spacing">
+        <div class="content-cards-wrapper" style="margin-top: 15px;">
 
             <!-- SECCIÓN NACIONAL -->
             <div id="sec-nacional" class="presentacion-section active">
@@ -102,7 +117,7 @@ $fechaActual = date('Y-m-d');
     <div class="fixed-bottom-total-container">
         <div class="total-general-card">
             TOTAL GENERAL MAZOS
-            <div class="total-general-val" id="total-general">0 piezas</div>
+            <div style="font-size: 1.4rem; font-weight: 800; margin-top: 2px;" id="total-general">0 piezas</div>
         </div>
     </div>
 
@@ -112,10 +127,20 @@ $fechaActual = date('Y-m-d');
         let datosCargadosActuales = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            // --- APLICAR MODO OSCURO SEGÚN ENCARGADO (theme_mode) ---
+            const temaGuardado = localStorage.getItem("theme_mode");
+            const prefiereOscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+            if (temaGuardado === "dark" || (!temaGuardado && prefiereOscuro)) {
+                document.body.classList.add("dark-mode");
+            } else {
+                document.body.classList.remove("dark-mode");
+            }
+
+            // --- LÓGICA DE INICIALIZACIÓN ---
             const inputFecha = document.getElementById('input-fecha-mazo');
             if (inputFecha && inputFecha.value) {
                 const partes = inputFecha.value.split('-');
-                // Parsear fecha exactamente como números enteros
                 fechaSeleccionadaObj = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
             }
             actualizarInterfazFecha();
@@ -167,13 +192,12 @@ $fechaActual = date('Y-m-d');
                     try {
                         data = JSON.parse(texto);
                     } catch (e) {
-                        console.error("Respuesta no válida del servidor:", texto);
+                        console.error("El servidor devolvió una respuesta no válida (no es JSON):", texto);
                         return;
                     }
 
                     datosCargadosActuales = data;
 
-                    // Renderizar las dos secciones: nacional e importado
                     ['nacional', 'importado'].forEach(tipoKey => {
                         const contenedor = document.getElementById(`contenedor-ventas-${tipoKey}`);
                         const tipo = data[tipoKey];
@@ -182,7 +206,7 @@ $fechaActual = date('Y-m-d');
                             contenedor.innerHTML = `
                                 <div class="empty-state-card">
                                     <i class="fa-solid fa-inbox fa-2x"></i>
-                                    <p class="empty-state-text">Sin ventas registradas en ${tipoKey.toUpperCase()}</p>
+                                    <p style="margin-top:5px;">Sin ventas registradas en ${tipoKey.toUpperCase()}</p>
                                 </div>`;
                         } else {
                             contenedor.innerHTML = tipo.ventas.map(v => `
@@ -207,14 +231,12 @@ $fechaActual = date('Y-m-d');
         function actualizarBanners() {
             if (!datosCargadosActuales) return;
 
-            // Subtotal de la presentación seleccionada
             const subtotal = datosCargadosActuales[presentacionActual];
             if (subtotal) {
                 const piezasVal = subtotal.piezas || 0;
                 document.getElementById('val-total-presentacion').textContent = `${piezasVal} piezas`;
             }
 
-            // Total General Inferior
             const totPiezas = datosCargadosActuales.total_general_piezas || 0;
             document.getElementById('total-general').textContent = `${totPiezas} piezas`;
         }
@@ -222,14 +244,11 @@ $fechaActual = date('Y-m-d');
         function seleccionarPresentacion(tipo) {
             presentacionActual = tipo;
 
-            // Cambiar botones activos
             document.getElementById('btn-nacional').classList.toggle('active', tipo === 'nacional');
             document.getElementById('btn-importado').classList.toggle('active', tipo === 'importado');
 
-            // Cambiar título del subtotal
             document.getElementById('label-total-presentacion').textContent = `TOTAL DEL DÍA (${tipo.toUpperCase()})`;
 
-            // Alternar vista de contenedores
             document.getElementById('sec-nacional').classList.toggle('active', tipo === 'nacional');
             document.getElementById('sec-importado').classList.toggle('active', tipo === 'importado');
 

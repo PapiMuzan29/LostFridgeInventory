@@ -2,6 +2,10 @@
 // chuleta.php
 session_start();
 
+
+$rolesPermitidos = [1, 5];
+require_once __DIR__ . '/../../Config/cadenero.php';
+
 // Configurar la zona horaria correcta para evitar desfase de día
 date_default_timezone_set('America/Mexico_City');
 
@@ -21,6 +25,17 @@ $fechaActual = date('Y-m-d');
     
     <!-- FontAwesome -->
     <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
+
+    <!-- DETECCIÓN INMEDIATA DE TEMA (EVITA PARPADEO BLANCO AL CARGAR) -->
+    <script>
+        (function() {
+            const temaGuardado = localStorage.getItem("theme_mode");
+            const prefiereOscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            if (temaGuardado === "dark" || (!temaGuardado && prefiereOscuro)) {
+                document.documentElement.classList.add("dark-mode");
+            }
+        })();
+    </script>
 
     <style>
         /* Ocultar el input tipo date sin afectar el flujo */
@@ -86,16 +101,25 @@ $fechaActual = date('Y-m-d');
     </main>
 
     <script>
-    // Inicializar la fecha leyendo estrictamente lo que devolvió PHP
+    // Inicializar elementos de fecha
     const inputFechaElem = document.getElementById('input-fecha-chuleta');
     const partesFecha = (inputFechaElem && inputFechaElem.value) ? inputFechaElem.value.split('-') : [];
 
-    // Crear el objeto fecha con año, mes (indexado en 0) y día exactos
     let fechaSeleccionadaObj = partesFecha.length === 3 
         ? new Date(parseInt(partesFecha[0]), parseInt(partesFecha[1]) - 1, parseInt(partesFecha[2]))
         : new Date();
 
+    // Sincronización del Modo Oscuro con la clave `theme_mode` del Encargado
     document.addEventListener('DOMContentLoaded', () => {
+        const temaGuardado = localStorage.getItem("theme_mode");
+        const prefiereOscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        if (temaGuardado === "dark" || (!temaGuardado && prefiereOscuro)) {
+            document.body.classList.add("dark-mode");
+        } else {
+            document.body.classList.remove("dark-mode");
+        }
+
         actualizarInterfazFecha();
         if (inputFechaElem) {
             cargarDatosChuletaPorFecha(inputFechaElem.value);
@@ -155,7 +179,7 @@ $fechaActual = date('Y-m-d');
 
                 if (!data.ventas || data.ventas.length === 0) {
                     contenedor.innerHTML = `
-                        <div class="empty-state-card" style="text-align: center; padding: 20px; color: #94a3b8;">
+                        <div class="empty-state-card" style="text-align: center; padding: 20px; color: var(--chuleta-text-muted, #94a3b8);">
                             <i class="fa-solid fa-inbox fa-2x"></i>
                             <p style="margin-top: 8px;">Sin ventas registradas en Chuleta Ahumada</p>
                         </div>`;

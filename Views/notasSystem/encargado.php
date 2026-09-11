@@ -1,5 +1,9 @@
 <?php
 session_start();
+
+$rolesPermitidos = [1, 5];
+require_once __DIR__ . '/../../Config/cadenero.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -11,6 +15,8 @@ session_start();
     <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    
+  
 
     <header class="app-header">
         <h1>Grupo Cárnico América</h1>
@@ -82,25 +88,32 @@ session_start();
                     <div class="resumen-card-details">
                         <h4>Pierna</h4>
                         <p class="resumen-metrics">
-                            <span class="highlight-qty">124</span> <small>piezas</small>
+                            <span class="highlight-qty" id="resumen-pierna-pzs">...</span> <small>piezas</small>
                             <span class="metric-dot">•</span>
-                            <span class="weight-qty">987.5 kg</span>
+                            <span class="weight-qty" id="resumen-pierna-kg">... kg</span>
                         </p>
                     </div>
                 </div>
 
                 <!-- Pecho -->
-                <div class="resumen-card">
+                <div class="resumen-card clickable-card" onclick="abrirModuloPecho()">
                     <div class="resumen-card-icon">
                         <img src="../../SRC/productos/pecho.jpeg" alt="Pecho" class="img-producto">
                     </div>
                     <div class="resumen-card-details">
                         <h4>Pecho</h4>
-                        <p class="resumen-metrics">
-                            <span class="highlight-qty">350</span> <small>piezas</small>
-                            <span class="metric-dot">•</span>
-                            <span class="weight-qty">1,245.0 kg</span>
-                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 5px;">
+                            <p class="resumen-metrics" style="margin: 0;">
+                                <span class="highlight-qty" id="resumen-pecho-suelto-pzs">...</span> <small>pzs (suelto)</small>
+                                <span class="metric-dot">•</span>
+                                <span class="weight-qty" id="resumen-pecho-suelto-kg">... kg</span>
+                            </p>
+                            <p class="resumen-metrics" style="margin: 0;">
+                                <span class="highlight-qty" id="resumen-pecho-caja-pzs">...</span> <small>cajas</small>
+                                <span class="metric-dot">•</span>
+                                <span class="weight-qty" id="resumen-pecho-caja-kg">... kg</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -112,7 +125,7 @@ session_start();
                     <div class="resumen-card-details">
                         <h4>Mazo</h4>
                         <p class="resumen-metrics">
-                            <span class="highlight-qty">280</span> <small>piezas</small>
+                            <span class="highlight-qty" id="resumen-mazo-pzs">...</span> <small>piezas</small>
                         </p>
                     </div>
                 </div>
@@ -125,7 +138,7 @@ session_start();
                     <div class="resumen-card-details">
                         <h4>Manteca</h4>
                         <p class="resumen-metrics">
-                            <span class="highlight-qty">86</span> <small>unidades</small>
+                            <span class="highlight-qty" id="resumen-manteca-pzs">...</span> <small>unidades</small>
                         </p>
                     </div>
                 </div>
@@ -138,9 +151,9 @@ session_start();
                     <div class="resumen-card-details">
                         <h4>Chuleta ahumada</h4>
                         <p class="resumen-metrics">
-                            <span class="highlight-qty">95</span> <small>piezas</small>
+                            <span class="highlight-qty" id="resumen-chuleta-pzs">...</span> <small>piezas</small>
                             <span class="metric-dot">•</span>
-                            <span class="weight-qty">425.0 kg</span>
+                            <span class="weight-qty" id="resumen-chuleta-kg">... kg</span>
                         </p>
                     </div>
                 </div>
@@ -182,6 +195,28 @@ session_start();
                 </div>
             </section>
 
+             <section class="card">
+                <h2 class="card-title"><i class="fa-solid fa-sliders"></i> Ajustes de Captura</h2>
+                
+                <!-- TOGGLE DE MODO OSCURO -->
+                <div class="toggle-control" style="margin-bottom: 16px;">
+                    <label for="toggle-dark-mode" style="margin: 0; cursor: pointer;">
+                        <i class="fa-solid fa-moon"></i> Modo Oscuro
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-dark-mode" onchange="toggleDarkMode(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Modo de Conexión</label>
+                    <select class="form-control" disabled>
+                        <option>En Línea (BD LFI Principal)</option>
+                    </select>
+                </div>
+            </section>
+
             <section class="card">
                 <h2 class="card-title"><i class="fa-solid fa-circle-info"></i> Sistema</h2>
                 <p style="font-size: 0.9rem; color: #64748b;"><strong>LFI Ventas Móvil:</strong> v1.0</p>
@@ -196,6 +231,8 @@ session_start();
         </div>
 
         <div class="spacer"></div>
+
+
     </main>
 
     <!-- NAVEGACIÓN INFERIOR -->
@@ -221,8 +258,8 @@ session_start();
             <div class="modal-body">
                 <form id="formAprobarNota">
                     <input type="hidden" id="modal_aprobar_id_nota" name="id_nota">
-                    
-                    <div class="form-group">
+
+                    <div class="form-group" id="grupo_folio_ticket">
                         <label>Folio de Ticket (Entregado en Caja) *</label>
                         <input type="text" id="folio_ticket_1" name="folios[]" class="form-control" required placeholder="Ej. TKT-00123">
                     </div>
@@ -284,7 +321,7 @@ session_start();
             </div>
         </div>
     </div>
-
+    
     <script src="encargado.js"></script>
     
 </body>

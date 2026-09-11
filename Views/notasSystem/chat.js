@@ -344,6 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnBackToUsers) btnBackToUsers.addEventListener('click', regresarAContactos);
 
+    // --- BÚSQUEDA CORREGIDA (Usuarios y Grupos) ---
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const busqueda = e.target.value.toLowerCase().trim();
@@ -352,10 +353,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderizarListaUsuarios(chatsActivosGuardados);
             } else {
                 if (sidebarTitle) sidebarTitle.textContent = "Resultados";
-                const filtrados = todosLosUsuariosGlobales.filter(u => 
-                    u.apodoUsuario.toLowerCase().includes(busqueda) || 
-                    (u.nombreUsuario && u.nombreUsuario.toLowerCase().includes(busqueda))
-                );
+                
+                // Combina los chats activos (contactos + grupos) y todos los usuarios globales
+                const mapaEntidades = new Map();
+
+                chatsActivosGuardados.forEach(c => mapaEntidades.set(`${c.tipo}_${c.idCuenta}`, c));
+                todosLosUsuariosGlobales.forEach(u => {
+                    const key = `usuario_${u.idCuenta}`;
+                    if (!mapaEntidades.has(key)) {
+                        mapaEntidades.set(key, { ...u, tipo: 'usuario' });
+                    }
+                });
+
+                const listaUnificada = Array.from(mapaEntidades.values());
+
+                const filtrados = listaUnificada.filter(item => {
+                    const apodoMatch = item.apodoUsuario && item.apodoUsuario.toLowerCase().includes(busqueda);
+                    const nombreMatch = item.nombreUsuario && item.nombreUsuario.toLowerCase().includes(busqueda);
+                    return apodoMatch || nombreMatch;
+                });
+
                 renderizarListaUsuarios(filtrados);
             }
         });
@@ -573,7 +590,6 @@ document.addEventListener('DOMContentLoaded', () => {
             chatModal.classList.add('show');
             posicionarVentanaOptima();
             
-            // Un pequeño timeout para asegurar que el navegador procese display: flex antes de animar
             setTimeout(() => {
                 chatModal.classList.add('active');
             }, 10);
@@ -583,7 +599,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             chatModal.classList.remove('active');
             
-            // Espera a que la transición de opacidad finalice antes de ocultarlo completamente
             setTimeout(() => {
                 if (!chatAbierto) {
                     chatModal.classList.remove('show');
