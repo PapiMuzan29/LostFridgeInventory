@@ -163,6 +163,7 @@ class modeloEncargado {
         }
     }
 
+<<<<<<< HEAD
    public function obtenerInventarioTemporalSalMazo(): array {
         // LEFT JOIN garantiza que siempre salgan en la lista, aunque no tengan inventario temporal (saldrán con 0)
         $sql = "SELECT 
@@ -174,11 +175,18 @@ class modeloEncargado {
                     IFNULL(i.cantidadPeso, 0) AS cantidadPeso 
                 FROM Producto p 
                 LEFT JOIN InventarioTemporalSalida i ON p.idProducto = i.idProducto 
+=======
+    public function obtenerInventarioTemporalSalMazo(): array {
+        $sql = "SELECT i.idSalidaTemporal, p.nombreProducto, i.cantidadPiezas, i.cantidadCajas, i.cantidadPeso 
+                FROM InventarioTemporalSalida i 
+                INNER JOIN Producto p ON i.idProducto = p.idProducto 
+>>>>>>> beb00f58658791e7720c2fe68ba23687240d3566
                 WHERE p.nombreProducto LIKE '%Mazo%' OR p.nombreProducto LIKE '%Sal%'";
         
         return $this->db->select($sql) ?: [];
     }
 
+<<<<<<< HEAD
     public function actualizarInventarioTemporal(int $idTemp, int $idProd, int $piezas, int $cajas, float $kilos): bool {
         // Si no hay fila previa y tampoco están metiendo datos, no hacemos nada para no ensuciar la BD
         if ($idTemp === 0 && $piezas === 0 && $cajas === 0 && $kilos == 0) {
@@ -232,4 +240,14 @@ class modeloEncargado {
         $this->db->update($sql, [$nuevoEstado, $idNota]);
         return true;
     }
+=======
+    public function actualizarInventarioTemporal(int $idTemp, int $piezas, int $cajas, float $kilos): bool {
+        $sql = "UPDATE InventarioTemporalSalida 
+                SET cantidadPiezas = ?, cantidadCajas = ?, cantidadPeso = ? 
+                WHERE idSalidaTemporal = ?";
+        
+        $resultado = $this->db->update($sql, [$piezas, $cajas, $kilos, $idTemp]);
+        return $resultado !== false;
+    }
+>>>>>>> beb00f58658791e7720c2fe68ba23687240d3566
 }

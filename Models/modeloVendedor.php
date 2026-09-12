@@ -31,11 +31,19 @@ class modeloVendedor {
         $sql = "SELECT 
                     i.idSalidaTemporal,
                     i.idProducto AS id_producto,
-                    COALESCE(l.codigoLote, p.nombreProducto) AS nombreProducto,
+                    COALESCE(
+                        l.codigoLote, 
+                        (SELECT l_sub.codigoLote FROM lote l_sub WHERE l_sub.idProducto = i.idProducto AND l_sub.activo = 1 AND l_sub.pesoActual > 0 ORDER BY l_sub.idLote DESC LIMIT 1),
+                        p.nombreProducto
+                    ) AS nombreProducto,
                     p.porPiezas,
                     p.precio,
                     i.cantidadCajas,
-                    COALESCE(l.pesoActual, i.cantidadPeso) AS cantidadPeso,
+                    COALESCE(
+                        l.pesoActual, 
+                        (SELECT l_sub.pesoActual FROM lote l_sub WHERE l_sub.idProducto = i.idProducto AND l_sub.activo = 1 AND l_sub.pesoActual > 0 ORDER BY l_sub.idLote DESC LIMIT 1),
+                        i.cantidadPeso
+                    ) AS cantidadPeso,
                     i.cantidadPiezas,
                     i.observaciones
                 FROM InventarioTemporalSalida i
@@ -83,7 +91,7 @@ class modeloVendedor {
                 $totalKilosDisponibles = ($dbCajas * 10) + $dbKilos;
                 
                 if ($kilos < 1) return ['exito' => false, 'mensaje' => "El mínimo de venta para $nombre es 1 kg."];
-                if ($kilos > $totalKilosDisponibles) return ['exito' => false, 'mensaje' => "Solo hay " . number_format($totalKilosDisponibles, 2) . " kg disponibles de $nombre (equivale a $dbCajas bultos)."];
+                if ($kilos > $totalKilosDisponibles) return ['exito' => false, 'mensaje' => "Solo hay " . number_format($totalKilosDisponibles, 2) . " kg disponibles de $nombre (equivalente a $dbCajas bultos cerrados)."];
                 
             } elseif ($esPorPiezas) {
                 if ($piezas <= 0) return ['exito' => false, 'mensaje' => "Debes ingresar la cantidad de piezas para $nombre."];
@@ -113,7 +121,7 @@ class modeloVendedor {
                 $sqlDetalle = "INSERT INTO detalle_notas (id_nota, idProducto, kilos, piezas) VALUES (?, ?, ?, ?)";
                 $this->db->insert($sqlDetalle, [$idNota, $idProd, $kilos, $piezas]);
 
-                $sqlInv = "SELECT idSalidaTemporal, cantidadPeso, cantidadPiezas, cantidadCajas, p.porPiezas 
+                $sqlInv = "SELECT idSalidaTemporal, cantidadPeso, cantidadPiezas, cantidadCajas, p.porPiezas, p.nombreProducto 
                            FROM InventarioTemporalSalida i
                            INNER JOIN Producto p ON i.idProducto = p.idProducto
                            WHERE i.idProducto = ?";
@@ -122,12 +130,20 @@ class modeloVendedor {
                 if (!empty($resInv)) {
                     $idTemp = $resInv[0]['idSalidaTemporal'];
                     $esPorPieza = intval($resInv[0]['porPiezas']) === 1;
+                    $esSal = (strpos(strtolower($resInv[0]['nombreProducto']), 'sal') !== false);
                     
                     $cajasActuales = intval($resInv[0]['cantidadCajas']);
                     $piezasActuales = intval($resInv[0]['cantidadPiezas']);
                     $pesoActual = floatval($resInv[0]['cantidadPeso']);
 
-                    if ($esPorPieza) {
+                    if ($esSal) {
+                        $kilosTotales = ($cajasActuales * 10) + $pesoActual;
+                        $kilosTotales -= $kilos;
+                        $kilosTotales = max(0, $kilosTotales);
+                        
+                        $cajasActuales = (int)floor($kilosTotales / 10);
+                        $pesoActual = $kilosTotales - ($cajasActuales * 10);
+                    } elseif ($esPorPieza) {
                         if ($cajasActuales > 0) {
                             $cajasActuales -= $piezas;
                         } else {
@@ -170,18 +186,29 @@ class modeloVendedor {
             $kilosDev = floatval($det['kilos']);
             $piezasDev = intval($det['piezas']);
 
-            $sqlProd = "SELECT porPiezas FROM Producto WHERE idProducto = ?";
+            $sqlProd = "SELECT porPiezas, nombreProducto FROM Producto WHERE idProducto = ?";
             $resProd = $this->db->select($sqlProd, [$idProd]);
             if (empty($resProd)) continue;
 
             $esPorPieza = intval($resProd[0]['porPiezas']) === 1;
+            $esSal = (strpos(strtolower($resProd[0]['nombreProducto']), 'sal') !== false);
 
             $sqlTemp = "SELECT idSalidaTemporal, cantidadPeso, cantidadPiezas, cantidadCajas FROM InventarioTemporalSalida WHERE idProducto = ?";
             $resTemp = $this->db->select($sqlTemp, [$idProd]);
 
             if (!empty($resTemp)) {
                 $idTemp = $resTemp[0]['idSalidaTemporal'];
-                if ($esPorPieza) {
+
+                if ($esSal) {
+                    $kilosTotales = ($resTemp[0]['cantidadCajas'] * 10) + $resTemp[0]['cantidadPeso'];
+                    $kilosTotales += $kilosDev;
+                    
+                    $nuevasCajas = (int)floor($kilosTotales / 10);
+                    $nuevoPeso = $kilosTotales - ($nuevasCajas * 10);
+                    
+                    $this->db->update("UPDATE InventarioTemporalSalida SET cantidadCajas = ?, cantidadPeso = ? WHERE idSalidaTemporal = ?", [$nuevasCajas, $nuevoPeso, $idTemp]);
+                    
+                } elseif ($esPorPieza) {
                     $cajasActuales = intval($resTemp[0]['cantidadCajas']);
                     if ($cajasActuales > 0 || $piezasDev > 0) {
                         if ($cajasActuales > 0) {
@@ -194,9 +221,16 @@ class modeloVendedor {
                     $this->db->update("UPDATE InventarioTemporalSalida SET cantidadPeso = cantidadPeso + ? WHERE idSalidaTemporal = ?", [$kilosDev, $idTemp]);
                 }
             } else {
-                $cajasIns = $esPorPieza ? $piezasDev : 0;
-                $piezasIns = 0;
-                $pesoIns = !$esPorPieza ? $kilosDev : 0.00;
+                if ($esSal) {
+                    $cajasIns = (int)floor($kilosDev / 10);
+                    $pesoIns = $kilosDev - ($cajasIns * 10);
+                    $piezasIns = 0;
+                } else {
+                    $cajasIns = $esPorPieza ? $piezasDev : 0;
+                    $piezasIns = 0;
+                    $pesoIns = !$esPorPieza ? $kilosDev : 0.00;
+                }
+                
                 $this->db->insert("INSERT INTO InventarioTemporalSalida (idProducto, cantidadCajas, cantidadPiezas, cantidadPeso) VALUES (?, ?, ?, ?)", [$idProd, $cajasIns, $piezasIns, $pesoIns]);
             }
         }

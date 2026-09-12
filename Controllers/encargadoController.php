@@ -143,20 +143,30 @@ switch ($action) {
         }
         
         $idTemp = (int)($_POST['id_temporal'] ?? 0);
+<<<<<<< HEAD
         $idProd = (int)($_POST['id_producto'] ?? 0); // <-- NUEVO
+=======
+>>>>>>> beb00f58658791e7720c2fe68ba23687240d3566
         $piezas = (int)($_POST['piezas'] ?? 0);
         $cajas = (int)($_POST['cajas'] ?? 0);
         $kilos = (float)($_POST['kilos'] ?? 0);
 
+<<<<<<< HEAD
         // Ahora evaluamos si tenemos cualquiera de los dos IDs
         if ($idTemp > 0 || $idProd > 0) {
             try {
                 $modelo->actualizarInventarioTemporal($idTemp, $idProd, $piezas, $cajas, $kilos);
+=======
+        if ($idTemp > 0) {
+            try {
+                $modelo->actualizarInventarioTemporal($idTemp, $piezas, $cajas, $kilos);
+>>>>>>> beb00f58658791e7720c2fe68ba23687240d3566
                 echo json_encode(['success' => true, 'message' => 'Inventario ajustado correctamente.']);
             } catch (Exception $e) {
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
         } else {
+<<<<<<< HEAD
             echo json_encode(['success' => false, 'message' => 'Datos de producto inválidos.']);
         }
         break;
@@ -221,6 +231,12 @@ switch ($action) {
             echo json_encode(['success' => false, 'message' => 'Acción desconocida.']);
         }
         break;
+=======
+            echo json_encode(['success' => false, 'message' => 'ID de inventario inválido.']);
+        }
+        break;
+
+>>>>>>> beb00f58658791e7720c2fe68ba23687240d3566
     default:
         echo json_encode(['success' => false, 'message' => 'Acción no válida.']);
         break;

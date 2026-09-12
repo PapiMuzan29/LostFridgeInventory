@@ -1225,13 +1225,17 @@ window.toggleDarkMode = function (isDark) {
 // MINI INVENTARIO TEMPORAL (MAZOS Y SAL)
 // ==========================================
 
+// ==========================================
+// MINI INVENTARIO TEMPORAL (MAZOS Y SAL)
+// ==========================================
+
 function cargarInventarioTemporalRuta() {
     fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=listarInvTemporal')
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById('tabla-inventario-temporal');
             if (!data.success || data.inventario.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:15px; color:#64748b;">No hay productos configurados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:15px; color:#64748b;">No hay Mazos ni Sal en ruta.</td></tr>';
                 return;
             }
 
@@ -1240,11 +1244,13 @@ function cargarInventarioTemporalRuta() {
                 let stockVisual = '';
                 
                 if (esSal) {
+                    // Solo mostramos Bultos
                     stockVisual = `<span style="font-weight:bold; color:var(--text-main);">${item.cantidadCajas}</span> bultos`;
                 } else {
                     stockVisual = `<span style="font-weight:bold; color:var(--text-main);">${item.cantidadPiezas}</span> pzs`;
                 }
 
+                // Escapar comillas para el onclick
                 const nombreSeguro = item.nombreProducto.replace(/'/g, "\\'");
 
                 return `
@@ -1252,8 +1258,7 @@ function cargarInventarioTemporalRuta() {
                         <td style="padding: 12px 15px; font-weight:600;">${item.nombreProducto}</td>
                         <td style="padding: 12px 15px;">${stockVisual}</td>
                         <td style="padding: 12px 15px; text-align: center;">
-                            <!-- NUEVO: Pasamos también item.idProducto -->
-                            <button type="button" class="btn-edit-inv" onclick="abrirModalInvTemp(${item.idSalidaTemporal}, ${item.idProducto}, '${nombreSeguro}', ${item.cantidadPiezas}, ${item.cantidadCajas})">
+                            <button type="button" class="btn-edit-inv" onclick="abrirModalInvTemp(${item.idSalidaTemporal}, '${nombreSeguro}', ${item.cantidadPiezas}, ${item.cantidadCajas})">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
                         </td>
@@ -1264,14 +1269,14 @@ function cargarInventarioTemporalRuta() {
         .catch(err => console.error("Error al cargar inventario ruta:", err));
 }
 
-function abrirModalInvTemp(idTemp, idProducto, nombre, piezas, cajas) {
-    registrarModalEnHistorial(); 
+function abrirModalInvTemp(id, nombre, piezas, cajas) {
+    registrarModalEnHistorial(); // Protección del botón atrás del celular
     
-    document.getElementById('modal_inv_id').value = idTemp;
-    document.getElementById('modal_inv_id_producto').value = idProducto; // <-- NUEVO
+    document.getElementById('modal_inv_id').value = id;
     document.getElementById('modal_inv_nombre').value = nombre;
     
     const esSal = nombre.toLowerCase().includes('sal');
+    
     const divPiezas = document.getElementById('grupo_inv_piezas');
     const divCajas = document.getElementById('grupo_inv_cajas');
     
@@ -1321,39 +1326,4 @@ document.getElementById('formEditarInvTemp')?.addEventListener('submit', functio
 // Inicializar la tabla al cargar
 document.addEventListener('DOMContentLoaded', () => {
     cargarInventarioTemporalRuta();
-});
-
-// ==========================================
-// BLOQUEO DE SCROLL AUTOMÁTICO PARA MODALES
-// ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Inyectamos la regla CSS de bloqueo automáticamente
-    const style = document.createElement('style');
-    style.innerHTML = `
-        body.no-scroll {
-            overflow: hidden !important;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // 2. Creamos el vigilante (Observer)
-    const observer = new MutationObserver(() => {
-        // Buscamos si hay CUALQUIER modal abierto en la pantalla
-        const modalesAbiertos = document.querySelectorAll(
-            '.modal-overlay.active, ' + 
-            '.modal-alert-overlay[style*="display: flex"], ' + 
-            '.modal-overlay[style*="display: flex"]'
-        );
-        
-        if (modalesAbiertos.length > 0) {
-            document.body.classList.add('no-scroll'); // Bloquea la pantalla trasera
-        } else {
-            document.body.classList.remove('no-scroll'); // Libera la pantalla trasera
-        }
-    });
-
-    // 3. Asignamos el vigilante a todos los modales de la página
-    document.querySelectorAll('.modal-overlay, .modal-alert-overlay').forEach(modal => {
-        observer.observe(modal, { attributes: true, attributeFilter: ['class', 'style'] });
-    });
 });
