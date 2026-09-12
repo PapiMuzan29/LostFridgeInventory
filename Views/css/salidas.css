@@ -52,18 +52,11 @@ body {
 }
 
 .logo-lfi {
-    width: 140px;          
+    width: 140px;           /* Cuadrado perfecto mantenido */
     height: 140px;         
-    object-fit: contain;   
+    object-fit: contain;    /* Ajuste limpio sin recortes */
     display: block;
-    margin: 0 auto 20px auto; 
-    margin-top: 10px;      
-    width: 140px;          /* Ajusta este valor al ancho ideal para tu barra */
-    height: 140px;         /* Manténlo igual al width para que sea un cuadrado perfecto */
-    object-fit: contain;   /* ESTO ES CLAVE: hace que toda la imagen quepa dentro del espacio sin recortar */
-    display: block;
-    margin: 0 auto 20px auto; 
-    margin-top: 10px;      /* Ajusté un poco el margen para que no toque el borde superior */
+    margin: 10px auto 20px auto; /* Márgenes unificados correctamente */
 }
 
 .titulo-lfi {
@@ -360,7 +353,7 @@ body {
     transform: scale(1.15);
 }
 
-/* --- CURSOR DE CERDITO SIEMPRE ARRIBA Y CLIC-THROUGH --- */
+/* --- CURSOR DE CERDITO --- */
 
 #cerditoCursor {
     position: fixed !important;
@@ -390,8 +383,9 @@ body {
     flex-direction: column;
     gap: 12px;
 }
+
 /* ================================================= */
-/* FORMULARIO SUPERIOR EN GRID (IDÉNTICO A ENTRADAS)  */
+/* FORMULARIO SUPERIOR EN GRID                       */
 /* ================================================= */
 .formulario-matriz-grid {
     display: grid;
@@ -405,7 +399,7 @@ body {
 }
 
 /* =================================================================== */
-/* CORRECCIÓN DE MODO OSCURO EN SALIDAS (Usando dark-theme)            */
+/* CORRECCIÓN DE MODO OSCURO EN SALIDAS                              */
 /* =================================================================== */
 body.dark-theme .card-entrada,
 body.dark-theme .tabla-partidas-container,
@@ -435,7 +429,4 @@ body.dark-theme #tablaPartidasBody input {
     background-color: #18181b !important;
     color: #ffffff !important;
     border: 1px solid #27272a !important;
-/* Campos que ocupan las dos columnas completas (como Motivo y Almacén) */
-.text-span-2 {
-    grid-column: span 2;
-}
+} /* ⚠️ Llave de cierre agregada correctamente aquí */

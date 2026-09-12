@@ -25,22 +25,22 @@ class salidasServicio {
 
     public function getSalidas($busqueda = '', $estado = '') {
         $sql = "SELECT 
-                    n.idNotas AS id,
-                    DATE_FORMAT(n.fechaCreacion, '%Y-%m-%d %H:%i') AS fecha,
+                    n.id_nota AS id,
+                    DATE_FORMAT(n.fecha_creacion, '%Y-%m-%d %H:%i') AS fecha,
                     COALESCE(c.nombreCliente, 'Sin Cliente') AS producto,
-                    COALESCE(SUM(dn.cantidad), 0) AS cantidad,
+                    COALESCE(SUM(dn.kilos), 0) AS cantidad,
                     cu.apodoUsuario AS responsable,
                     n.estado AS estado
-                FROM Notas n
-                LEFT JOIN Cliente c ON n.idCliente = c.idCliente
-                LEFT JOIN Cuenta cu ON n.idCuenta = cu.idCuenta
-                LEFT JOIN DetalleNotas dn ON n.idNotas = dn.idNotas
+                FROM notas n
+                LEFT JOIN cliente c ON n.id_cliente = c.idCliente
+                LEFT JOIN cuenta cu ON n.id_vendedor = cu.idCuenta
+                LEFT JOIN detalle_notas dn ON n.id_nota = dn.id_nota
                 WHERE 1=1";
         
         $parametros = [];
 
         if (!empty($busqueda)) {
-            $sql .= " AND (c.nombreCliente LIKE :busqueda OR n.folioTicketCaja LIKE :busqueda OR cu.apodoUsuario LIKE :busqueda)";
+            $sql .= " AND (c.nombreCliente LIKE :busqueda OR n.folio LIKE :busqueda OR cu.apodoUsuario LIKE :busqueda)";
             $parametros[':busqueda'] = '%' . $busqueda . '%';
         }
 
@@ -49,8 +49,8 @@ class salidasServicio {
             $parametros[':estado'] = $estado;
         }
 
-        $sql .= " GROUP BY n.idNotas, n.fechaCreacion, c.nombreCliente, cu.apodoUsuario, n.estado";
-        $sql .= " ORDER BY n.fechaCreacion DESC";
+        $sql .= " GROUP BY n.id_nota, n.fecha_creacion, c.nombreCliente, cu.apodoUsuario, n.estado";
+        $sql .= " ORDER BY n.fecha_creacion DESC";
 
         $stmt = $this->conexion->prepare($sql);
         $stmt->execute($parametros);
@@ -66,7 +66,7 @@ class salidasServicio {
             'entregadas' => 0
         ];
 
-        $sql = "SELECT estado, COUNT(*) as total_estado FROM Notas GROUP BY estado";
+        $sql = "SELECT estado, COUNT(*) as total_estado FROM notas GROUP BY estado";
         $stmt = $this->conexion->query($sql);
         $resultados = $stmt->fetchAll();
 
@@ -74,7 +74,7 @@ class salidasServicio {
             $stats['total'] += $fila['total_estado'];
             
             $estadoStr = strtolower($fila['estado']);
-            if ($estadoStr === 'aprobada') {
+            if ($estadoStr === 'cobrado' || $estadoStr === 'aprobada') {
                 $stats['aprobadas'] += $fila['total_estado'];
             } elseif ($estadoStr === 'pendiente' || $estadoStr === 'revision') {
                 $stats['pendientes'] += $fila['total_estado'];
@@ -108,8 +108,8 @@ class salidasServicio {
             $totalKgs = $datos['total_kgs'] ?? ($datos['totalKgs'] ?? 0);
             $totalCajas = $datos['cantidad_cajas'] ?? ($datos['total_cajas'] ?? count($datos['detalle']));
 
-            // Registrar en Notas
-            $sqlNota = "INSERT INTO Notas (idCliente, idCuenta, estado, folioTicketCaja, fechaCreacion) VALUES (?, ?, 'Aprobada', ?, NOW())";
+            // Registrar en Notas (con id_cliente incluido)
+            $sqlNota = "INSERT INTO notas (id_cliente, id_vendedor, estado, folio, fecha_creacion) VALUES (?, ?, 'PENDIENTE', ?, NOW())";
             $stmtNota = $this->conexion->prepare($sqlNota);
             $folioSimulado = "SAL-" . date('Ymd-His');
             $stmtNota->execute([
@@ -121,17 +121,14 @@ class salidasServicio {
             $idNotas = $this->conexion->lastInsertId();
 
             $stmtProd = $this->conexion->prepare("SELECT idProducto FROM producto WHERE TRIM(codigoProducto) = TRIM(?) LIMIT 1");
-            $stmtDetalleNota = $this->conexion->prepare("INSERT INTO DetalleNotas (idNotas, idProducto, cantidad, pesoNeto) VALUES (?, ?, ?, ?)");
             
-            // Sentencias directas y seguras para actualizar stock y lotes
+            // 🎯 Registramos el total de piezas correctamente en el campo 'piezas' de detalle_notas
+            $stmtDetalleNota = $this->conexion->prepare("INSERT INTO detalle_notas (id_nota, idProducto, kilos, piezas) VALUES (?, ?, ?, ?)");
+            
             $stmtUpdateStock = $this->conexion->prepare("UPDATE producto SET totalCajas = GREATEST(0, IFNULL(totalCajas, 0) - ?), totalPeso = GREATEST(0, IFNULL(totalPeso, 0) - ?) WHERE idProducto = ?");
             $stmtUpdateLote = $this->conexion->prepare("UPDATE lote SET pesoActual = GREATEST(0, pesoActual - ?), activo = IF(pesoActual - ? <= 0, 0, 1) WHERE idLote = ?");
 
             foreach ($datos['detalle'] as $item) {
-                // 🔍 Rastreo para verificar las propiedades que llegan desde el JS
-                error_log("ITEM RECIBIDO EN SERVICIO: " . json_encode($item));
-
-                // Captura infalible de IDs cubriendo todas las variantes posibles del frontend
                 $idLote = intval($item['id_lote'] ?? ($item['idLote'] ?? 0));
                 $idProducto = intval($item['id_producto'] ?? ($item['idProducto'] ?? ($item['id'] ?? ($item['id_lote'] ?? 0))));
 
@@ -141,18 +138,16 @@ class salidasServicio {
                     $idProducto = $productoBD ? intval($productoBD['idProducto']) : 0;
                 }
 
-                $cantidadItem = intval($item['cantidad'] ?? ($item['cajas'] ?? ($item['cantidadCajas'] ?? 1)));
+                $cantidadItem = intval($item['cantidad'] ?? ($item['cajas'] ?? ($item['cantidadCajas'] ?? ($item['piezas'] ?? 1))));
                 $kgsItem = floatval($item['kgs'] ?? ($item['peso'] ?? 0));
 
-                // Registrar en detalle de la nota
                 $stmtDetalleNota->execute([
                     $idNotas,
                     $idProducto > 0 ? $idProducto : null,
-                    $cantidadItem,
-                    $kgsItem
+                    $kgsItem,
+                    $cantidadItem
                 ]);
 
-                // 🛑 Descuento obligatorio en inventario general (tabla producto)
                 if ($idProducto > 0) {
                     $stmtUpdateStock->execute([
                         $cantidadItem,
@@ -161,13 +156,11 @@ class salidasServicio {
                     ]);
                 }
 
-                // 🛑 Descuento obligatorio en la tabla lote si viene especificado
                 if ($idLote > 0) {
                     $stmtUpdateLote->execute([$kgsItem, $kgsItem, $idLote]);
                 }
             }
 
-            // Registrar movimiento en bitácora
             $desc = "Se registró la salida ID {$idNotas} con {$totalCajas} items ({$totalKgs} Kgs) - Concepto: {$concepto}.";
             $stmtBitacora = $this->conexion->prepare("INSERT INTO bitacora_movimientos (tipo, usuarioResponsable, descripcion, moduloAfectado, fecha, hora) VALUES ('salida', ?, ?, 'Salidas', CURDATE(), CURTIME())");
             $stmtBitacora->execute([
@@ -176,7 +169,7 @@ class salidasServicio {
             ]);
 
             $this->conexion->commit();
-            return ["success" => true, "folio" => $idNotas, "mensaje" => "Salida procesada y stock descontado correctamente."];
+            return ["success" => true, "folio" => $idNotas, "mensaje" => "Salida procesada, piezas registradas y stock descontado correctamente."];
 
         } catch (Exception $e) {
             if ($this->conexion->inTransaction()) {
@@ -193,12 +186,7 @@ class salidasServicio {
             $stmt = $this->conexion->query($sql);
             return $stmt->fetchAll() ?: [];
         } catch (Exception $e) {
-            try {
-                $stmtAlt = $this->conexion->query("SELECT idProveedor as idCliente, nombreProveedor as nombreCliente FROM proveedor ORDER BY nombreProveedor ASC");
-                return $stmtAlt->fetchAll() ?: [];
-            } catch (Exception $ex) {
-                return [];
-            }
+            return [];
         }
     }
 
@@ -213,7 +201,6 @@ class salidasServicio {
             $stmt = $this->conexion->query($sql);
             return $stmt->fetchAll() ?: [];
         } catch (Exception $e) {
-            error_log("Error en listarCombosDisponiblesParaSalida: " . $e->getMessage());
             return [];
         }
     }
@@ -227,7 +214,6 @@ class salidasServicio {
             $stmt = $this->conexion->query($sql);
             return $stmt->fetchAll() ?: [];
         } catch (Exception $e) {
-            error_log("Error en listarMantecaDisponiblesParaSalida: " . $e->getMessage());
             return [];
         }
     }
@@ -245,12 +231,9 @@ class salidasServicio {
             if ($tramaLimpia !== '071641041752') {
                 $parteFinal = mb_substr($tramaLimpia, -2, 2, 'UTF-8'); 
                 $codigoProducto = ltrim($parteFinal, '0');
-                if (empty($codigoProducto)) {
-                    $codigoProducto = ltrim(mb_substr($tramaLimpia, -4), '0');
-                }
             }
 
-            $sql = "SELECT idProducto, codigoProducto, nombreProducto, costo 
+            $sql = "SELECT idProducto, codigoProducto, nombreProducto 
                     FROM producto 
                     WHERE TRIM(codigoProducto) = ? OR TRIM(codigoProducto) = ? LIMIT 1";
             
@@ -260,24 +243,21 @@ class salidasServicio {
             
             $nombreProd = $producto ? $producto['nombreProducto'] : "Plumon negro";
             $codProd = $producto ? $producto['codigoProducto'] : $codigoProducto;
-            $costoProd = $producto['costo'] ?? 0.00;
 
             return [
                 "codigoProducto"      => $codProd,
                 "producto"            => $codProd,
                 "nombreProducto"      => $nombreProd,
                 "descripcion"         => $nombreProd,
-                "descripcionProducto" => $nombreProd,
                 "peso"                => number_format($pesoCalculado, 2, '.', ''),
                 "kgs"                 => number_format($pesoCalculado, 2, '.', ''),
                 "codigoEnteros"       => number_format($pesoCalculado, 2, '.', ''),
                 "codigoDecimales"     => $decimales,
-                "costo"               => $costoProd,
+                "costo"               => 0.00,
                 "cantidad"            => 1
             ];
 
         } catch (Exception $e) {
-            error_log("Error en obtenerProductoPorCodigo (Salidas): " . $e->getMessage());
             return [
                 "codigoProducto"      => "52",
                 "nombreProducto"      => "Plumon negro",
@@ -289,4 +269,3 @@ class salidasServicio {
         }
     }
 }
-?>

@@ -54,6 +54,28 @@ try {
 } catch (Throwable $e) {
     $errorBD = $e->getMessage();
 }
+
+// 🔀 Lógica de redirección inteligente al módulo de notas según el rol de la sesión
+$idRol = $_SESSION['idRol'] ?? 0;
+$destinoNotas = 'notasSystem/vendedor.php'; // Predeterminado
+
+switch ($idRol) {
+    case 1: // Administrador
+        $destinoNotas = 'notasSystem/vendedor.php';
+        break;
+    case 2: // Vendedor
+        $destinoNotas = 'notasSystem/vendedor.php';
+        break;
+    case 5: // Encargado
+        $destinoNotas = 'notasSystem/encargado.php';
+        break;
+    case 6: // Cajero
+        $destinoNotas = 'notasSystem/cajero.php';
+        break;
+    default:
+        $destinoNotas = 'notasSystem/vendedor.php';
+        break;
+}
 ?>
 
 <!DOCTYPE html>
@@ -121,6 +143,13 @@ try {
             </div>
             
             <div style="position: absolute; top: 24px; right: 24px; display: flex; gap: 10px;">
+                <!-- 🔗 BOTÓN DE ACCESO DIRECTO AL MÓDULO DE NOTAS (VISIBILIDAD EXCLUSIVA PARA ADMINISTRADOR) -->
+                <?php if ($esAdmin): ?>
+                <a href="<?= htmlspecialchars($destinoNotas) ?>" class="btnNuevo" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; background: #059669; color: white; padding: 10px 18px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <i class="fa-solid fa-note-sticky"></i> Ir a Notas
+                </a>
+                <?php endif; ?>
+
                 <?php if ($esAdmin): ?>
                     <button type="button" onclick="abrirModalExportar()" style="padding: 10px 18px; cursor: pointer; background: #0d6efd; color: white; border: none; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <i class="fa-solid fa-print"></i> Imprimir Reporte

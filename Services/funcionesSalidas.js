@@ -12,9 +12,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 async function cargarClientesSelect() {
     const select = document.getElementById('idCliente') || document.getElementById('idProveedor');
-// 1. Cargar clientes select
-async function cargarClientesSelect() {
-    const select = document.getElementById('idCliente');
     if (!select) return;
 
     try {
@@ -25,18 +22,13 @@ async function cargarClientesSelect() {
             select.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
             clientes.forEach(cli => {
                 const option = document.createElement('option');
-                option.value = cli.idCliente || cli.idProveedor;
-                option.textContent = cli.nombreCliente || cli.nombreProveedor;
-            select.innerHTML = '<option value="">-- Seleccione un cliente/proveedor --</option>';
-            clientes.forEach(cli => {
-                const option = document.createElement('option');
-                option.value = cli.idCliente || cli.id_cliente;
-                option.textContent = cli.nombreCliente || cli.nombre;
+                option.value = cli.idCliente || cli.idProveedor || cli.id_cliente;
+                option.textContent = cli.nombreCliente || cli.nombreProveedor || cli.nombre;
                 select.appendChild(option);
             });
         }
     } catch (error) {
-        console.warn("⚠️ No se pudieron cargar clientes:", error);
+        console.warn("⚠️ No se pudieron cargar los clientes:", error);
     }
 }
 
@@ -98,10 +90,10 @@ function inicializarSelectorTipoDespacho() {
             tablaCabecera.innerHTML = `
                 <tr style="background: #f8fafc;">
                     <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 40px;">▶</th>
-                    <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0;">Lote</th>
-                    <th style="padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0;">Producto</th>
-                    <th style="padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0;">Descripcion</th>
-                    <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Cantidad (Cajas)</th>
+                    <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0;">Estado</th>
+                    <th style="padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0;">Código</th>
+                    <th style="padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0;">Descripción</th>
+                    <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Cajas</th>
                     <th style="padding: 16px; text-align: right; border-bottom: 1px solid #e2e8f0;">Kgs</th>
                     <th style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 60px;">Quitar</th>
                 </tr>
@@ -125,7 +117,6 @@ async function cargarCombosDisponibles() {
                 opt.value = combo.idLote || combo.idCombo || combo.id;
                 opt.dataset.idProducto = combo.idProducto || '';
                 opt.dataset.pesoBruto = combo.pesoActual || combo.pesoBruto || 0;
-                opt.dataset.pesoOrigen = combo.pesoOrigen || 0;
                 opt.dataset.codigoLote = combo.codigoLote || 'N/A';
                 
                 opt.textContent = `Lote: ${combo.codigoLote || 'N/A'} — ${combo.nombreProducto || 'Combo'} (${combo.pesoActual || 0} kg)`;
@@ -162,7 +153,7 @@ async function cargarMantecaDisponibles() {
         try {
             botes = JSON.parse(textoCrudo);
         } catch (e) {
-            console.error("Error al parsear JSON de mantecas. Respuesta cruda:", textoCrudo);
+            console.error("Error al parsear JSON de mantecas:", textoCrudo);
             selectCombo.innerHTML = '<option value="">-- Error al cargar mantecas --</option>';
             return;
         }
@@ -210,11 +201,6 @@ async function cargarMantecaDisponibles() {
     };
 }
 
-        console.warn("⚠️ Nota: No se pudieron cargar los clientes.", error);
-    }
-}
-
-// 2. Escáner inteligente híbrido: Delega validación y peso al Controlador
 function inicializarEscannerSalidas() {
     const inputCodigo = document.getElementById("inputCodigoBarras");
     const selectCliente = document.getElementById('idCliente') || document.getElementById('idProveedor');
@@ -245,65 +231,31 @@ function inicializarEscannerSalidas() {
 
             const idCliente = selectCliente ? selectCliente.value : '';
             if (!idCliente) {
-                alert("❌ Por favor, seleccione un cliente primero.");
+                alert("❌ Por favor, seleccione un cliente/proveedor primero.");
                 procesandoLectura = false;
                 return;
             }
 
             fetch(`../Controllers/salidasController.php?action=buscarProducto&codigo=${encodeURIComponent(trama)}&idCliente=${idCliente}`)
-                .then(async response => {
-                    if (!response.ok) throw new Error("Error en servidor");
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.error) {
-                        agregarFilaCajaSalida("52", "Plumon negro", 16.41);
-                    } else {
-                        let pesoCalculado = parseFloat(data.peso || data.codigoEnteros || data.kgs) || 16.41;
-                        if (isNaN(pesoCalculado) || pesoCalculado <= 0 || pesoCalculado > 1000) pesoCalculado = 16.41;
-                        
-                        const codigoFinal = data.codigoProducto || data.producto || "52";
-                        const descripcionFinal = data.nombreProducto || data.descripcion || "Plumon negro";
-
-                        agregarFilaCajaSalida(codigoFinal, descripcionFinal, pesoCalculado);
-                    }
-                    procesandoLectura = false;
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    agregarFilaCajaSalida("52", "Plumon negro", 16.41);
-                    procesandoLectura = false;
-            const trama = this.value.trim();
-            const idCliente = selectCliente ? selectCliente.value : '';
-
-            if (!idCliente) {
-                alert("❌ Por favor, seleccione un cliente/proveedor primero.");
-                this.value = "";
-                return;
-            }
-
-            // Enviamos la trama y el ID al servidor. 
-            // El controlador validará si el producto pertenece a este cliente y calculará el peso.
-            fetch(`../Controllers/salidasController.php?action=buscarProducto&codigo=${encodeURIComponent(trama)}&idCliente=${idCliente}`)
                 .then(response => response.json())
                 .then(data => {
-                    // Si el controlador devuelve un error (producto no registrado o de otro proveedor)
                     if (data.error) {
                         alert("❌ " + data.error);
+                        procesandoLectura = false;
                         return;
                     }
 
-                    // Calculamos el peso recibido del controlador
                     const pEntera = data.codigoEnteros || "0";
                     const pDecimal = data.codigoDecimales || "00";
-                    const pesoFinal = parseFloat(`${pEntera}.${pDecimal}`) || 1.00;
+                    const pesoFinal = parseFloat(`${pEntera}.${pDecimal}`) || parseFloat(data.peso) || 16.41;
 
-                    // Pintamos en tabla solo si todo es correcto
-                    agregarFilaSalida(data.codigoProducto, data.nombreProducto, pesoFinal);
+                    agregarFilaSalida(data.codigoProducto || data.producto || "52", data.nombreProducto || data.descripcion || "Producto", pesoFinal);
+                    procesandoLectura = false;
                 })
                 .catch(error => {
                     console.error("Error en la comunicación:", error);
                     alert("❌ Error de comunicación con el servidor.");
+                    procesandoLectura = false;
                 });
 
             this.value = ""; 
@@ -316,15 +268,9 @@ function esTablaCombos() {
     return selectTipo && selectTipo.value === 'combos';
 }
 
-function agregarFilaCajaSalida(codigo, nombreProducto, pesoKgs) {
-    const tbody = document.getElementById('tablaPartidasBody');
-// 3. Pintar fila en la tabla de salidas
 function agregarFilaSalida(codigo, nombreProducto, cantidad) {
-    const tbody = document.querySelector('#tablaPartidasBody') || document.querySelector('tbody');
+    const tbody = document.getElementById('tablaPartidasBody');
     if (!tbody) return;
-
-    const inputCosto = document.getElementById("inputCosto") || document.querySelector("input[placeholder='0.00']");
-    const costoActual = inputCosto ? parseFloat(inputCosto.value) || 0 : 0;
 
     numeroPartida++; 
     const tr = document.createElement('tr');
@@ -336,12 +282,10 @@ function agregarFilaSalida(codigo, nombreProducto, cantidad) {
         <td style="padding: 16px; text-align: center; color: #16a34a; font-weight: 600;">✓</td>
         <td class="partida-codigo" style="padding: 16px; font-weight: 600; text-align: left; color: #1e293b;">${codigo}</td>
         <td style="padding: 16px; text-align: left; color: #334155;">${nombreProducto}</td>
-        <td style="padding: 16px; text-align: right; color: #334155;">
-            <input type="text" class="partida-cajas" value="1" style="width: 50px; text-align: center; padding: 2px; border: 1px solid #cbd5e1; border-radius: 4px;" oninput="actualizarTotalesSalidas()">
+        <td style="padding: 16px; text-align: right;">
+            <input type="number" class="partida-cajas" value="1" min="1" style="width: 60px; text-align: center; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;" oninput="actualizarTotalesSalidas()">
         </td>
-        <td class="partida-cantidad" style="padding: 16px; text-align: right; font-weight: 600; color: #0f172a;">${pesoKgs.toFixed(2)}</td>
-        <td class="partida-cantidad" style="padding: 16px; text-align: right; font-weight: 600;">${cantidad.toFixed(2)}</td>
-        <td style="padding: 16px; text-align: right;">${costoActual.toFixed(2)}</td>
+        <td class="partida-cantidad" style="padding: 16px; text-align: right; font-weight: 600; color: #0f172a;">${cantidad.toFixed(2)}</td>
         <td style="padding: 16px; text-align: center;">
             <button class="btn-borrar-partida" onclick="this.closest('tr').remove(); actualizarTotalesSalidas();" style="background: none; border: none; color: #ef4444; cursor: pointer;">
                 <i class="fas fa-trash"></i>
@@ -375,7 +319,7 @@ function agregarFilaComboSalida(idLote, idProducto, codigoLote, pesoActual) {
         <td style="padding: 12px; text-align: center; color: #64748b;">${numeroPartida}</td>
         <td style="padding: 12px; font-weight: 600; color: #1e293b; text-align: left;">${codigoLote}</td>
         <td style="padding: 12px; text-align: right;">
-            <input type="text" value="${pesoActual > 0 ? pesoActual.toFixed(2) : ''}" class="val-peso-neto" style="width: 180px; text-align: right; font-weight: bold; font-size: 15px; color: #16a34a; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+            <input type="number" step="0.01" value="${pesoActual > 0 ? pesoActual.toFixed(2) : ''}" class="val-peso-neto" style="width: 180px; text-align: right; font-weight: bold; font-size: 15px; color: #16a34a; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px;" oninput="actualizarTotalesSalidas()">
         </td>
         <td style="padding: 12px; text-align: center;">
             <button class="btn-borrar-partida" onclick="removerFilaCombo(this, '${idLote}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px;">
@@ -388,12 +332,9 @@ function agregarFilaComboSalida(idLote, idProducto, codigoLote, pesoActual) {
     const selectCombo = document.getElementById('selectComboInventario');
     if (selectCombo) {
         const optionToHide = selectCombo.querySelector(`option[value="${idLote}"]`);
-        if (optionToHide) {
-            optionToHide.style.display = 'none';
-        }
+        if (optionToHide) optionToHide.style.display = 'none';
     }
 
-    activarCalculoFilaCombo(tr);
     actualizarTotalesSalidas();
 }
 
@@ -442,30 +383,11 @@ function removerFilaCombo(button, idLote) {
         const selectCombo = document.getElementById('selectComboInventario');
         if (selectCombo) {
             const optionToShow = selectCombo.querySelector(`option[value="${idLote}"]`);
-            if (optionToShow) {
-                optionToShow.style.display = 'block';
-            }
+            if (optionToShow) optionToShow.style.display = 'block';
         }
         
         actualizarTotalesSalidas();
     }
-}
-
-function activarCalculoFilaCombo(tr) {
-    const inputPeso = tr.querySelector('.val-peso-neto');
-    if (!inputPeso) return;
-
-    inputPeso.addEventListener('input', () => {
-        actualizarTotalesSalidas();
-function actualizarTotalesSalida() {
-    const cantidades = document.querySelectorAll('.partida-cantidad');
-    let acumuladorKgs = 0;
-    let contadorPartidas = 0;
-
-    cantidades.forEach(td => {
-        acumuladorKgs += parseFloat(td.textContent) || 0;
-        contadorPartidas++;
-    });
 }
 
 function actualizarTotalesSalidas() {
@@ -488,7 +410,7 @@ function actualizarTotalesSalidas() {
         });
     } else if (esTablaCombos()) {
         document.querySelectorAll('#tablaPartidasBody tr').forEach(tr => {
-            acumuladorKgs += parseFloat(tr.querySelector('.val-peso-neto')?.value || tr.querySelector('.val-peso-neto')?.textContent) || 0;
+            acumuladorKgs += parseFloat(tr.querySelector('.val-peso-neto')?.value) || 0;
             contadorItems++;
         });
     } else {
@@ -506,14 +428,6 @@ function actualizarTotalesSalidas() {
 }
 
 function inicializarBotonesSalidas() {
-    const btnGuardar = document.getElementById("btnGuardarSalida");
-    const btnLimpiar = document.getElementById("btnLimpiarPantalla");
-    if (divQty) divQty.textContent = contadorPartidas;
-    if (divKgs) divKgs.textContent = acumuladorKgs.toFixed(2);
-}
-
-// 4. Botón de Procesar Salida
-function inicializarBotonesSalida() {
     const btnGuardar = document.getElementById("btnGuardarSalida") || document.querySelector(".btnAplicar");
     const btnLimpiar = document.getElementById("btnLimpiarPantalla") || document.querySelector(".btnLimpiar");
 
@@ -521,29 +435,23 @@ function inicializarBotonesSalida() {
 
     if (btnGuardar) {
         btnGuardar.addEventListener("click", async function() {
-            const idCliente = document.getElementById('idCliente')?.value;
+            const idCliente = document.getElementById('idCliente')?.value || document.getElementById('idProveedor')?.value;
             if (!idCliente) {
-                alert("❌ Seleccione un cliente.");
+                alert("❌ Seleccione un cliente o proveedor.");
                 return;
             }
 
-            const conceptoSeleccionado = document.getElementById('selectConceptoSalida')?.value;
+            const selectConcepto = document.getElementById('selectConceptoSalida');
+            const inputConcepto = document.querySelector("input[placeholder*='Concepto']");
+            const conceptoSeleccionado = selectConcepto ? selectConcepto.value : (inputConcepto ? inputConcepto.value : "Venta");
+            
             if (!conceptoSeleccionado) {
-                alert("❌ Seleccione un concepto de salida.");
+                alert("❌ Seleccione o escriba un concepto de salida.");
                 return;
             }
 
             const selectTipo = document.getElementById('selectTipoDespacho');
             const tipoDespacho = selectTipo ? selectTipo.value : 'cajas';
-
-            const idCliente = document.getElementById("idCliente").value;
-            const inputConcepto = document.querySelector("input[placeholder*='Concepto']");
-            const concepto = inputConcepto ? inputConcepto.value : "Venta";
-            
-            if (!idCliente) {
-                alert("❌ Seleccione un cliente para procesar la salida.");
-                return;
-            }
 
             const filas = document.querySelectorAll('#tablaPartidasBody tr');
             if (filas.length === 0) {
@@ -556,7 +464,6 @@ function inicializarBotonesSalida() {
                 if (tipoDespacho === 'manteca') {
                     const botesVal = parseInt(fila.querySelector('.val-cantidad-botes')?.value) || 1;
                     const pesoUnitario = parseFloat(fila.dataset.pesoUnitario) || 0;
-                    const pesoTotalFila = botesVal * pesoUnitario;
                     const idProducto = fila.dataset.idProducto || 0;
                     
                     detalle.push({ 
@@ -565,10 +472,10 @@ function inicializarBotonesSalida() {
                         id_producto: idProducto,
                         cantidad: botesVal,
                         cajas: botesVal,
-                        kgs: pesoTotalFila 
+                        kgs: botesVal * pesoUnitario 
                     });
                 } else if (esTablaCombos()) {
-                    const pesoNetoVal = parseFloat(fila.querySelector('.val-peso-neto')?.value || fila.querySelector('.val-peso-neto')?.textContent) || 0;
+                    const pesoNetoVal = parseFloat(fila.querySelector('.val-peso-neto')?.value) || 0;
                     const idLote = fila.dataset.idLote || 0;
                     const idProducto = fila.dataset.idProducto || 0;
                     
@@ -589,9 +496,6 @@ function inicializarBotonesSalida() {
                         cantidad: cajasVal 
                     });
                 }
-                const codigo = fila.querySelector('.partida-codigo').innerText;
-                const kgs = parseFloat(fila.querySelector('.partida-cantidad').innerText);
-                detalle.push({ partida: index + 1, codigo_producto: codigo, kgs: kgs, cantidad_cajas: 1 });
             });
 
             const totalKgs = parseFloat(document.getElementById('totalKgs')?.innerText) || 0;
@@ -604,17 +508,13 @@ function inicializarBotonesSalida() {
                 total_kgs: totalKgs,
                 total_items: totalCajas,
                 id_almacen: 1,
-                concepto: concepto,
-                total_kgs: parseFloat(document.getElementById('totalKgs').innerText),
-                total_cajas: parseFloat(document.getElementById('totalCantidad').innerText),
                 detalle: detalle
             };
 
             try {
                 this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+
                 const response = await fetch("../Controllers/salidasController.php?action=guardarSalida", {
                     method: "POST",
                     headers: { 
@@ -639,21 +539,15 @@ function inicializarBotonesSalida() {
                     alert(`✅ ${result.mensaje || 'Salida guardada correctamente.'}`);
                     window.location.reload(); 
                 } else {
-                    alert(`❌ Error del servidor: ${result.error || result.message}`);
-                const result = await response.json();
-                if (result.success) {
-                    alert(`✅ Éxito. Folio: ${result.folio}`);
-                    window.location.reload(); 
-                } else {
-                    alert(`❌ Error: ${result.error}`);
+                    alert(`❌ Error del servidor: ${result.error || result.message || 'Desconocido'}`);
                     this.disabled = false;
                     this.innerHTML = '<i class="fas fa-save"></i> Procesar Salida';
                 }
             } catch (error) {
                 console.error("Error al guardar salida:", error);
                 alert("❌ Error de conexión al guardar la salida.");
-                alert("❌ Error de conexión.");
                 this.disabled = false;
+                this.innerHTML = '<i class="fas fa-save"></i> Procesar Salida';
             }
         });
     }

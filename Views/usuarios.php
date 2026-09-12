@@ -204,14 +204,14 @@ $stats = $service->getStats();
                 <div class="grupo-input" style="margin-top: 10px;">
                     <label>Rol</label>
                     <select name="idRol" required>
-                        <option value="">Seleccionar rol</option>
-                        <option value="1">Administrador</option>
-                        <option value="2">Vendedor</option>
-                        <option value="3">Operador</option>
-                        <option value="4">Estibador</option>
-                        <option value="5">Encargado</option>
-                        <option value="6">Cajero</option>
-                    </select>
+    <option value="">Seleccionar rol</option>
+    <option value="1">Administrador</option>
+    <option value="2">Vendedor</option>
+    <option value="3">Operador</option>
+    <option value="4">Estivador</option>
+    <option value="5">Encargado</option>
+    <option value="6">Cajero</option>
+</select>
                 </div>
 
                 <button type="submit" class="btnGuardarUsuario">
