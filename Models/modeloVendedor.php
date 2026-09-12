@@ -29,21 +29,19 @@ class modeloVendedor {
 
     public function obtenerProductosActivos(): array {
         $sql = "SELECT 
-                    MIN(i.idSalidaTemporal) AS idSalidaTemporal,
+                    i.idSalidaTemporal,
                     i.idProducto AS id_producto,
-                    COALESCE(l.codigoLote, l_alt.codigoLote, p.nombreProducto) AS nombreProducto,
+                    COALESCE(l.codigoLote, p.nombreProducto) AS nombreProducto,
                     p.porPiezas,
                     p.precio,
-                    SUM(i.cantidadCajas) AS cantidadCajas,
-                    COALESCE(MAX(l.pesoActual), MAX(l_alt.pesoActual), SUM(i.cantidadPeso)) AS cantidadPeso,
-                    SUM(i.cantidadPiezas) AS cantidadPiezas,
-                    MAX(i.observaciones) AS observaciones
+                    i.cantidadCajas,
+                    COALESCE(l.pesoActual, i.cantidadPeso) AS cantidadPeso,
+                    i.cantidadPiezas,
+                    i.observaciones
                 FROM InventarioTemporalSalida i
                 INNER JOIN Producto p ON i.idProducto = p.idProducto
                 LEFT JOIN lote l ON i.idLote = l.idLote
-                LEFT JOIN lote l_alt ON i.idProducto = l_alt.idProducto AND l_alt.activo = 1 AND l_alt.pesoActual > 0
-                GROUP BY COALESCE(l.codigoLote, l_alt.codigoLote, p.nombreProducto), i.idProducto
-                ORDER BY idSalidaTemporal ASC";
+                ORDER BY i.idSalidaTemporal ASC";
 
         return $this->db->select($sql);
     }
