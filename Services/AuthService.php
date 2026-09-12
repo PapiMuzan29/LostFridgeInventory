@@ -9,7 +9,6 @@ class AuthService {
     private User $userModel;
 
     public function __construct() {
-
         $this->userModel = new User();
     }
 
@@ -18,14 +17,15 @@ class AuthService {
         $user = $this->userModel->findByUsername($username);
 
         if (
-    $user !== null &&
-    isset($user['contrasenaUsuario']) &&
-    isset($user['apodoUsuario']) &&
-    isset($user['nombreRol']) &&
-    isset($user['estado']) &&
-    $user['estado'] == 1 &&
-    $password === $user['contrasenaUsuario']
-) {
+            $user !== null &&
+            isset($user['idCuenta']) &&  // 👈 Validamos que el ID exista en la base de datos
+            isset($user['contrasenaUsuario']) &&
+            isset($user['apodoUsuario']) &&
+            isset($user['nombreRol']) &&
+            isset($user['estado']) &&
+            $user['estado'] == 1 &&
+            $password === $user['contrasenaUsuario']
+        ) {
 
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
@@ -33,6 +33,9 @@ class AuthService {
 
             session_regenerate_id(true);
 
+            // 🔑 AQUÍ GUARDAMOS EL ID EN LA SESIÓN (Solución al error de llaves foráneas)
+            $_SESSION['idCuenta'] = $user['idCuenta']; 
+            
             $_SESSION['apodoUsuario'] = $user['apodoUsuario'];
             $_SESSION['nombreRol'] = $user['nombreRol'];
 
@@ -51,9 +54,7 @@ class AuthService {
         $_SESSION = [];
 
         if (ini_get("session.use_cookies")) {
-
             $params = session_get_cookie_params();
-
             setcookie(
                 session_name(),
                 '',

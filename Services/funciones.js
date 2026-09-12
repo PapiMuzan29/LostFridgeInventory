@@ -7,11 +7,11 @@ function actualizarHora() {
     const minutos = ahora.getMinutes().toString().padStart(2, '0');
     const segundos = ahora.getSeconds().toString().padStart(2, '0');
     
-    const contenedorHora = document.getElementById("hora"); // Asegúrate de que coincida con tu ID
+    const contenedorHora = document.getElementById("hora"); 
     if (contenedorHora) {
         contenedorHora.textContent = `${horas}:${minutos}:${segundos}`;
     }
-}     
+}    
 
 document.addEventListener("DOMContentLoaded", () => {
     setInterval(actualizarHora, 1000);
@@ -50,7 +50,6 @@ function configurarBusquedaRealTime(inputId, tbodyId, urlBackend, renderFila) {
     let temporizador = null;
     let paginaActual = 1;
 
-    // Alerta visual en consola si los IDs no coinciden con el HTML
     if (!input) {
         console.error(`Error: No se encontró el input con ID "${inputId}"`);
         return;
@@ -91,7 +90,6 @@ function configurarBusquedaRealTime(inputId, tbodyId, urlBackend, renderFila) {
         }
     }
 
-    // 🔥 CORRECCIÓN 1: Cargar los datos automáticamente al abrir la página
     cargarDatos();
 
     input.addEventListener('input', function () {
@@ -102,7 +100,6 @@ function configurarBusquedaRealTime(inputId, tbodyId, urlBackend, renderFila) {
         }, 300);
     });
 
-    // 🔥 CORRECCIÓN 2: Paginación inteligente que acepta direcciones ('anterior' / 'siguiente')
     window.cambiarPaginaUsuarios = function (accion) {
         if (accion === 'anterior') {
             if (paginaActual > 1) {
@@ -110,11 +107,9 @@ function configurarBusquedaRealTime(inputId, tbodyId, urlBackend, renderFila) {
                 cargarDatos();
             }
         } else if (accion === 'siguiente') {
-            // Incrementa la página de manera dinámica
             paginaActual++;
             cargarDatos();
         } else {
-            // Por si acaso pasas un número directo
             const nuevaPagina = parseInt(accion);
             if (!isNaN(nuevaPagina) && nuevaPagina >= 1) {
                 paginaActual = nuevaPagina;
@@ -125,10 +120,9 @@ function configurarBusquedaRealTime(inputId, tbodyId, urlBackend, renderFila) {
 }
 
 // ===================================================================================
-// 4. RENDERIZADOR DE FILAS PARA LA TABLA DE USUARIOS (ACTUALIZADO PARA MODALES)
+// 4. RENDERIZADOR DE FILAS PARA LA TABLA DE USUARIOS
 // ===================================================================================
 function renderizarFilaUsuario(usuario) {
-
     const estadoClase = Number(usuario.estado) === 1 ? 'activo' : 'inactivo';
     const estadoTexto = Number(usuario.estado) === 1 ? 'Activo' : 'Inactivo';
 
@@ -174,12 +168,9 @@ function renderizarFilaUsuario(usuario) {
     `;
 }
 
-
 // ===================================================================================
-// 5. GESTIÓN DE MODALES (CREAR, EDITAR, ELIMINAR)
+// 5. GESTIÓN DE MODALES (CREAR, EDITAR, ELIMINAR - USUARIOS E INVENTARIO)
 // ===================================================================================
-
-/* --- MODAL NUEVO USUARIO --- */
 function abrirModalUsuario() {
     document.getElementById('modalNuevoUsuario').style.display = 'flex';
 }
@@ -188,7 +179,6 @@ function cerrarModalUsuario() {
     document.getElementById('modalNuevoUsuario').style.display = 'none';
 }
 
-/* --- MODAL EDITAR USUARIO --- */
 function abrirModalEditar(usuario) {
     document.getElementById('editIdUsuario').value = usuario.id;
     document.getElementById('editApodo').value = usuario.apodo;
@@ -205,15 +195,53 @@ function cerrarModalEditar() {
     document.getElementById('modalEditarUsuario').style.display = 'none';
 }
 
-/* --- MODAL ELIMINAR USUARIO --- */
-function abrirModalEliminar(id, apodo) {
-    document.getElementById('nombreUsuarioEliminar').textContent = apodo;
-    document.getElementById('btnConfirmarEliminar').href = `../Controllers/usuariosController.php?action=delete&id=${id}`;
-    document.getElementById('modalEliminarUsuario').style.display = 'flex';
-}
-
 function cerrarModalEliminar() {
     document.getElementById('modalEliminarUsuario').style.display = 'none';
+    clearInterval(temporizadorAnimacion);
+}
+
+/* --- MODALES DE INVENTARIO (PRODUCTOS Y PROVEEDORES) --- */
+function abrirModalAgregarProducto() {
+    const modal = document.getElementById('modalAgregarProducto');
+    if (modal) modal.style.display = 'flex';
+}
+
+function cerrarModalAgregarProducto() {
+    const modal = document.getElementById('modalAgregarProducto');
+    if (modal) modal.style.display = 'none';
+}
+
+function cerrarModalEditarProducto() {
+    const modal = document.getElementById('modalEditarProducto');
+    if (modal) modal.style.display = 'none';
+}
+
+function cerrarModalEliminarProducto() {
+    const modal = document.getElementById('modalEliminarProducto');
+    if (modal) modal.style.display = 'none';
+}
+
+function abrirModalAgregarProveedor() {
+    const modal = document.getElementById('modalAgregarProveedor');
+    if (modal) {
+        document.getElementById('formNuevoProveedor').reset();
+        modal.style.display = 'flex';
+    }
+}
+
+function cerrarModalAgregarProveedor() {
+    const modal = document.getElementById('modalAgregarProveedor');
+    if (modal) modal.style.display = 'none';
+}
+
+function cerrarModalEditarProveedor() {
+    const modal = document.getElementById('modalEditarProveedor');
+    if (modal) modal.style.display = 'none';
+}
+
+function cerrarModalEliminarProveedor() {
+    const modal = document.getElementById('modalEliminarProveedor');
+    if (modal) modal.style.display = 'none';
 }
 
 /* --- CIERRE GLOBAL DE MODALES (CLICK FUERA DE LA CAJA) --- */
@@ -223,22 +251,37 @@ window.addEventListener('click', function(e) {
     const modalEliminar = document.getElementById('modalEliminarUsuario');
     const modalLogout = document.getElementById('modalCerrarSesion');
 
+    const modalAgregarProd = document.getElementById('modalAgregarProducto');
+    const modalEditarProd = document.getElementById('modalEditarProducto');
+    const modalEliminarProd = document.getElementById('modalEliminarProducto');
+    
+    const modalAgregarProv = document.getElementById('modalAgregarProveedor');
+    const modalEditarProv = document.getElementById('modalEditarProveedor');
+    const modalEliminarProv = document.getElementById('modalEliminarProveedor');
+
     if (e.target === modalNuevo) cerrarModalUsuario();
     if (e.target === modalEditar) cerrarModalEditar();
     if (e.target === modalEliminar) cerrarModalEliminar();
     if (e.target === modalLogout) cerrarModalLogout();
+
+    if (e.target === modalAgregarProd) cerrarModalAgregarProducto();
+    if (e.target === modalEditarProd) cerrarModalEditarProducto();
+    if (e.target === modalEliminarProd) cerrarModalEliminarProducto();
+    
+    if (e.target === modalAgregarProv) cerrarModalAgregarProveedor();
+    if (e.target === modalEditarProv) cerrarModalEditarProveedor();
+    if (e.target === modalEliminarProv) cerrarModalEliminarProveedor();
 });
 
 /* ===================================================================================
-   CONFIGURACIÓN DE LA ANIMACIÓN (0 A 14 FOTOGRAMAS)
+   ANIMACIÓN DE ELIMINAR (USUARIOS)
 =================================================================================== */
 let temporizadorAnimacion = null;
-const totalFotogramas = 10;      // Siguen siendo 15 imágenes en total
-const velocidadAnimacion = 100;   // Velocidad en milisegundos
+const totalFotogramas = 10;      
+const velocidadAnimacion = 100;   
 const rutaCarpeta = '../SRC/animacion/'; 
 const extensionImagen = '.png';
 
-/* --- MODAL ELIMINAR USUARIO --- */
 function abrirModalEliminar(id, apodo) {
     document.getElementById('nombreUsuarioEliminar').textContent = apodo;
     document.getElementById('btnConfirmarEliminar').href = `../Controllers/usuariosController.php?action=delete&id=${id}`;
@@ -247,41 +290,28 @@ function abrirModalEliminar(id, apodo) {
     modal.style.display = 'flex';
 
     const imgElement = document.getElementById('imgAnimacionEliminar');
-    
-    // 🔥 CORRECCIÓN: Forzamos a que inicie mostrando la imagen cero
     let fotogramaActual = 0; 
     imgElement.src = `${rutaCarpeta}${fotogramaActual}${extensionImagen}`;
 
     clearInterval(temporizadorAnimacion);
 
-    // Bucle de animación corregido para base cero (0 a 14)
     temporizadorAnimacion = setInterval(() => {
         fotogramaActual++;
-        
-        // 🔥 Si llega a 15, significa que ya pasó por el 14, así que reinicia a 0
         if (fotogramaActual >= totalFotogramas) {
             fotogramaActual = 0; 
         }
-        
         imgElement.src = `${rutaCarpeta}${fotogramaActual}${extensionImagen}`;
     }, velocidadAnimacion);
 }
 
-function cerrarModalEliminar() {
-    document.getElementById('modalEliminarUsuario').style.display = 'none';
-    clearInterval(temporizadorAnimacion);
-}
-
 /* ===================================================================================
-   CONFIGURACIÓN DE ANIMACIÓN POR FOTOGRAMAS Y MÚSICA (MÓDULO VACA DINÁMICO)
+   ANIMACIÓN LOGOUT (CON TEXTO BLANCO AUTOMÁTICO EN MODO OSCURO)
 =================================================================================== */
 let temporizadorLogout = null;
-const totalFotogramasLogout = 40; // 🐮 Tus 40 imágenes estables     
+const totalFotogramasLogout = 40;     
 const rutaCarpetaLogout = '../SRC/vaca/'; 
 const extensionImagenLogout = '.png'; 
 
-
-// 🐮 REPERTORIO DE FRASES ULTRA-BURLONAS DE LA VACA
 const mensajesVaca = [
     "¡Muuu! ¿El cursor es un cerdo o es tu reflejo? ¡Broma! 🐮🤭",
     "Mira a ese puerquito... a un click de convertirse en chicharrón. 🥓🔥",
@@ -303,23 +333,65 @@ function abrirModalLogout() {
     const modal = document.getElementById('modalCerrarSesion');
     if (!modal) return;
     
-    modal.style.display = 'flex';
+    // 1. Movemos el modal al body y forzamos el fondo oscuro general de la pantalla
+    document.body.appendChild(modal);
+    
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('position', 'fixed', 'important');
+    modal.style.setProperty('top', '0', 'important');
+    modal.style.setProperty('left', '0', 'important');
+    modal.style.setProperty('width', '100vw', 'important');
+    modal.style.setProperty('height', '100vh', 'important');
+    modal.style.setProperty('background-color', 'rgba(0, 0, 0, 0.6)', 'important'); 
+    modal.style.setProperty('z-index', '999999', 'important');
+    modal.style.setProperty('justify-content', 'center', 'important');
+    modal.style.setProperty('align-items', 'center', 'important');
+
+    // 2. Detección automática del modo oscuro
+    const esOscuro = document.body.classList.contains('dark-mode') || 
+                     document.documentElement.classList.contains('dark-mode') ||
+                     localStorage.getItem('darkMode') === 'true' ||
+                     localStorage.getItem('theme') === 'dark';
+
+    // 3. Aplicamos colores dinámicos al cuadro y a los textos internos
+    const contenidoModal = modal.querySelector('.modal-contenido');
+    if (contenidoModal) {
+        contenidoModal.style.setProperty('max-width', '480px', 'important');
+        contenidoModal.style.setProperty('width', '90%', 'important');
+        contenidoModal.style.setProperty('padding', '38px', 'important');
+        contenidoModal.style.setProperty('border-radius', '18px', 'important');
+        contenidoModal.style.setProperty('box-shadow', '0 12px 30px rgba(0,0,0,0.35)', 'important');
+        contenidoModal.style.setProperty('overflow', 'hidden', 'important');
+
+        // Seleccionamos todos los textos dentro del modal (h2, p, etc.)
+        const textosInternos = contenidoModal.querySelectorAll('h2, p');
+
+        if (esOscuro) {
+            // Fondo oscuro para el cuadro y letras blancas
+            contenidoModal.style.setProperty('background-color', '#1e293b', 'important');
+            contenidoModal.style.setProperty('color', '#f8fafc', 'important');
+            textosInternos.forEach(el => el.style.setProperty('color', '#f8fafc', 'important'));
+        } else {
+            // Fondo blanco para el cuadro y letras oscuras
+            contenidoModal.style.setProperty('background-color', '#ffffff', 'important');
+            contenidoModal.style.setProperty('color', '#0f172a', 'important');
+            textosInternos.forEach(el => el.style.setProperty('color', '#0f172a', 'important'));
+        }
+    }
 
     const imgElement = document.getElementById('imgAnimacionLogout');
-    const globoElement = document.getElementById('globoTextoLogout'); // 🔥 Capturamos el globo
+    const globoElement = document.getElementById('globoTextoLogout'); 
     if (!imgElement) return;
 
     let fotogramaActual = 0; 
-    let indiceMensaje = 0;        // 🔥 Rastrea qué mensaje se está mostrando
-    let contadorCambioTexto = 0;  // 🔥 Mide el tiempo para cambiar el diálogo
+    let indiceMensaje = 0;         
+    let contadorCambioTexto = 0;  
 
-    // Inicializamos el primer fotograma y el primer mensaje de la lista
     imgElement.src = `${rutaCarpetaLogout}${fotogramaActual}${extensionImagenLogout}`;
     if (globoElement) {
         globoElement.textContent = mensajesVaca[indiceMensaje];
     }
 
-    // Configuración segura del audio vaca.mp3
     if (!musicaLogout) {
         musicaLogout = new Audio('../SRC/vaca/vaca.mp3'); 
         musicaLogout.loop = true;
@@ -332,27 +404,22 @@ function abrirModalLogout() {
 
     clearInterval(temporizadorLogout);
 
-    // Bucle unificado para animación, música y texto dinámico
     temporizadorLogout = setInterval(() => {
-        // 1. Avanzar fotograma de la animación
         fotogramaActual++;
         if (fotogramaActual >= totalFotogramasLogout) {
             fotogramaActual = 0; 
         }
         imgElement.src = `${rutaCarpetaLogout}${fotogramaActual}${extensionImagenLogout}`;
 
-        // 2. 🔥 LÓGICA DEL TEXTO DINÁMICO: Cambia cada 2 segundos (20 fotogramas * 100ms = 2000ms)
         contadorCambioTexto++;
         if (contadorCambioTexto >= 40) { 
-            contadorCambioTexto = 0; // Reiniciamos el contador de tiempo
-            indiceMensaje++;         // Saltamos a la siguiente frase
+            contadorCambioTexto = 0; 
+            indiceMensaje++;         
             
-            // Si recorrió todos los mensajes, vuelve a empezar desde el primero
             if (indiceMensaje >= mensajesVaca.length) {
                 indiceMensaje = 0;
             }
             
-            // Inyectamos el nuevo texto en el HTML del globo
             if (globoElement) {
                 globoElement.textContent = mensajesVaca[indiceMensaje];
             }
@@ -372,4 +439,46 @@ function cerrarModalLogout() {
     }
 }
 
+// ===================================================================================
+// 🔥 FUNCIÓN MEJORADA: CARGA LOS VALORES GUARDADOS AL EDITAR PROVEEDOR
+// ===================================================================================
+async function editarProveedor(id) {
+    const modal = document.getElementById('modalEditarProveedor');
+    if (!modal) return;
 
+    try {
+        const respuesta = await fetch(`../Controllers/inventarioController.php?action=obtenerProveedor&id=${id}`);
+        const resultado = await respuesta.json();
+
+        if (resultado.status === 'success' && resultado.datos) {
+            const prov = resultado.datos;
+
+            // Rellenamos los campos principales del proveedor
+            document.getElementById('editProvId').value = prov.idProveedor ?? '';
+            document.getElementById('editProvCodigo').value = prov.codigoProveedor ?? '';
+            document.getElementById('editProvNombre').value = prov.nombreProveedor ?? '';
+            document.getElementById('editProvRfc').value = prov.rfc ?? '';
+            document.getElementById('editProvDireccion').value = prov.direccion ?? '';
+            document.getElementById('editProvColonia').value = prov.colonia ?? '';
+            document.getElementById('editProvCp').value = prov.codigoPostal ?? '';
+            document.getElementById('editProvEstado').value = prov.estadoRepublica ?? '';
+
+            // Rellenamos la configuración del lector QR si existe en el formulario de edición
+            if (document.getElementById('editCodigoBarrasProductosPosicion')) {
+                document.getElementById('editCodigoBarrasProductosPosicion').value = prov.codigoBarrasProductosPosicion ?? 0;
+                document.getElementById('editCodigoBarrasProductosLongitud').value = prov.codigoBarrasProductosLongitud ?? 0;
+                document.getElementById('editCodigoBarrasEnterosPosicion').value = prov.codigoBarrasEnterosPosicion ?? 0;
+                document.getElementById('editCodigoBarrasEnterosLongitud').value = prov.codigoBarrasEnterosLongitud ?? 0;
+                document.getElementById('editCodigoBarrasDecimalesPosicion').value = prov.codigoBarrasDecimalesPosicion ?? 0;
+                document.getElementById('editCodigoBarrasDecimalesLongitud').value = prov.codigoBarrasDecimalesLongitud ?? 0;
+            }
+
+            modal.style.display = 'flex';
+        } else {
+            alert('Error: No se pudieron cargar los datos del proveedor.');
+        }
+    } catch (error) {
+        console.error('Error al obtener el proveedor:', error);
+        alert('Ocurrió un error al conectar con el servidor.');
+    }
+}

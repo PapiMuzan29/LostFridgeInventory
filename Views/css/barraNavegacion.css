@@ -24,13 +24,22 @@
     padding: 15px 20px;
     text-align: center;
     flex-shrink: 0; /* Evita que el área del logo se distorsione */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .logo-america {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
+    width: 90px !important;
+    height: 90px !important;
+    min-width: 90px !important;
+    min-height: 90px !important;
+    max-width: 90px !important;
+    max-height: 90px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
 }
 
 /* El menú central controla de forma exclusiva su propio scroll si hay demasiados botones */
@@ -57,22 +66,39 @@
     display: flex;
     align-items: center;
     gap: 15px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, color 0.3s;
+    color: #94a3b8; /* Color gris claro profesional para los enlaces inactivos */
 }
 
 .nav-link i {
     font-size: 18px;
     width: 25px;
     text-align: center;
+    color: #94a3b8; /* Color coherente para los iconos */
+    transition: color 0.3s;
 }
 
 .nav-link:hover {
     background-color: #1f2937;
+    color: #ffffff;
 }
 
-.nav-link.activo {
-    background-color: rgba(255,255,255,.1);
-    border-left: 4px solid white;
+.nav-link:hover i {
+    color: #ffffff;
+}
+
+/* ESTADOS ACTIVOS Y ENFOCADOS UNIFICADOS */
+.nav-link.activo, 
+.nav-link.menu-enfocado {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    color: #3b82f6 !important;
+    border-left: 4px solid #3b82f6 !important;
+    padding-left: 16px; /* Ajuste para compensar el borde izquierdo */
+}
+
+.nav-link.activo i, 
+.nav-link.menu-enfocado i {
+    color: #3b82f6 !important;
 }
 
 .sidebar-linea-divisoria {
@@ -369,7 +395,8 @@ body.dark-theme .nav-link:hover {
     background-color: #1e293b !important;
 }
 
-body.dark-theme .nav-link.activo {
+body.dark-theme .nav-link.activo,
+body.dark-theme .nav-link.menu-enfocado {
     background-color: rgba(59, 130, 246, 0.2) !important;
     border-left: 4px solid #3b82f6 !important;
     color: #60a5fa !important;
@@ -414,4 +441,12 @@ body.dark-theme .globo-texto::after {
 
 body.dark-theme .globo-texto::before {
     border-color: #334155 transparent !important;
+}
+/* ========================================== */
+/* UNIFICACIÓN DE TIPOGRAFÍA EN EL MENÚ       */
+/* ========================================== */
+.nav-menu .nav-link {
+    font-family: inherit !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px;
 }

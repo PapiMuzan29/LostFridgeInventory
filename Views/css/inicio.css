@@ -1,0 +1,316 @@
+/* Atrapa cualquier variante de modo oscuro que use tu sistema */
+body.dark-mode, 
+html.dark-mode body, 
+[data-theme="dark"] body,
+.dark-mode {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .contenedor, 
+html.dark-mode .contenedor {
+    background-color: #0f172a !important;
+}
+
+
+
+/* ==========================================
+   ESTILOS GENERALES DE INICIO (Modo Claro)
+   ========================================== */
+.card-inicio {
+    background: #ffffff;
+    padding: 24px 30px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.header-bienvenida-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.titulo-principal {
+    font-size: 22px;
+    color: #0f172a;
+    font-weight: 700;
+    margin: 0;
+}
+
+.subtitulo-descripcion {
+    color: #64748b;
+    font-size: 13px;
+    margin: 0;
+}
+
+.badge-rol {
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.badge-rol.admin {
+    background: #2563eb15;
+    color: #2563eb;
+    border: 1px solid #2563eb30;
+}
+.badge-rol.operador {
+    background: #16a34a15;
+    color: #3b82f6;
+    border: 1px solid #16a34a30;
+}
+
+.estado-servidor-box {
+    text-align: right;
+    background: #f8fafc;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.estado-label {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado-valor {
+    font-size: 13px;
+    color: #3b82f6;
+    font-weight: 700;
+}
+
+.table-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
+}
+
+.tabla-titulo {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.badge-tiempo-real {
+    font-size: 12px;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.tabla-movimientos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.tabla-movimientos th {
+    color: #64748b;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 8px;
+}
+
+.tabla-movimientos td {
+    padding: 12px 8px;
+    color: #1e293b;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.badge-tipo {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.badge-tipo.salida {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.badge-tipo.entrada {
+    background: #dcfce7;
+    color: #3b82f6;
+}
+
+
+/* ==========================================
+   MODO OSCURO FORZADO (DARK MODE)
+   ========================================== */
+body.dark-mode {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .contenedor {
+    background-color: #0f172a !important;
+}
+
+body.dark-mode .card-inicio {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: none !important;
+}
+
+body.dark-mode .titulo-principal,
+body.dark-mode .tabla-titulo {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .subtitulo-descripcion {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .estado-servidor-box {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+body.dark-mode .estado-label {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .table-header-container {
+    border-bottom-color: #334155 !important;
+}
+
+body.dark-mode .badge-tiempo-real {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border: 1px solid #334155 !important;
+}
+
+body.dark-mode .tabla-movimientos th {
+    color: #cbd5e1 !important;
+    border-bottom: 1px solid #334155 !important;
+    background-color: transparent !important;
+}
+
+body.dark-mode .tabla-movimientos td {
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+body.dark-mode .tabla-movimientos tr:hover {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* ==========================================
+   MANDO OSCURO PARA LA BARRA SUPERIOR
+   ========================================== */
+body.dark-mode .top-bar-dashboard,
+body.dark-mode div.top-bar-dashboard {
+    background-color: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .top-bar-dashboard .modulo-titulo,
+body.dark-mode .top-bar-dashboard h2,
+body.dark-mode .top-bar-dashboard .value,
+body.dark-mode .top-bar-dashboard .user-id,
+body.dark-mode .top-bar-dashboard .user-role {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .top-bar-dashboard .label,
+body.dark-mode .top-bar-dashboard i.icon-blue {
+    color: #94a3b8 !important;
+}
+@media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            /* Mostrar contenedor, membrete, tarjetas y tabla */
+            .contenedor, .contenedor *, .header-impresion-oficial, .header-impresion-oficial *, .cards, .cards *, .tabla-movimientos, .tabla-movimientos * {
+                visibility: visible;
+            }
+
+            .contenedor {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 5px;
+                background: white !important;
+            }
+
+            .header-impresion-oficial {
+                display: block !important;
+            }
+
+            /* Ocultar el saludo de bienvenida, botones y navegación */
+            .card-bienvenida-usuario,
+            button, 
+            .btn-imprimir,
+            nav, 
+            .barra-navegacion, 
+            .top-bar-dashboard {
+                display: none !important;
+            }
+
+            /* Estilo limpio para las tarjetas de estadísticas en papel */
+            .cards {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px !important;
+                margin-bottom: 20px !important;
+            }
+
+            .card {
+                border: 1px solid #cbd5e1 !important;
+                padding: 12px !important;
+                border-radius: 8px !important;
+                background: #fff !important;
+                box-shadow: none !important;
+            }
+
+            /* Estilo de la tabla de movimientos */
+            .tabla-movimientos {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin-top: 10px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            .tabla-movimientos th {
+                background-color: #0f172a !important;
+                color: #ffffff !important;
+                border: none !important;
+                padding: 10px 12px !important;
+                font-size: 11px !important;
+                text-transform: uppercase;
+                text-align: left;
+            }
+
+            .tabla-movimientos td {
+                border-bottom: 1px solid #cbd5e1 !important;
+                padding: 9px 12px !important;
+                color: #1e293b !important;
+                font-size: 11px !important;
+                background: transparent !important;
+            }
+        }
+
+        @page {
+            size: auto;
+            margin: 10mm 10mm 10mm 10mm;
+        }

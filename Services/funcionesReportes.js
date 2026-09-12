@@ -1,3 +1,33 @@
+// Función global para manejar la descarga o impresión directa del reporte sin modales molestos
+function DescargarReporte(ruta) {
+    if (!ruta || ruta === '#' || ruta === '') {
+        alert("❌ El archivo de este reporte aún no ha sido generado.");
+        return;
+    }
+
+    // Usamos un iframe totalmente invisible para procesar el comprobante por detrás
+    let iframeOculto = document.getElementById('iframeImpresionOculto');
+    if (!iframeOculto) {
+        iframeOculto = document.createElement('iframe');
+        iframeOculto.id = 'iframeImpresionOculto';
+        iframeOculto.style.display = 'none';
+        document.body.appendChild(iframeOculto);
+    }
+
+    // Cargamos la ruta en el iframe oculto
+    iframeOculto.src = ruta;
+
+    // Lanza la impresión de forma automática y transparente sin mostrar pantallas intermedias
+    iframeOculto.onload = function() {
+        try {
+            iframeOculto.contentWindow.focus();
+            iframeOculto.contentWindow.print();
+        } catch (e) {
+            window.location.href = ruta;
+        }
+    };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     let paginaActual  = 1;
     let totalPaginas  = 1; 
@@ -12,11 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Carga y renderizado ──────────────────────────────────────────
     async function cargarReportes() {
+        if (!tbodyReportes) return;
         tbodyReportes.innerHTML = '<tr><td colspan="7" style="text-align:center;">Buscando reportes... <i class="fa-solid fa-spinner fa-spin"></i></td></tr>';
 
-        const tipo   = selectTipo.value;
-        const inicio = inputFechaInicio.value;
-        const fin    = inputFechaFin.value;
+        const tipo   = selectTipo ? selectTipo.value : '';
+        const inicio = inputFechaInicio ? inputFechaInicio.value : '';
+        const fin    = inputFechaFin ? inputFechaFin.value : '';
 
         try {
             const url = `../Controllers/reportesController.php?action=busqueda`
@@ -28,16 +59,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const respuesta = await fetch(url);
             if (!respuesta.ok) throw new Error(`Error HTTP: ${respuesta.status}`);
 
-            const resultado = await respuesta.json(); // { datos, total, pagina, totalPaginas }
-
+            const resultado = await respuesta.json();
             totalPaginas = resultado.totalPaginas ?? 1;
 
             renderizarTablaReportes(resultado.datos ?? []);
             actualizarPaginacion();
 
         } catch (error) {
-            console.error('Error al cargar la información:', error);
-            tbodyReportes.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">Error al conectar con el servidor.</td></tr>';
+            console.error('Error detallado:', error);
+            tbodyReportes.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">❌ Error al conectar con el servidor.</td></tr>`;
         }
     }
 
@@ -50,48 +80,29 @@ document.addEventListener('DOMContentLoaded', () => {
         let htmlContent = '';
 
         datos.forEach(documento => {
-            const rutaArchivo = documento.rutaArchivo;
-            let iconoImagen = '';
-            let descripcionInventario = '';
+            const rutaArchivo = documento.rutaArchivo || '#';
+            let iconoImagen = '<i class="fa-solid fa-file-lines"></i>';
+            let tituloReporte = 'Reporte General';
+            let descripcionInventario = 'Registro del sistema';
 
-            switch (documento.tipoDocumento) {
-                case 'movimiento_inventario':
-                    iconoImagen = '<i class="fa-solid fa-clipboard-check"></i>';
-                    descripcionInventario = 'Entradas y salidas por rango de fechas';
-                    break;
-                case 'inventario_actual':
-                    iconoImagen = '<i class="fa-solid fa-cube"></i>';
-                    descripcionInventario = 'Stock actual por producto y ubicación';
-                    break;
-                case 'vencimiento':
-                    iconoImagen = '<i class="fa-solid fa-calendar"></i>';
-                    descripcionInventario = 'Productos próximos a vencer';
-                    break;
-                case 'movimientos_usuario':
-                    iconoImagen = '<i class="fa-solid fa-users"></i>';
-                    descripcionInventario = 'Actividad realizada por cada usuario';
-                    break;
-                case 'utilizacion_ubicaciones':
-                    iconoImagen = '<i class="fa-solid fa-chart-pie"></i>';
-                    descripcionInventario = 'Utilización de ubicaciones';
-                    break;
-                default:
-                    iconoImagen = '<i class="fa-solid fa-file-lines"></i>';
-                    descripcionInventario = 'Reporte general';
-                    break;
+            if (documento.tipoDocumento === 'movimiento_inventario') {
+                iconoImagen = '<i class="fa-solid fa-clipboard-check"></i>';
+                tituloReporte = 'Movimiento de Inventario';
+                descripcionInventario = 'Entradas y salidas por rango de fechas';
+            } else if (documento.tipoDocumento === 'inventario_actual') {
+                iconoImagen = '<i class="fa-solid fa-cube"></i>';
+                tituloReporte = 'Inventario Actual';
+                descripcionInventario = 'Stock actual por producto';
             }
-
-            const responsable = documento.nombreCompletoResponsable || 'Sistema';
-            const fechaFin    = documento.fechaFinalizacion || 'N/A';
 
             htmlContent += `
                 <tr>
-                    <td class="reporteNombre">${iconoImagen} ${documento.tipoDocumento}</td>
-                    <td>${documento.tipoDocumento}</td>
+                    <td class="reporteNombre">${iconoImagen} ${tituloReporte}</td>
+                    <td><span style="background: #e2e8f0; padding: 3px 8px; border-radius: 4px; font-size: 12px;">${documento.tipoDocumento}</span></td>
                     <td>${descripcionInventario}</td>
-                    <td>${responsable}</td>
+                    <td>${documento.nombreCompletoResponsable || 'Sistema'}</td>
                     <td>${documento.fechaCreacion}</td>
-                    <td>${fechaFin}</td>
+                    <td>${documento.fechaFinalizacion || 'N/A'}</td>
                     <td>
                         <button type="button" class="btnDescargar" onclick="DescargarReporte('${rutaArchivo}')">
                             <i class="fa-solid fa-download"></i>
@@ -105,17 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Paginación ───────────────────────────────────────────────────
     function actualizarPaginacion() {
-        // Deshabilitar / habilitar botones
-        btnAnterior.disabled  = paginaActual <= 1;
-        btnSiguiente.disabled = paginaActual >= totalPaginas;
+        if (btnAnterior) btnAnterior.disabled  = paginaActual <= 1;
+        if (btnSiguiente) btnSiguiente.disabled = paginaActual >= totalPaginas;
 
-        // Redibujar los números de página
         const contenedor = document.querySelector('.botones-paginacion');
+        if (!contenedor) return;
 
-        // Eliminar los botones de número que ya existen
         contenedor.querySelectorAll('.numero-pagina').forEach(b => b.remove());
 
-        // Insertar los nuevos números antes del botón Siguiente
         for (let i = 1; i <= totalPaginas; i++) {
             const btn = document.createElement('button');
             btn.type = 'button';
@@ -131,40 +139,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ── Eventos ──────────────────────────────────────────────────────
-    btnFiltrar.addEventListener('click', () => {
-        const inicio = inputFechaInicio.value;
-        const fin    = inputFechaFin.value;
+    if (btnFiltrar) {
+        btnFiltrar.addEventListener('click', () => {
+            const inicio = inputFechaInicio ? inputFechaInicio.value : '';
+            const fin    = inputFechaFin ? inputFechaFin.value : '';
 
-        if (inicio && fin && inicio > fin) {
-            alert('La fecha de inicio no puede ser posterior a la fecha de fin.');
-            return;
-        }
+            if (inicio && fin && inicio > fin) {
+                alert('La fecha de inicio no puede ser posterior a la fecha de fin.');
+                return;
+            }
 
-        paginaActual = 1;
-        cargarReportes();
-    });
-
-    btnLimpiar.addEventListener('click', () => {
-        selectTipo.value        = '';
-        inputFechaInicio.value  = '';
-        inputFechaFin.value     = '';
-        paginaActual = 1;
-        cargarReportes();
-    });
-
-    btnAnterior.addEventListener('click', () => {
-        if (paginaActual > 1) {
-            paginaActual--;
+            paginaActual = 1;
             cargarReportes();
-        }
-    });
+        });
+    }
 
-    btnSiguiente.addEventListener('click', () => {
-        if (paginaActual < totalPaginas) {
-            paginaActual++;
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', () => {
+            if (selectTipo) selectTipo.value = '';
+            if (inputFechaInicio) inputFechaInicio.value = '';
+            if (inputFechaFin) inputFechaFin.value = '';
+            paginaActual = 1;
             cargarReportes();
-        }
-    });
+        });
+    }
+
+    if (btnAnterior) {
+        btnAnterior.addEventListener('click', () => {
+            if (paginaActual > 1) {
+                paginaActual--;
+                cargarReportes();
+            }
+        });
+    }
+
+    if (btnSiguiente) {
+        btnSiguiente.addEventListener('click', () => {
+            if (paginaActual < totalPaginas) {
+                paginaActual++;
+                cargarReportes();
+            }
+        });
+    }
 
     // ── Inicio ───────────────────────────────────────────────────────
     cargarReportes();

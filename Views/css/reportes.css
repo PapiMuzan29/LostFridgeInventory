@@ -442,3 +442,19 @@ body.dark-theme .btn-pagina.activa {
 body.dark-theme .puntos {
     color: #a1a1aa !important;
 }
+/* --- CORRECCIÓN DE VISIBILIDAD EN COLUMNA TIPO (REPORTES) --- */
+body.dark-theme table td:nth-child(2),
+body.dark-theme .tablaReportes td:nth-child(2),
+body.dark-theme tr td span, 
+body.dark-theme tr td div {
+    color: #ffffff !important;
+}
+
+/* Si el tipo es un elemento con fondo (badge/etiqueta) que se oculta */
+body.dark-theme table td span {
+    background-color: #27272a !important;
+    color: #f4f4f5 !important;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}

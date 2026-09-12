@@ -220,7 +220,7 @@ body {
 }
 
 .user-card {
-    border-left: 5px solid #22c55e;
+    border-left: 5px solid cornflowerblue;
     overflow: hidden;
 }
 
@@ -384,7 +384,7 @@ body {
     align-items: center;
     gap: 6px;
     background-color: #dcfce7;
-    color: #15803d;
+    color:#2563eb;
     padding: 3px 10px;
     border-radius: 6px;
     font-weight: 700;
@@ -424,7 +424,7 @@ body {
 
 .status-badge-optimo {
     background-color: #dcfce7;
-    color: #15803d;
+    color:#2563eb;
     padding: 3px 10px;
     border-radius: 6px;
     font-size: 0.82rem;
@@ -686,11 +686,11 @@ input:checked + .slider:before {
 
 .activo {
     background: #dcfce7;
-    color: #15803d;
+    color:#2563eb;
 }
 
 .activo::before {
-    background: #15803d;
+    background: #2563eb;
 }
 
 .inactivo {
@@ -1151,7 +1151,7 @@ body.dark-theme .company-card {
 
 body.dark-theme .user-card,
 body.dark-theme .card.success {
-    border-left: 5px solid #22c55e !important; /* Verde Neón */
+    border-left: 5px solid cornflowerblue !important; /* Verde Neón */
 }
 
 body.dark-theme .system-card {

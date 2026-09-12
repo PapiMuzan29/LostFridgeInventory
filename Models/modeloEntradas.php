@@ -1,16 +1,15 @@
 <?php
+// Nota: Se removió session_start() de este archivo para evitar conflictos de sesiones múltiples.
+
 require_once __DIR__ . '/../Config/BD.php'; 
 
 class modeloEntradas {
     private $db;
 
     public function __construct() {
-        $this->db = new BD(); 
+        $this->db = BD::obtenerInstancia(); 
     }
 
-    /**
-     * 👥 Trae los proveedores activos
-     */
     public function obtenerTodosProveedores() {
         $query = "SELECT idProveedor, nombreProveedor FROM proveedor WHERE status = 1 ORDER BY nombreProveedor ASC";
         try {
@@ -22,222 +21,232 @@ class modeloEntradas {
         }
     }
 
-    public function obtenerCodigoDeProducto(
-        string $columna = '',
-        string $valor = '',
-        string $CodigoBarras = ''
-    ): array {
+    public function obtenerCodigoDeProducto(string $columna = '', string $valor = '', string $CodigoBarras = ''): array {
+        if ($CodigoBarras === '') return [];
 
-        if ($CodigoBarras === '' || $columna === '' || $valor === '') {
-            return [];
+        $longitudTotal = mb_strlen($CodigoBarras, 'UTF-8');
+        
+        $parteFinal = mb_substr($CodigoBarras, -2, 2, 'UTF-8'); 
+        $codigoProducto = ltrim($parteFinal, '0');
+        if (empty($codigoProducto)) {
+            $codigoProducto = ltrim($CodigoBarras, '0');
         }
 
-        $columnasValidas = ['idProveedor', 'codigoProveedor', 'nombreProveedor', 'rfc'];
-        if (!in_array($columna, $columnasValidas)) {
-            return [];
-        }
+        $partePeso = mb_substr($CodigoBarras, 2, 4, 'UTF-8'); 
+        $enteros = mb_substr($partePeso, 0, 2, 'UTF-8');     
+        $decimales = mb_substr($partePeso, 2, 2, 'UTF-8');   
 
-        $query = "SELECT 
-                    codigoBarrasProductosPosicion,
-                    codigoBarrasProductosLongitud,
-                    codigoBarrasEnterosPosicion,
-                    codigoBarrasEnterosLongitud,
-                    codigoBarrasDecimalesPosicion,
-                    codigoBarrasDecimalesLongitud 
-                  FROM proveedor 
-                  WHERE {$columna} = ? 
-                  AND status = 1";
-    
-        $params = [$valor]; 
-
-        try {
-            $stmt = $this->db->consulta($query, $params);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$result) {
-                return []; 
-            }
-        } catch (Exception $e) {
-            error_log("Error en modeloEntradas: " . $e->getMessage());
-            return [];
-        }
-
-        $codigoBarrasProductosPosicion = $result['codigoBarrasProductosPosicion'] ?? 0;
-        $codigoBarrasProductosLongitud = $result['codigoBarrasProductosLongitud'] ?? 0;
-        $codigoBarrasEnterosPosicion   = $result['codigoBarrasEnterosPosicion'] ?? 0;
-        $codigoBarrasEnterosLongitud   = $result['codigoBarrasEnterosLongitud'] ?? 0;
-        $codigoBarrasDecimalesPosicion = $result['codigoBarrasDecimalesPosicion'] ?? 0;
-        $codigoBarrasDecimalesLongitud = $result['codigoBarrasDecimalesLongitud'] ?? 0;
-
-        $codigoProducto = mb_substr($CodigoBarras, $codigoBarrasProductosPosicion, $codigoBarrasProductosLongitud, 'UTF-8');
-        $codigoEnteros = mb_substr($CodigoBarras, $codigoBarrasEnterosPosicion, $codigoBarrasEnterosLongitud, 'UTF-8');
-        $codigoDecimales = mb_substr($CodigoBarras, $codigoBarrasDecimalesPosicion, $codigoBarrasDecimalesLongitud, 'UTF-8');
+        $pesoCalculado = floatval($enteros . '.' . $decimales);
 
         return [
-            'codigoProducto' => $codigoProducto,
-            'codigoEnteros' => $codigoEnteros,
-            'codigoDecimales' => $codigoDecimales
+            'codigoProducto'  => $codigoProducto, 
+            'codigoEnteros'   => (string)$pesoCalculado, 
+            'codigoDecimales' => $decimales
         ];
     }
 
-   public function obtenerProducto(
-        string $codigoBarras = '',
-        string $codigoProveedor = '',
-        string $nombreProveedor = '',
-        string $rfc = ''
-    ): array {
+    public function obtenerProducto(string $codigoBarras = '', string $codigoProveedor = '', string $nombreProveedor = '', string $rfc = ''): array {
+        if ($codigoBarras === '') return [];
 
-        if ($codigoBarras === '') {
-            return [];
-        }
-
-        $columna = '';
-        $valor = '';
-
-        if ($codigoProveedor !== '') {
-            $columna = 'idProveedor'; 
-            $valor = $codigoProveedor;
-        } else if ($nombreProveedor !== '') {
-            $columna = 'nombreProveedor';
-            $valor = $nombreProveedor;
-        } else if ($rfc !== '') {
-            $columna = 'rfc';
-            $valor = $rfc;
-        } else {
-            return [];
-        }
+        $query = "SELECT codigoProducto, nombreProducto FROM producto WHERE codigoProducto = ? OR TRIM(codigoProducto) = ? LIMIT 1";
         
-        // Ejecutamos el desglose matemático (Devuelve el producto, enteros y decimales)
-        $Producto = $this->obtenerCodigoDeProducto($columna, $valor, $codigoBarras);
-
-        if (empty($Producto) || !isset($Producto['codigoProducto']) || $Producto['codigoProducto'] === '') {
-            return []; 
-        }
-
-        $claveLimpia = trim($Producto['codigoProducto']); // Ej: "3390"
-
-        // 🛡️ BÚSQUEDA ULTRA-FLEXIBLE: 
-        // 1. Busca coincidencia exacta.
-        // 2. Busca ignorando ceros a la izquierda (por si en la BD está como 03390).
-        // 3. Busca con LIKE por si hay espacios invisibles en tu catálogo.
-        $query = "SELECT nombreProducto FROM Producto 
-                  WHERE TRIM(codigoProducto) = ? 
-                     OR LTRIM(REPLACE(codigoProducto, '0', ' ')) = LTRIM(REPLACE(?, '0', ' '))
-                     OR codigoProducto LIKE ? 
-                  LIMIT 1";
-                  
-        $params = [$claveLimpia, $claveLimpia, "%" . $claveLimpia . "%"]; 
-
         try {
-            $stmt = $this->db->consulta($query, $params);
+            $stmt = $this->db->consulta($query, [$codigoBarras, trim($codigoBarras)]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$result) {
-                return []; // Si de verdad no existe de ninguna forma, sale vacío
+            
+            if ($result) {
+                return [
+                    'nombreProducto'  => $result['nombreProducto'], 
+                    'codigoEnteros'   => '1', 
+                    'codigoDecimales' => '00',
+                    'codigoProducto'  => $result['codigoProducto']
+                ];
             }
 
-            // 🔥 AQUÍ ESTÁ EL TRUCO DEL PESO:
-            // Si el producto SÍ existe, regresamos los cortes reales de los kilogramos
-            // para que el JavaScript pinte 0.54 en lugar de caer en el "1.00" de emergencia.
-            return [
-                'nombreProducto' => $result['nombreProducto'] ?? '',
-                'codigoEnteros' => $Producto['codigoEnteros'] ?? '0',
-                'codigoDecimales' => $Producto['codigoDecimales'] ?? '00'
-            ];
+            return [];
         } catch (Exception $e) {
-            error_log("Error en modeloEntradas (obtenerProducto): " . $e->getMessage());
+            error_log("Error en obtenerProducto: " . $e->getMessage());
             return [];
         }
     }
 
-    /**
-     * 🎛️ PUENTE DE ENTRADA DIRECTA (MODO QR)
-     */
     public function buscarProductoPorCodigoYProveedor($codigo, $idProveedor) {
-        // 🛡️ OPTIMIZACIÓN ULTRA-ESTRICTA: Mismo criterio para búsquedas globales manuales
-        $query = "SELECT nombreProducto FROM Producto WHERE CAST(TRIM(codigoProducto) AS CHAR) = CAST(TRIM(?) AS CHAR) LIMIT 1";
-        $params = [trim($codigo)];
+        if (empty($codigo)) return null;
 
+        $query = "SELECT codigoProducto, nombreProducto FROM producto WHERE codigoProducto = ? LIMIT 1";
         try {
-            $stmt = $this->db->consulta($query, $params);
-            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+            $stmt = $this->db->consulta($query, [$codigo]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? [
+                'codigoProducto' => $result['codigoProducto'],
+                'nombreProducto' => $result['nombreProducto']
+            ] : null;
         } catch (Exception $e) {
             error_log("Error en buscarProductoPorCodigoYProveedor: " . $e->getMessage());
             return null;
         }
     }
-    /**
-     * 🔥 REGISTRO TRANSACCIONAL Y ACTUALIZACIÓN DE INVENTARIO DIRECTO
-     * Guarda la entrada, el detalle, la bitácora e incrementa el stock en la tabla producto.
-     */
+
     public function registrarEntradaTransaccion($datos, $idUsuario, $apodoUsuario) {
         try {
-            // INICIAMOS TRANSACCIÓN SQL
             $this->db->consulta("START TRANSACTION");
 
-            // 1. Insertar en tabla `entradas`
-            $queryEntrada = "INSERT INTO entradas (id_almacen, id_proveedor, id_usuario, totalKgs, status) VALUES (?, ?, ?, ?, 'A')";
+            $stmtFolio = $this->db->consulta("SELECT IFNULL(MAX(folio), 0) + 1 AS siguiente_folio FROM entradas");
+            $siguienteFolio = $stmtFolio->fetch(PDO::FETCH_ASSOC)['siguiente_folio'];
+
+            $idAlmacen = $datos['id_almacen'] ?? 1;
+            $totalKgs = $datos['total_kgs'] ?? 0;
+            $totalCajas = $datos['cantidad_cajas'] ?? ($datos['total_cajas'] ?? count($datos['detalle']));
+
+            $queryEntrada = "INSERT INTO entradas (folio, id_almacen, id_proveedor, id_usuario, totalPeso, status) VALUES (?, ?, ?, ?, ?, 'A')";
             $this->db->consulta($queryEntrada, [
-                $datos['id_almacen'], 
+                $siguienteFolio, 
+                $idAlmacen, 
                 $datos['id_proveedor'], 
                 $idUsuario, 
-                $datos['total_kgs']
+                $totalKgs
             ]);
             
-            // Obtener el ID insertado
-            $stmtLastId = $this->db->consulta("SELECT LAST_INSERT_ID() as id");
-            $idEntrada = $stmtLastId->fetch(PDO::FETCH_ASSOC)['id'];
+            $idEntrada = $this->db->consulta("SELECT LAST_INSERT_ID() as id")->fetch(PDO::FETCH_ASSOC)['id'];
 
-            // 2. Procesar cada caja/producto escaneado
             foreach ($datos['detalle'] as $item) {
-                
-                // A) Buscar ID real del producto por su código
-                $queryProd = "SELECT idProducto FROM producto WHERE codigoProducto = ? LIMIT 1";
-                $stmtProd = $this->db->consulta($queryProd, [$item['codigo_producto']]);
+                $stmtProd = $this->db->consulta("SELECT idProducto FROM producto WHERE codigoProducto = ? LIMIT 1", [$item['codigo_producto']]);
                 $productoBD = $stmtProd->fetch(PDO::FETCH_ASSOC);
                 $idProducto = $productoBD ? $productoBD['idProducto'] : 1; 
 
-                // B) Insertar en entradas_detalle
+                $cantidadItem = $item['cantidad'] ?? 1;
+                $kgsItem = $item['kgs'] ?? 0;
+
                 $queryDetalle = "INSERT INTO entradas_detalle (id_entrada, partida, id_producto, cantidad, kgs) VALUES (?, ?, ?, ?, ?)";
-                $this->db->consulta($queryDetalle, [
-                    $idEntrada, 
-                    $item['partida'], 
+                $this->db->consulta($queryDetalle, [$idEntrada, $item['partida'], $idProducto, $cantidadItem, $kgsItem]);
+                
+                $idEntradaDetalle = $this->db->consulta("SELECT LAST_INSERT_ID() as id")->fetch(PDO::FETCH_ASSOC)['id'];
+
+                $codigoLoteGenerado = "LOT-" . $siguienteFolio . "-" . $item['partida'];
+                $queryLote = "INSERT INTO lote (idProducto, idUbicacion, idEntradaDetalle, idRack, codigoLote, fechaIngreso, pesoActual, estadoCalidad, activo) 
+                              VALUES (?, ?, ?, ?, ?, NOW(), ?, 'Aprobado', 1)";
+                
+                $this->db->consulta($queryLote, [
                     $idProducto, 
-                    $item['cantidad_cajas'], 
-                    $item['kgs']
+                    $idAlmacen, 
+                    $idEntradaDetalle, 
+                    1, 
+                    $codigoLoteGenerado, 
+                    $kgsItem
                 ]);
 
-                // C) 🔥 ACTUALIZAR EL INVENTARIO EN LA TABLA PRODUCTO 🔥
-                // Usamos IFNULL para que, si el campo está en NULL, lo trate como 0 antes de sumar
-                $queryUpdateStock = "UPDATE producto 
-                                     SET totalCajas = IFNULL(totalCajas, 0) + ?, 
-                                         totalPeso = IFNULL(totalPeso, 0) + ? 
-                                     WHERE idProducto = ?";
-                $this->db->consulta($queryUpdateStock, [
-                    $item['cantidad_cajas'],
-                    $item['kgs'],
-                    $idProducto
+                $this->db->consulta("UPDATE producto SET totalCajas = IFNULL(totalCajas, 0) + ?, totalPeso = IFNULL(totalPeso, 0) + ? WHERE idProducto = ?", 
+                    [$cantidadItem, $kgsItem, $idProducto]);
+            }
+
+            $this->db->consulta("INSERT INTO bitacora_movimientos (tipo, usuarioResponsable, descripcion, moduloAfectado, fecha, hora) VALUES ('entrada', ?, ?, 'Entradas', CURDATE(), CURTIME())", 
+                [$apodoUsuario, "Se registró la entrada Folio {$siguienteFolio} con {$totalCajas} cajas ({$totalKgs} Kgs)."]);
+
+            $this->db->consulta("COMMIT");
+            return ["success" => true, "folio" => $siguienteFolio];
+
+        } catch (Exception $e) {
+            $this->db->consulta("ROLLBACK");
+            error_log("Error en registrarEntradaTransaccion: " . $e->getMessage());
+            return ["success" => false, "error" => $e->getMessage()];
+        }
+    }
+
+    public function registrarEntradaCombosTransaccion($datos, $idUsuario, $apodoUsuario) {
+        try {
+            $this->db->consulta("START TRANSACTION");
+
+            $stmtFolio = $this->db->consulta("SELECT IFNULL(MAX(folio), 0) + 1 AS siguiente_folio FROM entradas");
+            $siguienteFolio = $stmtFolio->fetch(PDO::FETCH_ASSOC)['siguiente_folio'];
+
+            $idAlmacen = $datos['id_almacen'] ?? 1;
+            $idProveedor = $datos['id_proveedor'] ?? $datos['idProveedor'] ?? 0;
+            $detalle = $datos['detalle'] ?? [];
+            $totalKgs = $datos['total_kgs'] ?? 0;
+            
+            $cantidadCombosNuevos = count($detalle);
+            
+            $tipoCombo = strtolower($datos['tipo_combo'] ?? $datos['modo_captura'] ?? 'pierna');
+            $nombreFiltro = strpos($tipoCombo, 'codillo') !== false ? '%CODILLO%' : '%PIERNA%';
+
+            $queryEntrada = "INSERT INTO entradas (folio, id_almacen, id_proveedor, id_usuario, totalPeso, status) VALUES (?, ?, ?, ?, ?, 'A')";
+            $this->db->consulta($queryEntrada, [
+                $siguienteFolio, 
+                $idAlmacen, 
+                $idProveedor, 
+                $idUsuario, 
+                $totalKgs
+            ]);
+            
+            $idEntrada = $this->db->consulta("SELECT LAST_INSERT_ID() as id")->fetch(PDO::FETCH_ASSOC)['id'];
+
+            $stmtProd = $this->db->consulta("SELECT idProducto FROM producto WHERE nombreProducto LIKE ? LIMIT 1", [$nombreFiltro]);
+            $productoBD = $stmtProd->fetch(PDO::FETCH_ASSOC);
+
+            if ($productoBD) {
+                $idProducto = $productoBD['idProducto'];
+            } else {
+                $nombreProdCrear = strpos($tipoCombo, 'codillo') !== false ? 'Combo de Codillo de Cerdo' : 'Combo de Pierna de Cerdo';
+                $codigoProdCrear = strpos($tipoCombo, 'codillo') !== false ? 'CMB-COD' : 'CMB-PIE';
+                
+                $this->db->consulta("INSERT INTO producto (codigoProducto, nombreProducto, activo, totalCajas, totalPeso) VALUES (?, ?, 1, 0, 0)", 
+                    [$codigoProdCrear, $nombreProdCrear]);
+                $idProducto = $this->db->consulta("SELECT LAST_INSERT_ID() as id")->fetch(PDO::FETCH_ASSOC)['id'];
+            }
+
+            // Obtenemos las siglas del proveedor (Ej: TITAN -> TI)
+            $stmtProv = $this->db->consulta("SELECT nombreProveedor FROM proveedor WHERE idProveedor = ? LIMIT 1", [$idProveedor]);
+            $datosProv = $stmtProv->fetch(PDO::FETCH_ASSOC);
+            $nombreProveedorText = $datosProv ? strtoupper($datosProv['nombreProveedor']) : 'GEN';
+            
+            $siglasProveedor = preg_replace('/[^A-Z]/', '', $nombreProveedorText);
+            $siglasProveedor = substr($siglasProveedor, 0, 2);
+            if (empty($siglasProveedor)) $siglasProveedor = 'XX';
+
+            // Formato de fecha MMDDYYYY (Ej: 08272026)
+            $fechaFormato = date('mdY');
+
+            foreach ($detalle as $item) {
+                $pesoNetoItem = floatval($item['peso_neto'] ?? $item['pesoNeto'] ?? 0);
+                if ($pesoNetoItem <= 0) continue; 
+
+                $queryDetalle = "INSERT INTO entradas_detalle (id_entrada, partida, id_producto, cantidad, kgs) VALUES (?, ?, ?, 0, ?)";
+                $this->db->consulta($queryDetalle, [$idEntrada, $item['partida'], $idProducto, $pesoNetoItem]);
+                
+                $idEntradaDetalle = $this->db->consulta("SELECT LAST_INSERT_ID() as id")->fetch(PDO::FETCH_ASSOC)['id'];
+
+                // Construcción basada en la partida del combo (Ej: partida 3 -> 03 + TI + 08272026 = 03TI08272026)
+                $numeroPartidaStr = str_pad($item['partida'] ?? 1, 2, '0', STR_PAD_LEFT);
+                $codigoLoteGenerado = "{$numeroPartidaStr}{$siglasProveedor}{$fechaFormato}";
+                
+                $queryLote = "INSERT INTO lote (idProducto, idUbicacion, idEntradaDetalle, idRack, codigoLote, fechaIngreso, pesoActual, estadoCalidad, activo) 
+                              VALUES (?, ?, ?, ?, ?, NOW(), ?, 'Aprobado', 1)";
+                
+                $this->db->consulta($queryLote, [
+                    $idProducto, 
+                    $idAlmacen, 
+                    $idEntradaDetalle, 
+                    1, 
+                    $codigoLoteGenerado, 
+                    $pesoNetoItem
                 ]);
             }
 
-            // 3. Registrar en bitacora_movimientos
-            $desc = "Se registró la entrada Folio {$idEntrada} con {$datos['total_cajas']} cajas ({$datos['total_kgs']} Kgs).";
-            $queryBitacora = "INSERT INTO bitacora_movimientos (tipo, usuarioResponsable, descripcion, moduloAfectado, fecha, hora) VALUES ('entrada', ?, ?, 'Entradas', CURDATE(), CURTIME())";
-            $this->db->consulta($queryBitacora, [
-                $apodoUsuario,
-                $desc
-            ]);
+            // Acumulamos el conteo de combos y el peso en la tabla producto
+            $this->db->consulta("UPDATE producto SET totalCajas = IFNULL(totalCajas, 0) + ?, totalPeso = IFNULL(totalPeso, 0) + ? WHERE idProducto = ?", 
+                [$cantidadCombosNuevos, $totalKgs, $idProducto]);
 
-            // CONFIRMAR TRANSACCIÓN
+            $this->db->consulta("INSERT INTO bitacora_movimientos (tipo, usuarioResponsable, descripcion, moduloAfectado, fecha, hora) VALUES ('entrada', ?, ?, 'Entradas Combos', CURDATE(), CURTIME())", 
+                [$apodoUsuario, "Se registró la entrada de combos ({$tipoCombo}) Folio {$siguienteFolio} con {$cantidadCombosNuevos} combo(s) y {$totalKgs} Kgs."]);
+
             $this->db->consulta("COMMIT");
-
-            return ["success" => true, "folio" => $idEntrada];
+            return ["success" => true, "status" => "success", "folio" => $siguienteFolio, "message" => "Entrada de combos registrada con éxito"];
 
         } catch (Exception $e) {
-            // Deshacer todo si hubo un fallo
             $this->db->consulta("ROLLBACK");
-            error_log("Error guardando entrada e inventario: " . $e->getMessage());
-            return ["success" => false, "error" => "Error de base de datos: " . $e->getMessage()];
+            error_log("Error en registrarEntradaCombosTransaccion: " . $e->getMessage());
+            return ["success" => false, "status" => "error", "error" => $e->getMessage(), "message" => $e->getMessage()];
         }
     }
 }
+?>

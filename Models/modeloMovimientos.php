@@ -12,11 +12,10 @@ class modeloMovimientos {
      * 📝 Registra cualquier tipo de evento en el sistema de manera global
      */
     public function registrar(string $tipo, string $usuario, string $descripcion, string $modulo, ?array $detalles = null): bool {
-        $query = "INSERT INTO bitacora_movimientos (tipo, usuarioResponsable, descripcion, moduloAfectado, fecha, hora, detallesJson) 
-                  VALUES (?, ?, ?, ?, CURDATE(), CURTIME(), ?)";
+        $query = "INSERT INTO bitacora_movimientos (tipo, usuarioResponsable, descripcion, moduloAfectado, fecha, hora) 
+                  VALUES (?, ?, ?, ?, CURDATE(), CURTIME())";
         
-        $jsonDetalles = $detalles ? json_encode($detalles, JSON_UNESCAPED_UNICODE) : null;
-        $params = [$tipo, $usuario, $descripcion, $modulo, $jsonDetalles];
+        $params = [$tipo, $usuario, $descripcion, $modulo];
 
         try {
             $this->db->consulta($query, $params);
@@ -52,11 +51,11 @@ class modeloMovimientos {
         $stmtCount = $this->db->consulta($queryCount, $params);
         $totalRegistros = $stmtCount->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
-        // Carga de la página actual
-        $queryData = "SELECT idMovimiento, tipo, usuarioResponsable, descripcion, moduloAfectado, hora, detallesJson 
+        // Carga de la página actual ordenando de forma descendente por la primera columna disponible
+        $queryData = "SELECT * 
                       FROM bitacora_movimientos 
                       {$whereClause} 
-                      ORDER BY idMovimiento DESC 
+                      ORDER BY 1 DESC 
                       LIMIT $limite OFFSET $offset";
                       
         $stmtData = $this->db->consulta($queryData, $params);
@@ -70,18 +69,26 @@ class modeloMovimientos {
     }
 
     /**
-     * 📊 Obtiene el conteo de movimientos del día
+     * 📊 Obtiene el conteo de movimientos del día y las cajas ingresadas
      */
     public function obtenerContadoresDia(string $fecha): array {
         try {
+            // 1. Total de movimientos en la bitácora del día
             $qMov = "SELECT COUNT(*) as total FROM bitacora_movimientos WHERE fecha = ?";
             $stmt = $this->db->consulta($qMov, [$fecha]);
             $totalMov = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
+            // 2. Total de entradas del día
+            $qCajas = "SELECT COUNT(*) as total FROM entradas WHERE DATE(fecha_captura) = ? AND status = 'A'";
+            $stmtCajas = $this->db->consulta($qCajas, [$fecha]);
+            $cajasIngresadas = $stmtCajas->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+            $cajasDespachadas = 0; 
+
             return [
                 'movimientosDia' => $totalMov,
-                'cajasIngresadas' => 0, // Enlazar a futuro con tablas reales
-                'cajasDespachadas' => 0 
+                'cajasIngresadas' => $cajasIngresadas,
+                'cajasDespachadas' => $cajasDespachadas 
             ];
         } catch (Exception $e) {
             return ['movimientosDia' => 0, 'cajasIngresadas' => 0, 'cajasDespachadas' => 0];

@@ -634,3 +634,226 @@ body.dark-theme .modal-contenido div[style*="border-top: 2px dashed"] {
 body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
     box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15) !important;
 }
+
+@media print {
+    /* Ocultar todo por defecto */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Mostrar únicamente el contenedor principal y la tabla de inventario */
+    .main-content, .main-content *, .tablaUsuarios, .tablaUsuarios * {
+        visibility: visible;
+    }
+
+    .main-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Ocultar barras de navegación, filtros, paginación y botones superiores */
+    .header-acciones, 
+    .inventario-filtro-container, 
+    .botones-paginacion, 
+    .barra-navegacion, 
+    nav,
+    .acciones {
+        display: none !important;
+    }
+
+    .tablaUsuarios {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    .tablaUsuarios th, .tablaUsuarios td {
+        border: 1px solid #cbd5e1 !important;
+        padding: 8px !important;
+        color: #000 !important;
+    }
+}
+@media print {
+    /* Ocultar elementos generales por defecto */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Mostrar contenido principal y tabla */
+    .main-content, .main-content *, .tablaUsuarios, .tablaUsuarios * {
+        visibility: visible;
+    }
+
+    .main-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 5px;
+        background: white !important;
+    }
+
+    /* Ocultar elementos no imprimibles */
+    .header-acciones, 
+    .inventario-filtro-container, 
+    .botones-paginacion, 
+    .barra-navegacion, 
+    nav {
+        display: none !important;
+    }
+
+    
+
+    /* --- OCULTAR COLUMNAS DE ESTADO Y ACCIONES --- */
+    .tablaUsuarios th:nth-last-child(1),
+    .tablaUsuarios td:nth-last-child(1),
+    .tablaUsuarios th:nth-last-child(2),
+    .tablaUsuarios td:nth-last-child(2) {
+        display: none !important;
+    }
+
+    /* --- TABLA EXPANDIDA AL 100% --- */
+    .tablaUsuarios {
+        width: 100% !important;
+        table-layout: fixed !important; /* Fuerza a que respete el ancho total de la página */
+        border-collapse: collapse !important;
+        border: 1px solid #000 !important;
+        margin-top: 5px;
+        box-shadow: none !important;
+    }
+
+    .tablaUsuarios tr {
+        border: 1px solid #000 !important;
+        background: transparent !important;
+    }
+
+    .tablaUsuarios th {
+        background-color: #e2e8f0 !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        font-size: 11px !important;
+        padding: 8px 4px !important;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .tablaUsuarios td {
+        border: 1px solid #000 !important;
+        padding: 7px 6px !important;
+        color: #000 !important;
+        font-size: 11px !important;
+        background: transparent !important;
+        vertical-align: middle;
+        word-wrap: break-word; /* Evita que los textos largos desborden */
+    }
+
+    /* Distribución de porcentajes por columna para llenar todo el ancho */
+    .tablaUsuarios th:nth-child(1), .tablaUsuarios td:nth-child(1) { width: 15%; text-align: center; } /* Código */
+    .tablaUsuarios th:nth-child(2), .tablaUsuarios td:nth-child(2) { width: 30%; } /* Producto */
+    .tablaUsuarios th:nth-child(3), .tablaUsuarios td:nth-child(3) { width: 15%; text-align: center; } /* Categoría */
+    .tablaUsuarios th:nth-child(4), .tablaUsuarios td:nth-child(4) { width: 20%; } /* Proveedor */
+    .tablaUsuarios th:nth-child(5), .tablaUsuarios td:nth-child(5) { width: 10%; text-align: center; } /* Cajas */
+    .tablaUsuarios th:nth-child(6), .tablaUsuarios td:nth-child(6) { width: 10%; text-align: right; }  /* Peso */
+}
+ /* ===================================================================
+   REGLAS DE IMPRESIÓN CORPORATIVA (LFI)
+=================================================================== */
+@media print {
+    /* Ocultar todo por defecto */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Mostrar únicamente el contenedor, el membrete oficial con logo, tarjetas y tabla */
+    .contenedor, .contenedor *, .main-content, .main-content *, .header-impresion-oficial, .header-impresion-oficial *, .cards, .cards *, .tablaUsuarios, .tablaUsuarios * {
+        visibility: visible;
+    }
+
+    .contenedor, .main-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 5px;
+        background: white !important;
+    }
+
+    .header-impresion-oficial {
+        display: block !important;
+    }
+
+    /* Ocultar elementos de la interfaz que no deben imprimirse */
+    .header-acciones,
+    .inventario-header,
+    .inventario-filtro-container,
+    .botones-paginacion,
+    button, 
+    .btn-exportar,
+    .btn-imprimir,
+    .btn-agregar-prod,
+    .btn-agregar-prov,
+    nav, 
+    .barra-navegacion, 
+    .top-bar-dashboard,
+    .acciones {
+        display: none !important;
+    }
+
+    /* Ocultar columnas de acciones o estados al final de la tabla si es necesario */
+    .tablaUsuarios th:nth-last-child(1),
+    .tablaUsuarios td:nth-last-child(1) {
+        display: none !important;
+    }
+
+    /* Estilo para las tarjetas de estadísticas en papel */
+    .cards {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .card {
+        border: 1px solid #cbd5e1 !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+
+    /* Estilo de la tabla de inventario para papel */
+    .tablaUsuarios {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 10px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .tablaUsuarios th {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 10px 12px !important;
+        font-size: 11px !important;
+        text-transform: uppercase;
+        text-align: left;
+    }
+
+    .tablaUsuarios td {
+        border-bottom: 1px solid #cbd5e1 !important;
+        padding: 9px 12px !important;
+        color: #1e293b !important;
+        font-size: 11px !important;
+        background: transparent !important;
+    }
+}
+
+@page {
+    size: auto;
+    margin: 10mm;
+}

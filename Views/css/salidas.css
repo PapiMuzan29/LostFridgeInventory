@@ -52,11 +52,12 @@ body {
 }
 
 .logo-lfi {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    margin-bottom: 20px;
-    margin-top: -15px;
+    width: 140px;          
+    height: 140px;         
+    object-fit: contain;   
+    display: block;
+    margin: 0 auto 20px auto; 
+    margin-top: 10px;      
 }
 
 .titulo-lfi {
@@ -359,4 +360,73 @@ body {
     position: fixed !important;
     pointer-events: none !important;
     z-index: 99999999 !important;
+}
+
+/* ================================================= */
+/* CONTENEDOR DE REJILLA: TABLA + PANEL LATERAL      */
+/* ================================================= */
+.seccion-tabla-totales-grid {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.seccion-tabla-totales-grid > .tabla-partidas-container {
+    flex: 1;
+    overflow-x: auto;
+}
+
+.seccion-tabla-totales-grid > .panel-totales-entradas {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+/* ================================================= */
+/* FORMULARIO SUPERIOR EN GRID (IDÉNTICO A ENTRADAS)  */
+/* ================================================= */
+.formulario-matriz-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 20px;
+}
+
+.text-span-2 {
+    grid-column: span 2;
+}
+
+/* =================================================================== */
+/* CORRECCIÓN DE MODO OSCURO EN SALIDAS (Usando dark-theme)            */
+/* =================================================================== */
+body.dark-theme .card-entrada,
+body.dark-theme .tabla-partidas-container,
+body.dark-theme .panel-totales-entradas {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .tablaUsuarios tr,
+body.dark-theme .tablaUsuarios td,
+body.dark-theme .tablaUsuarios th,
+body.dark-theme #tablaPartidasBody tr,
+body.dark-theme #tablaPartidasBody td {
+    background-color: #121215 !important;
+    color: #ffffff !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .tablaUsuarios tbody tr:hover,
+body.dark-theme #tablaPartidasBody tr:hover {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .tablaUsuarios input,
+body.dark-theme #tablaPartidasBody input {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border: 1px solid #27272a !important;
 }
