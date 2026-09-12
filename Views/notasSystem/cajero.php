@@ -25,6 +25,7 @@ $nombreUsuario = $_SESSION['apodoUsuario'] ?? $_SESSION['nombreUsuario'] ?? 'Caj
     <link rel="stylesheet" href="../Views/notasSystem/CSS/cajero.css">
     <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
 </head>
+<?php include __DIR__ . '/chat.php'; ?>
 <body>
      
     <header class="app-header">

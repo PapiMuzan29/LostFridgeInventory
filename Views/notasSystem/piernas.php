@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-
 $rolesPermitidos = [1, 5];
 require_once __DIR__ . '/../../Config/cadenero.php';
 
-// piernas.php
 $fechaActual = isset($_GET['fecha']) && !empty($_GET['fecha']) ? $_GET['fecha'] : date('Y-m-d');
-$comboActual = isset($_GET['combo']) ? $_GET['combo'] : 'todos';
+$comboActual = isset($_GET['combo']) ? $_GET['combo'] : 'combo1';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -22,143 +20,305 @@ $comboActual = isset($_GET['combo']) ? $_GET['combo'] : 'todos';
     <!-- CSS Externo -->
     <link rel="stylesheet" href="CSS/piernas.css">
     
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 16px;
+            padding-bottom: 90px;
+        }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .btn-volver {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .module-badge {
+            background: #1e293b;
+            color: #38bdf8;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #334155;
+        }
+        .user-badge {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 1px solid #334155;
+        }
+        .date-selector {
+            background: #131b2e;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .date-selector button {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #f8fafc;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .date-display {
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #f8fafc;
+        }
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .combos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-combo {
+            background: #131b2e;
+            border: 1px solid #1e293b;
+            color: #94a3b8;
+            padding: 14px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-combo.active {
+            background: #1e293b;
+            border: 2px solid #f59e0b;
+            color: #ffffff;
+        }
+        .card-total-dia {
+            background: #1f170e;
+            border: 1px solid #78350f;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .card-total-dia span.titulo {
+            font-size: 11px;
+            font-weight: 700;
+            color: #f59e0b;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .card-total-dia span.valor {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        .card-total-dia i {
+            font-size: 28px;
+            color: #f59e0b;
+        }
+        .venta-item {
+            background: #131b2e;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .venta-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .venta-cliente {
+            font-weight: 700;
+            font-size: 14px;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .venta-ticket {
+            font-size: 12px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .venta-badge-pzs {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #f59e0b;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 14px;
+            min-width: 45px;
+        }
+        .bottom-total-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #0b0f19;
+            padding: 12px 16px;
+            box-sizing: border-box;
+            border-top: 1px solid #1e293b;
+        }
+        .bottom-total-content {
+            background: #131b2e;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 14px 20px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .bottom-total-content span.label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .bottom-total-content span.val {
+            font-size: 18px;
+            font-weight: 800;
+            color: #f59e0b;
+        }
+    </style>
 </head>
 <body>
 
-    <header class="piernas-header">
-        <div class="piernas-top-bar">
-            <button type="button" class="btn-back" onclick="volverPantallaAnterior()">
-                <i class="fas fa-arrow-left"></i> Volver
-            </button>
-            <span class="module-title">MÓDULO PIERNAS</span>
+    <!-- BARRA SUPERIOR -->
+    <div class="top-nav">
+        <a href="inventario.php" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver</a>
+        <div class="module-badge"><i class="fa-solid fa-drumstick-bite"></i> Módulo Piernas</div>
+        <div class="user-badge"><i class="fa-solid fa-user"></i> <?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Admin') ?></div>
+    </div>
+
+    <!-- SELECTOR DE FECHA -->
+    <div class="date-selector">
+        <button type="button"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="date-display">
+            <i class="far fa-calendar-alt" style="color: #f59e0b;"></i> 
+            <span id="display-fecha"><?php echo htmlspecialchars($fechaActual); ?></span>
         </div>
+        <button type="button"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
 
-        <div class="date-picker-trigger">
-            <i class="far fa-calendar-alt"></i>
-            <span id="fecha-piernas-display"><?php echo htmlspecialchars($fechaActual); ?></span>
-            <input type="date" id="fecha-piernas-input" value="<?php echo htmlspecialchars($fechaActual); ?>" onchange="actualizarFechaPiernas(this.value)">
+    <!-- SELECCIONA COMBO -->
+    <span class="section-label">SELECCIONA COMBO</span>
+    <div class="combos-grid">
+        <button type="button" class="btn-combo active" onclick="seleccionarCombo('combo1')">
+            <i class="fa-solid fa-box"></i> Combo 1
+        </button>
+        <button type="button" class="btn-combo" onclick="seleccionarCombo('combo2')">
+            <i class="fa-solid fa-box"></i> Combo 2
+        </button>
+        <button type="button" class="btn-combo" onclick="seleccionarCombo('todos')">
+            <i class="fa-solid fa-boxes-stacked"></i> Todos
+        </button>
+    </div>
+
+    <!-- TOTAL DEL DÍA -->
+    <div class="card-total-dia">
+        <div>
+            <span class="titulo">TOTAL DEL DÍA (COMBO 1)</span>
+            <span class="valor" id="txtTotalDia">0 unidades (0.00 kg)</span>
         </div>
+        <i class="fa-solid fa-boxes-stacked"></i>
+    </div>
 
-        <div class="combo-selector-wrapper">
-            <label for="combo-select">Combo:</label>
-            <select id="combo-select" class="combo-select" onchange="cambiarComboPiernas(this.value)">
-                <option value="todos" <?php echo $comboActual === 'todos' ? 'selected' : ''; ?>>Todos los combos</option>
-                <option value="combo1" <?php echo $comboActual === 'combo1' ? 'selected' : ''; ?>>Combo 1</option>
-                <option value="combo2" <?php echo $comboActual === 'combo2' ? 'selected' : ''; ?>>Combo 2</option>
-            </select>
-            <i class="fas fa-chevron-down combo-dropdown-icon"></i>
-        </div>
-
-        <nav class="sub-tabs-container">
-            <button type="button" class="sub-tab-btn active" onclick="desplazarAPestania(0)">Registros</button>
-            <button type="button" class="sub-tab-btn" onclick="desplazarAPestania(1)">Resumen</button>
-        </nav>
-    </header>
-
-    <div class="piernas-viewport" id="piernas-viewport">
-        <div class="piernas-slider" id="piernas-slider">
-            
-            <!-- Pestaña 0: Registros -->
-            <div class="subtab-pane" id="pane-registros">
-                <p class="section-subtitle">DETALLE DE ENTREGAS</p>
-                <div id="lista-registros-piernas" class="records-list">
-                    <div style="text-align:center; padding: 30px; color: #64748b;">
-                        <i class="fas fa-spinner fa-spin fa-2x"></i>
-                        <p style="margin-top:12px; font-weight: 600;">Cargando registros...</p>
-                    </div>
+    <!-- LISTADO DE VENTAS / NOTAS -->
+    <span class="section-label" id="lblSubtituloVentas">VENTAS COMBO 1</span>
+    <div id="contenedorVentasPiernas">
+        <!-- Ejemplo visual de tarjeta de venta basada en notas -->
+        <div class="venta-item">
+            <div class="venta-info">
+                <div class="venta-cliente">
+                    <i class="fa-solid fa-user" style="color: #f59e0b; font-size: 12px;"></i> Cliente: ChuyLux
+                </div>
+                <div class="venta-ticket">
+                    <i class="fa-solid fa-receipt" style="font-size: 11px;"></i> Ticket: #1042
                 </div>
             </div>
+            <div class="venta-badge-pzs">
+                12 <span style="font-size:9px; display:block; font-weight:normal; color:#94a3b8;">pzs</span>
+            </div>
+        </div>
 
-            <!-- Pestaña 1: Resumen -->
-            <div class="subtab-pane" id="pane-resumen">
-                <p class="section-subtitle">TOTALES ACUMULADOS</p>
-                <div id="contenido-resumen-piernas">
-                    <div style="text-align:center; padding: 30px; color: #64748b;">
-                        <i class="fas fa-spinner fa-spin fa-2x"></i>
-                        <p style="margin-top:12px; font-weight: 600;">Cargando resumen...</p>
-                    </div>
+        <div class="venta-item">
+            <div class="venta-info">
+                <div class="venta-cliente">
+                    <i class="fa-solid fa-user" style="color: #f59e0b; font-size: 12px;"></i> Cliente: Mostrador
+                </div>
+                <div class="venta-ticket">
+                    <i class="fa-solid fa-receipt" style="font-size: 11px;"></i> Ticket: #1045
                 </div>
             </div>
-
+            <div class="venta-badge-pzs">
+                4 <span style="font-size:9px; display:block; font-weight:normal; color:#94a3b8;">pzs</span>
+            </div>
         </div>
     </div>
 
-    <div id="combo-total-bar" class="combo-total-bar">
-        <span class="total-label">TOTAL DEL COMBO</span>
-        <span class="total-values" id="texto-totales-piernas">0 Cajas / 0.00 Kg</span>
+    <!-- BARRA INFERIOR DE TOTAL GENERAL -->
+    <div class="bottom-total-bar">
+        <div class="bottom-total-content">
+            <span class="label">TOTAL GENERAL ACUMULADO</span>
+            <span class="val" id="txtTotalGeneral">16 unidades (124.50 kg)</span>
+        </div>
     </div>
 
     <script>
-        const slider = document.getElementById('piernas-slider');
-        const totalBar = document.getElementById('combo-total-bar');
-        const tabBtns = document.querySelectorAll('.sub-tab-btn');
-
-        let pestaniaActual = 0;
-        let startX = 0;
-        let startY = 0;
-
-        function desplazarAPestania(index) {
-            pestaniaActual = index;
-            if (slider) {
-                slider.style.transform = `translateX(-${index * 50}%)`;
-            }
-
-            tabBtns.forEach((btn, i) => {
-                btn.classList.toggle('active', i === index);
-            });
-
-            if (totalBar) {
-                if (index === 0) {
-                    totalBar.classList.remove('hidden');
-                } else {
-                    totalBar.classList.add('hidden');
-                }
-            }
-        }
-
-        document.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-        }, { passive: true });
-
-        document.addEventListener('touchend', (e) => {
-            if (!startX || !startY) return;
-
-            const endX = e.changedTouches[0].clientX;
-            const endY = e.changedTouches[0].clientY;
-
-            const diffX = startX - endX;
-            const diffY = startY - endY;
-
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (Math.abs(diffX) > 40) {
-                    if (diffX > 0 && pestaniaActual === 0) {
-                        desplazarAPestania(1);
-                    } else if (diffX < 0 && pestaniaActual === 1) {
-                        desplazarAPestania(0);
-                    }
-                }
-            }
-
-            startX = 0;
-            startY = 0;
-        }, { passive: true });
-
-        function volverPantallaAnterior() {
-            if (document.referrer) {
-                window.location.href = document.referrer;
-            } else {
-                window.history.back();
-            }
-        }
-
-        function actualizarFechaPiernas(fecha) {
-            const display = document.getElementById('fecha-piernas-display');
-            if (display) display.innerText = fecha;
-        }
-
-        function cambiarComboPiernas(combo) {
-            // Lógica AJAX
+        function seleccionarCombo(combo) {
+            document.querySelectorAll('.btn-combo').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            const nombreCombo = combo === 'todos' ? 'Todos los Combos' : (combo === 'combo1' ? 'Combo 1' : 'Combo 2');
+            document.querySelector('.card-total-dia span.titulo').textContent = `TOTAL DEL DÍA (${nombreCombo.toUpperCase()})`;
+            document.getElementById('lblSubtituloVentas').textContent = `VENTAS ${nombreCombo.toUpperCase()}`;
+            
+            // Aquí puedes conectar el consumo visual de tus notas mediante AJAX o recarga
         }
     </script>
 </body>

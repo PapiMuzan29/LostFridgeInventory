@@ -61,7 +61,7 @@ $destinoNotas = 'notasSystem/vendedor.php'; // Predeterminado
 
 switch ($idRol) {
     case 1: // Administrador
-        $destinoNotas = 'notasSystem/vendedor.php';
+        $destinoNotas = 'notasSystem/encargado.php';
         break;
     case 2: // Vendedor
         $destinoNotas = 'notasSystem/vendedor.php';
@@ -124,9 +124,10 @@ switch ($idRol) {
     </style>
 </head>
 
+
 <body>
     <?php include 'assets/barraNavegacion.php'; ?>
-
+    <?php include __DIR__ . '/notasSystem/chat.php' ?>
     <div class="contenedor" style="padding: 24px;">
 
         <div class="card-inicio card-bienvenida-usuario" style="position: relative;">

@@ -7,9 +7,10 @@
     <title>Chat Privado y Grupal</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="CSS/chat.css">
-</head>
+<link rel="stylesheet" href="/LostFridgeInventory/Views/NotasSystem/CSS/chat.css"></head>
+
 <body>
+
 
     <!-- Botón Flotante para Abrir Chat -->
     <button id="btn-toggle-chat" class="chat-float-btn" type="button" aria-label="Abrir Chat Privado">
@@ -98,6 +99,6 @@
         </div>
     </div>
 
-    <script src="chat.js" defer></script>
+    <script src="/LostFridgeInventory/Views/NotasSystem/chat.js" defer></script>
 </body>
 </html>

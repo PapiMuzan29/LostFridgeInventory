@@ -155,7 +155,7 @@ try {
 
                 <div class="input-costo-line" style="flex: 1; display: flex; align-items: center; gap: 12px;">
                     <label class="label-inline" style="font-weight: 700;">Costo:</label>
-                    <input type="number" id="inputCosto" name="costo" class="input-captura" value="0.00" step="0.01" style="width: 100%; height: 40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 12px;">
+                    <input type="number" id="inputCosto" name="costo" class="input-captura" value="0.00" step="any" style="width: 100%; height: 40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 12px;">
                 </div>
 
                 <div class="modos-captura-radios" style="display: flex; gap: 16px;">
@@ -187,7 +187,7 @@ try {
                     </div>
                     <div style="flex: 1; min-width: 180px;">
                         <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">Cantidad de Envases:</label>
-                        <input type="number" id="inputCantidadManteca" class="input-captura" value="1" min="1" style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; background: white;">
+                        <input type="number" id="inputCantidadManteca" class="input-captura" value="1" min="1" step="any" style="width: 100%; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; background: white;">
                     </div>
                     <div style="display: flex; align-items: flex-end;">
                         <button type="button" onclick="agregarFilaManteca()" class="btnAplicar" style="height: 38px; padding: 0 20px; background: #0f172a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
@@ -331,14 +331,14 @@ try {
                     htmlCombos += `
                         <tr class="fila-combo" data-index="${i}">
                             <td><strong>${i}</strong></td>
-                            <td><input type="number" step="0.1" class="input-combo-grid peso-bruto" oninput="calcularFilaCombo(${i})" value=""></td>
-                            <td><input type="number" step="1" class="input-combo-grid lb-tara" value="58" oninput="calcularFilaCombo(${i})"></td>
+                            <td><input type="number" step="any" class="input-combo-grid peso-bruto" oninput="calcularFilaCombo(${i})" value=""></td>
+                            <td><input type="number" step="any" class="input-combo-grid lb-tara" value="58" oninput="calcularFilaCombo(${i})"></td>
                             <td><span class="kg-tara">0.00</span></td>
                             <td><span class="peso-neto font-bold text-success">0.00</span></td>
-                            <td><input type="number" step="0.1" class="input-combo-grid peso-origen" oninput="calcularFilaCombo(${i})" value=""></td>
+                            <td><input type="number" step="any" class="input-combo-grid peso-origen" oninput="calcularFilaCombo(${i})" value=""></td>
                             <td><span class="merma">0.00</span></td>
                             <td><span class="porcentaje">0.00</span></td>
-                            <td><input type="number" step="0.1" class="input-combo-grid diferencia" value="0"></td>
+                            <td><input type="number" step="any" class="input-combo-grid diferencia" value="0.00"></td>
                         </tr>
                     `;
                 }

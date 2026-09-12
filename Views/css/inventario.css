@@ -473,7 +473,7 @@ body.dark-theme .btn-limpiar-inv:hover {
     background-color: #27272a !important;
 }
 
-/* Tabla de Inventario y Visibilidad de Números/Existencias */
+/* Tabla de Inventario y Visibilidad de Celdas */
 body.dark-theme .tabla-inventario,
 body.dark-theme .tablaUsuarios {
     background-color: #121215 !important;
@@ -502,30 +502,63 @@ body.dark-theme .tablaUsuarios tbody tr:hover {
     background-color: #18181b !important;
 }
 
-/* Badges de Categorías y Ubicación en Modo Oscuro (Legibilidad Corregida) */
-body.dark-theme .badge-extra,
+/* Visibilidad de Existencias Garantizada */
+body.dark-theme .tabla-inventario td:nth-child(5),
+body.dark-theme .tablaUsuarios td:nth-last-child(3) {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* 🎯 ELIMINAR TOTALMENTE CUADRADITOS BLANCOS DE CATEGORÍA CON MÁXIMA PRIORIDAD */
 body.dark-theme .badge-categoria,
-body.dark-theme .tablaUsuarios td span.badge-extra,
+body.dark-theme .badge-extra,
 body.dark-theme .tablaUsuarios td span.badge-categoria,
-body.dark-theme .tabla-inventario td span.badge-extra,
-body.dark-theme .tabla-inventario td span.badge-categoria {
-    background-color: rgba(3, 105, 161, 0.25) !important;
+body.dark-theme .tablaUsuarios td span.badge-extra,
+body.dark-theme .tabla-inventario td span.badge-categoria,
+body.dark-theme .tabla-inventario td span.badge-extra {
+    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
     color: #38bdf8 !important;
-    border: 1px solid rgba(56, 189, 248, 0.3) !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 body.dark-theme .badge-ubicacion,
 body.dark-theme .tablaUsuarios td span.badge-ubicacion,
 body.dark-theme .tabla-inventario td span.badge-ubicacion {
-    background-color: rgba(30, 64, 175, 0.3) !important;
+    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
     color: #93c5fd !important;
-    border-color: rgba(147, 197, 253, 0.3) !important;
+    padding: 0 !important;
+    box-shadow: none !important;
 }
 
-body.dark-theme .estado-optimo {
-    background-color: rgba(22, 163, 74, 0.25) !important;
-    color: #4ade80 !important;
-    border-color: rgba(74, 222, 128, 0.3) !important;
+/* Estado Activo / Óptimo en Modo Oscuro (Diseño oscuro sobrio) */
+body.dark-theme .estado-optimo,
+body.dark-theme .estado,
+body.dark-theme .activo {
+    background-color: #18181b !important;
+    color: #f4f4f5 !important;
+    border: 1px solid #27272a !important;
+}
+
+/* Botones de Pestañas Superiores (Cajas, Combos, Mantecas) */
+body.dark-theme .tabs-inventario .tab-btn {
+    background-color: #121215 !important;
+    color: #a1a1aa !important;
+    border: 1px solid #27272a !important;
+}
+
+body.dark-theme .tabs-inventario .tab-btn.activo {
+    background-color: #38bdf8 !important;
+    color: #0a0a0c !important;
+    border-color: #38bdf8 !important;
+    font-weight: 700 !important;
 }
 
 /* Paginación Footer */
@@ -558,13 +591,11 @@ body.dark-theme .btn-pagina.activa {
    7. REGLAS MODALES (AGREGAR / EDITAR PROVEEDOR Y PRODUCTO)
 =================================================================== */
 
-/* Limpieza de íconos o pseudoelementos indeseados en etiquetas del modal */
 .modal-contenido label::before,
 .modal-contenido label::after {
     content: none !important;
 }
 
-/* Ajuste de contenedor del modal en modo oscuro */
 body.dark-theme .modal-contenido {
     background-color: #121215 !important;
     border: 1px solid #27272a !important;
@@ -576,19 +607,16 @@ body.dark-theme .modal-contenido h3 {
     color: #ffffff !important;
 }
 
-/* Corrección de recuadros QR para que se adapten al modo oscuro */
 body.dark-theme .modal-contenido div[style*="background: #f8fafc"],
 body.dark-theme .modal-contenido div[style*="background-color: #f8fafc"] {
     background-color: #18181b !important;
     border-color: #27272a !important;
 }
 
-/* Labels dentro del modal en modo oscuro */
 body.dark-theme .modal-contenido label {
     color: #a1a1aa !important;
 }
 
-/* Inputs y Selects dentro de modales en modo oscuro */
 body.dark-theme .modal-contenido input,
 body.dark-theme .modal-contenido select {
     background-color: #0a0a0c !important;
@@ -596,179 +624,48 @@ body.dark-theme .modal-contenido select {
     color: #ffffff !important;
 }
 
-/* Títulos de las tarjetas QR */
 body.dark-theme .modal-contenido span[style*="color: #0d6efd"] {
     color: #60a5fa !important;
 }
 
-/* Línea divisoria punteada */
 body.dark-theme .modal-contenido div[style*="border-top: 2px dashed"] {
     border-top-color: #27272a !important;
 }
 
+
 /* ===================================================================
    EFECTOS HOVER Y FOCO EN BOTONES DE GUARDAR EN MODALES
 =================================================================== */
-
-/* Estado normal del botón guardar en el modal */
 .modal-contenido .btnGuardarUsuario {
     transition: all 0.2s ease-in-out !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer !important;
 }
 
-/* Efecto al pasar el mouse por encima (Hover) */
 .modal-contenido .btnGuardarUsuario:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     filter: brightness(1.15);
 }
 
-/* Efecto de clic sostenido (Active) */
 .modal-contenido .btnGuardarUsuario:active {
     transform: translateY(0);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Adaptación para Tema Oscuro */
 body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
     box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15) !important;
 }
 
-@media print {
-    /* Ocultar todo por defecto */
-    body * {
-        visibility: hidden;
-    }
-    
-    /* Mostrar únicamente el contenedor principal y la tabla de inventario */
-    .main-content, .main-content *, .tablaUsuarios, .tablaUsuarios * {
-        visibility: visible;
-    }
 
-    .main-content {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-    }
-
-    /* Ocultar barras de navegación, filtros, paginación y botones superiores */
-    .header-acciones, 
-    .inventario-filtro-container, 
-    .botones-paginacion, 
-    .barra-navegacion, 
-    nav,
-    .acciones {
-        display: none !important;
-    }
-
-    .tablaUsuarios {
-        width: 100% !important;
-        border-collapse: collapse !important;
-    }
-
-    .tablaUsuarios th, .tablaUsuarios td {
-        border: 1px solid #cbd5e1 !important;
-        padding: 8px !important;
-        color: #000 !important;
-    }
-}
-@media print {
-    /* Ocultar elementos generales por defecto */
-    body * {
-        visibility: hidden;
-    }
-    
-    /* Mostrar contenido principal y tabla */
-    .main-content, .main-content *, .tablaUsuarios, .tablaUsuarios * {
-        visibility: visible;
-    }
-
-    .main-content {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 5px;
-        background: white !important;
-    }
-
-    /* Ocultar elementos no imprimibles */
-    .header-acciones, 
-    .inventario-filtro-container, 
-    .botones-paginacion, 
-    .barra-navegacion, 
-    nav {
-        display: none !important;
-    }
-
-    
-
-    /* --- OCULTAR COLUMNAS DE ESTADO Y ACCIONES --- */
-    .tablaUsuarios th:nth-last-child(1),
-    .tablaUsuarios td:nth-last-child(1),
-    .tablaUsuarios th:nth-last-child(2),
-    .tablaUsuarios td:nth-last-child(2) {
-        display: none !important;
-    }
-
-    /* --- TABLA EXPANDIDA AL 100% --- */
-    .tablaUsuarios {
-        width: 100% !important;
-        table-layout: fixed !important; /* Fuerza a que respete el ancho total de la página */
-        border-collapse: collapse !important;
-        border: 1px solid #000 !important;
-        margin-top: 5px;
-        box-shadow: none !important;
-    }
-
-    .tablaUsuarios tr {
-        border: 1px solid #000 !important;
-        background: transparent !important;
-    }
-
-    .tablaUsuarios th {
-        background-color: #e2e8f0 !important;
-        color: #000 !important;
-        border: 1px solid #000 !important;
-        font-size: 11px !important;
-        padding: 8px 4px !important;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    .tablaUsuarios td {
-        border: 1px solid #000 !important;
-        padding: 7px 6px !important;
-        color: #000 !important;
-        font-size: 11px !important;
-        background: transparent !important;
-        vertical-align: middle;
-        word-wrap: break-word; /* Evita que los textos largos desborden */
-    }
-
-    /* Distribución de porcentajes por columna para llenar todo el ancho */
-    .tablaUsuarios th:nth-child(1), .tablaUsuarios td:nth-child(1) { width: 15%; text-align: center; } /* Código */
-    .tablaUsuarios th:nth-child(2), .tablaUsuarios td:nth-child(2) { width: 30%; } /* Producto */
-    .tablaUsuarios th:nth-child(3), .tablaUsuarios td:nth-child(3) { width: 15%; text-align: center; } /* Categoría */
-    .tablaUsuarios th:nth-child(4), .tablaUsuarios td:nth-child(4) { width: 20%; } /* Proveedor */
-    .tablaUsuarios th:nth-child(5), .tablaUsuarios td:nth-child(5) { width: 10%; text-align: center; } /* Cajas */
-    .tablaUsuarios th:nth-child(6), .tablaUsuarios td:nth-child(6) { width: 10%; text-align: right; }  /* Peso */
-}
- /* ===================================================================
+/* ===================================================================
    REGLAS DE IMPRESIÓN CORPORATIVA (LFI)
 =================================================================== */
 @media print {
-    /* Ocultar todo por defecto */
     body * {
         visibility: hidden;
     }
     
-    /* Mostrar únicamente el contenedor, el membrete oficial con logo, tarjetas y tabla */
     .contenedor, .contenedor *, .main-content, .main-content *, .header-impresion-oficial, .header-impresion-oficial *, .cards, .cards *, .tablaUsuarios, .tablaUsuarios * {
         visibility: visible;
     }
@@ -787,7 +684,6 @@ body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
         display: block !important;
     }
 
-    /* Ocultar elementos de la interfaz que no deben imprimirse */
     .header-acciones,
     .inventario-header,
     .inventario-filtro-container,
@@ -804,13 +700,11 @@ body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
         display: none !important;
     }
 
-    /* Ocultar columnas de acciones o estados al final de la tabla si es necesario */
     .tablaUsuarios th:nth-last-child(1),
     .tablaUsuarios td:nth-last-child(1) {
         display: none !important;
     }
 
-    /* Estilo para las tarjetas de estadísticas en papel */
     .cards {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
@@ -826,7 +720,6 @@ body.dark-theme .modal-contenido .btnGuardarUsuario:hover {
         box-shadow: none !important;
     }
 
-    /* Estilo de la tabla de inventario para papel */
     .tablaUsuarios {
         width: 100% !important;
         border-collapse: collapse !important;

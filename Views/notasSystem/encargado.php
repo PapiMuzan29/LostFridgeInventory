@@ -12,8 +12,13 @@ require_once __DIR__ . '/../../Config/cadenero.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Módulo Encargado - Grupo Cárnico América</title>
     <link rel="stylesheet" href="CSS/encargado.css">
+    
+    
     <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
 </head>
+
+
+
 <body>
     
   
@@ -22,10 +27,19 @@ require_once __DIR__ . '/../../Config/cadenero.php';
         <h1>Grupo Cárnico América</h1>
         <p id="header-subtitle">Revisión de Notas</p>
 
-        <div style="background-color: rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 8px; color: #ffffff; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">
-            <i class="fa-solid fa-circle-user" style="font-size: 1.1rem;"></i>
-            <span><?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Encargado') ?></span>
+        <div style="display:flex; align-items:center; gap: 15px;">
+            <div style="position: relative; cursor: pointer;" onclick="abrirModalAutorizaciones()">
+                <i class="fa-solid fa-bell" id="campana-noti" style="font-size: 1.4rem; color: #fff;"></i>
+                <span id="badge-autorizaciones" style="display:none; position: absolute; top: -5px; right: -8px; background: #e53e3e; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 50%;">0</span>
+            </div>
+            <div style="background-color: rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 8px; color: #ffffff; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">
+                    <i class="fa-solid fa-circle-user" style="font-size: 1.1rem;"></i>
+                    <span><?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Encargado') ?></span>
+            </div>
         </div>
+        
+        <audio id="audio-noti" src="/LostFridgeInventory/SRC/sounds/noti.wav" preload="auto"></audio>
+                    
     </header>
 
     <main class="app-content">
@@ -157,6 +171,26 @@ require_once __DIR__ . '/../../Config/cadenero.php';
                         </p>
                     </div>
                 </div>
+            </div>
+
+            <!-- MINI INVENTARIO EN RUTA -->
+            <div class="resumen-section-header" style="margin-top: 25px;">
+                <h3>INVENTARIO MAYOREO</h3>
+            </div>
+            
+            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead style="background-color: var(--bg-dark-header, #0f172a); color: white;">
+                        <tr>
+                            <th style="padding: 12px 15px;">Producto</th>
+                            <th style="padding: 12px 15px;">Stock en Ruta</th>
+                            <th style="padding: 12px 15px; text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-inventario-temporal">
+                        <tr><td colspan="3" style="text-align:center; padding: 15px;">Cargando inventario...</td></tr>
+                    </tbody>
+                </table>
             </div>
 
         </div>
@@ -321,7 +355,124 @@ require_once __DIR__ . '/../../Config/cadenero.php';
             </div>
         </div>
     </div>
-    
+
+    <!-- Modal Lista Autorizaciones -->
+    <div id="modalAutorizaciones" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-shield-halved"></i> Autorizaciones Pendientes</h2>
+                <button type="button" class="btn-close-modal" onclick="document.getElementById('modalAutorizaciones').classList.remove('active')">&times;</button>
+            </div>
+            <div class="modal-body" id="lista-autorizaciones-container" style="max-height: 60vh; overflow-y: auto;">
+                Cargando...
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Password -->
+    <div id="modalPasswordAutorizacion" class="modal-overlay" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 350px;">
+            <div class="modal-header">
+                <h2>Seguridad</h2>
+                <button type="button" class="btn-close-modal" onclick="document.getElementById('modalPasswordAutorizacion').classList.remove('active')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="auth_id_nota">
+                <div class="form-group">
+                    <label>Contraseña de Encargado</label>
+                    <input type="password" id="auth_password" class="form-control" placeholder="****">
+                </div>
+                <button type="button" class="btn-primary" style="width:100%; margin-top:15px;" onclick="confirmarPasswordAutorizacion()">Autorizar Nota</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Password -->
+<div id="modalPasswordAutorizacion" class="modal-overlay" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 350px;">
+        <div class="modal-header">
+            <h2><i class="fa-solid fa-lock"></i> Seguridad</h2>
+            <button type="button" class="btn-close-modal" onclick="document.getElementById('modalPasswordAutorizacion').classList.remove('active')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="auth_id_nota">
+            
+            <div class="form-group" style="margin-bottom: 5px;">
+                <label>Contraseña de Encargado</label>
+                <input type="password" id="auth_password" class="form-control" placeholder="****">
+            </div>
+            
+            <!-- SPAN DE ERROR OCULTO -->
+            <span id="auth_error_msg" style="color: #e53e3e; font-size: 0.85rem; font-weight: bold; display: none;">
+                <i class="fa-solid fa-circle-exclamation"></i> Contraseña incorrecta.
+            </span>
+            
+            <button type="button" class="btn-primary" style="width:100%; margin-top:15px;" onclick="confirmarPasswordAutorizacion()">Autorizar Nota</button>
+        </div>
+    </div>
+</div>
+
+<!-- NUEVO: Modal Confirmar Rechazo -->
+<div id="modalConfirmarRechazo" class="modal-overlay" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 350px; text-align: center;">
+        <div style="color: #e53e3e; font-size: 3rem; margin-bottom: 15px;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 style="margin-bottom: 10px;">¿Rechazar esta nota?</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">El inventario será devuelto al sistema y la nota será cancelada.</p>
+        
+        <input type="hidden" id="rechazo_id_nota">
+        
+        <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn-secondary-sm" style="flex: 1;" onclick="document.getElementById('modalConfirmarRechazo').classList.remove('active')">Cancelar</button>
+            <button type="button" class="btn-primary" style="flex: 1; background-color: #e53e3e; border: none;" onclick="ejecutarRechazo()">Sí, rechazar</button>
+        </div>
+    </div>
+</div>
+
+    <!-- MODAL EDITAR INVENTARIO TEMPORAL -->
+    <div id="modalEditarInvTemp" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-pen"></i> Ajustar Inventario</h2>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalInvTemp()">&times;</button>
+            </div>
+            <div class="modal-body">
+               <form id="formEditarInvTemp">
+                    
+                    <input type="hidden" id="modal_inv_id" name="id_temporal">
+                    
+                    <input type="hidden" id="modal_inv_id_producto" name="id_producto">
+                    
+                    <div class="form-group">
+                        <label>Producto</label>
+                        <input type="text" id="modal_inv_nombre" class="form-control" disabled style="background:#f1f5f9;">
+                    </div>
+
+                    <!-- Campos para Mazo -->
+                    <div class="form-group" id="grupo_inv_piezas">
+                        <label>Piezas Actuales</label>
+                        <input type="number" id="modal_inv_piezas" name="piezas" class="form-control" min="0">
+                    </div>
+
+                    <!-- Campos para Sal -->
+                    <div class="form-group" id="grupo_inv_cajas" style="display: none;">
+                        <label>Bultos Cerrados (Cajas de 10kg)</label>
+                        <input type="number" id="modal_inv_cajas" name="cajas" class="form-control" min="0">
+                        <!-- Mandamos 0 kilos en automático para no afectar la Base de Datos -->
+                        <input type="hidden" name="kilos" value="0">
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <button type="submit" class="btn-primary" id="btnGuardarInvTemp">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Ajuste
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <?php include __DIR__ . '/chat.php'; ?>
     <script src="encargado.js"></script>
     
 </body>

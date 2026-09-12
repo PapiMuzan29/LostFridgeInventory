@@ -142,10 +142,10 @@ function agregarFilaTabla(codigo, nombreProducto, pesoBruto, costo) {
             <td style="padding: 10px 8px; text-align: left;">${codigo}</td>
             <td style="padding: 10px 8px; text-align: left;">${nombreProducto}</td>
             <td style="padding: 10px 8px; text-align: right;">
-                <input type="number" step="0.01" class="input-cantidad" value="${cantidadReal.toFixed(2)}" style="width: 90px; text-align: right; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                <input type="number" step="any" class="input-cantidad" value="${cantidadReal.toFixed(2)}" style="width: 90px; text-align: right; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;">
             </td>
             <td style="padding: 10px 8px; text-align: right;">
-                <input type="number" step="0.01" class="input-costo-partida" value="${costo.toFixed(2)}" style="width: 80px; text-align: right; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                <input type="number" step="any" class="input-costo-partida" value="${costo.toFixed(2)}" style="width: 80px; text-align: right; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;">
             </td>
             <td style="padding: 10px 8px; text-align: right; font-weight: bold;" class="td-importe">${importeInicial}</td>
             <td style="padding: 10px 8px; text-align: center;">
@@ -166,20 +166,20 @@ function agregarFilaTabla(codigo, nombreProducto, pesoBruto, costo) {
         tr.innerHTML = `
             <td style="padding: 6px; text-align: center;"><strong>${numeroPartida}</strong></td>
             <td style="padding: 6px; text-align: center;">
-                <input type="number" step="0.1" class="input-combo-grid peso-bruto input-peso-bruto" value="${pesoBruto > 0 ? pesoBruto.toFixed(2) : ''}">
+                <input type="number" step="any" class="input-combo-grid peso-bruto input-peso-bruto" value="${pesoBruto > 0 ? pesoBruto.toFixed(2) : ''}">
             </td>
             <td style="padding: 6px; text-align: center;">
-                <input type="number" step="1" class="input-combo-grid lb-tara input-lb-tara" value="58">
+                <input type="number" step="any" class="input-combo-grid lb-tara input-lb-tara" value="58">
             </td>
             <td style="padding: 6px; text-align: right;" class="kg-tara td-kg-tara">0.00</td>
             <td style="padding: 6px; text-align: right; font-weight: bold;" class="peso-neto text-success td-peso-neto">0.00</td>
             <td style="padding: 6px; text-align: center;">
-                <input type="number" step="0.1" class="input-combo-grid peso-origen input-peso-origen" value="">
+                <input type="number" step="any" class="input-combo-grid peso-origen input-peso-origen" value="">
             </td>
             <td style="padding: 6px; text-align: right;" class="merma td-merma">0.00</td>
             <td style="padding: 6px; text-align: right;" class="porcentaje td-porcentaje">0.00</td>
             <td style="padding: 6px; text-align: center;">
-                <input type="number" step="0.1" class="input-combo-grid diferencia input-diferencia" value="0.00">
+                <input type="number" step="any" class="input-combo-grid diferencia input-diferencia" value="0.00">
             </td>
             <input type="hidden" class="input-codigo-prod" value="${codigo}">
             <input type="hidden" class="input-desc-prod" value="${nombreProducto}">
@@ -227,7 +227,7 @@ function agregarFilaManteca() {
         <td style="padding: 10px 8px; text-align: center; font-weight: 600;">${codigoProd}</td>
         <td style="padding: 10px 8px; text-align: left;">${nombrePres}</td>
         <td style="padding: 10px 8px; text-align: right;">
-            <input type="number" class="input-manteca-cant" value="${cantidad}" style="width: 80px; text-align: right; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;" readonly>
+            <input type="number" step="any" class="input-manteca-cant" value="${cantidad}" style="width: 80px; text-align: right; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;" readonly>
         </td>
         <td style="padding: 10px 8px; text-align: right; font-weight: bold;" class="manteca-fila-total">${totalKgs.toFixed(2)} kg</td>
         <td style="padding: 10px 8px; text-align: center;">

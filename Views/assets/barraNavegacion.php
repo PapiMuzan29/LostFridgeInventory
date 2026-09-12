@@ -45,9 +45,7 @@ $esAdmin = (stripos($nombreRol, 'admin') !== false || $apodo === 'admin_sistema'
             </li>
 
             <?php if ($esAdmin): ?>
-                <li class="nav-link" onclick="cargarModulo('ubicaciones')">
-                    <i class="fa-solid fa-location-dot"></i> UBICACIONES
-                </li>
+                
 
                 <li class="nav-link" onclick="cargarModulo('movimientos')">
                     <i class="fa-solid fa-retweet"></i> MOVIMIENTOS

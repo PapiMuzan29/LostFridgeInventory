@@ -24,20 +24,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pesoKilos = isset($_POST['peso']) ? (float)$_POST['peso'] : 0.0;
             
             if ($idCaja > 0 && $pesoKilos > 0) {
-                $idPechoSuelto = 126; // ID real de pecho suelto
-                $exito = $modelo->abrirCajaConvertirAKilos($idCaja, $idPechoSuelto, $pesoKilos);
+                // NUEVO: Busca el ID dinámicamente usando LIKE '%Pecho%'
+                $idPechoSuelto = $modelo->obtenerIdProductoPorNombre('Pecho');
                 
-                if ($exito) {
-                    $_SESSION['alerta_exito'] = "¡Caja abierta exitosamente! Se sumaron {$pesoKilos} kg al inventario.";
+                if ($idPechoSuelto > 0) {
+                    $exito = $modelo->abrirCajaConvertirAKilos($idCaja, $idPechoSuelto, $pesoKilos);
+                    
+                    if ($exito) {
+                        $_SESSION['alerta_exito'] = "¡Caja abierta exitosamente! Se sumaron {$pesoKilos} kg al inventario.";
+                    } else {
+                        $_SESSION['alerta_error'] = "Error: No se encontró inventario en la caja.";
+                    }
                 } else {
-                    $_SESSION['alerta_error'] = "Error: No se encontró inventario en la caja.";
+                    $_SESSION['alerta_error'] = "Error: No se encontró el producto 'Pecho' en el catálogo.";
                 }
             } else {
                 $_SESSION['alerta_error'] = 'Datos inválidos para abrir la caja.';
             }
             
             session_write_close();
-            header("Location: vendedorController.php");
+            header("Location: /LostFridgeInventory/Controllers/vendedorController.php");
             exit;
         }
 
@@ -50,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($cliente) || empty($productos)) {
             $_SESSION['alerta_error'] = 'El nombre del cliente y los productos son obligatorios.';
             session_write_close();
-            header("Location: vendedorController.php");
+            header("Location: /LostFridgeInventory/Controllers/vendedorController.php");
             exit;
         }
 
@@ -58,15 +64,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$validacion['exito']) {
             $_SESSION['alerta_error'] = $validacion['mensaje'];
             session_write_close();
-            header("Location: vendedorController.php");
+            header("Location: /LostFridgeInventory/Controllers/vendedorController.php");
             exit;
         }
 
         $folio = $modelo->obtenerSiguienteFolio();
-        $estadoInicial = ($accionBoton === 'guardar_espera') ? 'GUARDADA' : 'PENDIENTE';
+        $observacion = trim($_POST['observacion_especial'] ?? '');
         
-        $idNotaCreada = $modelo->guardarNotaConEstado($folio, $cliente, (int)$idCuenta, $productos, $estibadores, $estadoInicial);
-
+        // El estado se vuelve PREVAUTORIZAR solo si envían a caja y hay texto
+        if ($accionBoton === 'guardar_espera') {
+            $estadoInicial = 'GUARDADA';
+        } else {
+            $estadoInicial = empty($observacion) ? 'PENDIENTE' : 'PREVAUTORIZAR';
+        }
+        
+        // Pasa la observación a la función (debes añadir este 7mo parámetro en tu modelo)
+        $idNotaCreada = $modelo->guardarNotaConEstado($folio, $cliente, (int)$idCuenta, $productos, $estibadores, $estadoInicial, $observacion);
         if ($idNotaCreada) {
             if ($estadoInicial === 'GUARDADA') {
                 $_SESSION['alerta_exito'] = '¡Nota previa guardada en espera correctamente!';
@@ -86,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         session_write_close();
-        header("Location: vendedorController.php");
+        header("Location: /LostFridgeInventory/Controllers/vendedorController.php");
         exit;
 
     } catch (Exception $e) {
@@ -127,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['accion'])) {
         }
 
         session_write_close();
-        header("Location: vendedorController.php");
+        header("Location: /LostFridgeInventory/Controllers/vendedorController.php");
         exit;
 
     } catch (Exception $e) {

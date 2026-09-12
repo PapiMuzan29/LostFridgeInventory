@@ -101,92 +101,94 @@ try {
             exit;
         }
 
-        $conceptoSalida = $datos['concepto'] ?? '';
+        // Capturamos el concepto real que manda la interfaz (ej. "Venta", "Traspaso", etc.)
+        $conceptoSalida = $datos['concepto'] ?? 'Salida General';
 
-        // 📦 SI EL CONCEPTO ES TRASPASO A MAYOREO -> GUARDAR EN TEMPORAL Y RESTAR STOCK / LOTES
-        if ($conceptoSalida === 'inventariotemporalsalida') {
-            try {
-                $db = BD::obtenerInstancia();
-                $db->beginTransaction();
+        try {
+            $db = BD::obtenerInstancia();
+            $db->beginTransaction();
 
-                foreach ($datos['detalle'] as $item) {
-                    $idProducto = intval($item['id_producto'] ?? ($item['idProducto'] ?? ($item['id'] ?? ($item['id_lote'] ?? 0))));
-                    $idLote = intval($item['id_lote'] ?? ($item['idLote'] ?? 0));
-                    
-                    // Cantidad mapeada correctamente a cantidadPiezas
-                    $cantidadPiezas = intval($item['cantidad'] ?? ($item['cajas'] ?? ($item['cantidadCajas'] ?? ($item['piezas'] ?? 1))));
-                    
-                    $cantidadCajas = intval($item['cajas'] ?? ($item['cantidad'] ?? 0));
-                    $cantidadPeso = floatval($item['kgs'] ?? ($item['peso'] ?? 0.00));
-                    
-                    if ($idProducto <= 0 && (!empty($item['codigo_producto']) || !empty($item['codigoProducto']))) {
-                        $codigoBusqueda = trim($item['codigo_producto'] ?? $item['codigoProducto']);
-                        $stmtBuscaProd = $db->prepare("SELECT idProducto FROM producto WHERE TRIM(codigoProducto) = ? LIMIT 1");
-                        $stmtBuscaProd->execute([$codigoBusqueda]);
-                        $prodEncontrado = $stmtBuscaProd->fetch(PDO::FETCH_ASSOC);
-                        if ($prodEncontrado) {
-                            $idProducto = intval($prodEncontrado['idProducto']);
-                        }
-                    }
-
-                    $observaciones = "Traspaso a mayoreo - Cliente ID: " . ($datos['id_cliente'] ?? 'General');
-
-                    // 1. Insertar usando la columna real de la tabla: cantidadPiezas
-                    $queryTemp = "INSERT INTO inventariotemporalsalida 
-                                  (idProducto, cantidadCajas, cantidadPeso, cantidadPiezas, observaciones) 
-                                  VALUES (:idProducto, :cantidadCajas, :cantidadPeso, :cantidadPiezas, :observaciones)";
-                    
-                    $db->consulta($queryTemp, [
-                        ':idProducto'     => $idProducto > 0 ? $idProducto : null,
-                        ':cantidadCajas'  => $cantidadCajas,
-                        ':cantidadPeso'   => $cantidadPeso,
-                        ':cantidadPiezas' => $cantidadPiezas,
-                        ':observaciones'  => $observaciones
-                    ]);
-
-                    // 2. Descontar stock general de la tabla producto
-                    if ($idProducto > 0) {
-                        $queryUpdateProd = "UPDATE producto 
-                                            SET totalCajas = GREATEST(0, IFNULL(totalCajas, 0) - ?), 
-                                                totalPeso = GREATEST(0, IFNULL(totalPeso, 0) - ?) 
-                                            WHERE idProducto = ?";
-                        $db->consulta($queryUpdateProd, [$cantidadCajas, $cantidadPeso, $idProducto]);
-                    }
-
-                    // 3. Descontar peso y desactivar el lote si aplica (tabla lote)
-                    if ($idLote > 0) {
-                        $queryUpdateLote = "UPDATE lote 
-                                            SET pesoActual = GREATEST(0, pesoActual - ?), 
-                                                activo = IF(pesoActual - ? <= 0, 0, 1) 
-                                            WHERE idLote = ?";
-                        $db->consulta($queryUpdateLote, [$cantidadPeso, $cantidadPeso, $idLote]);
+            foreach ($datos['detalle'] as $item) {
+                $idProducto = intval($item['id_producto'] ?? ($item['idProducto'] ?? ($item['id'] ?? 0)));
+                
+                // 🎯 Captura súper robusta del idLote (busca en todas las variantes posibles del JSON)
+                $idLote = intval($item['id_lote'] ?? ($item['idLote'] ?? ($item['lote'] ?? 0)));
+                
+                $cantidadPiezas = intval($item['cantidad'] ?? ($item['cajas'] ?? ($item['cantidadCajas'] ?? ($item['piezas'] ?? 1))));
+                $cantidadCajas = intval($item['cajas'] ?? ($item['cantidad'] ?? 0));
+                $cantidadPeso = floatval($item['kgs'] ?? ($item['peso'] ?? 0.00));
+                
+                // Búsqueda de producto por código si viene vacío
+                if ($idProducto <= 0 && (!empty($item['codigo_producto']) || !empty($item['codigoProducto']))) {
+                    $codigoBusqueda = trim($item['codigo_producto'] ?? $item['codigoProducto']);
+                    $stmtBuscaProd = $db->prepare("SELECT idProducto FROM producto WHERE TRIM(codigoProducto) = ? LIMIT 1");
+                    $stmtBuscaProd->execute([$codigoBusqueda]);
+                    $prodEncontrado = $stmtBuscaProd->fetch(PDO::FETCH_ASSOC);
+                    if ($prodEncontrado) {
+                        $idProducto = intval($prodEncontrado['idProducto']);
                     }
                 }
 
-                $db->commit();
-                echo json_encode([
-                    'success' => true, 
-                    'mensaje' => 'Traspaso a mayoreo almacenado y stock/lotes descontados correctamente.'
+                // Rescatar el idProducto desde la tabla lote si viene en 0 y tenemos un idLote válido
+                if ($idProducto <= 0 && $idLote > 0) {
+                    $stmtLoteProd = $db->prepare("SELECT idProducto FROM lote WHERE idLote = ? LIMIT 1");
+                    $stmtLoteProd->execute([$idLote]);
+                    $loteData = $stmtLoteProd->fetch(PDO::FETCH_ASSOC);
+                    if ($loteData) {
+                        $idProducto = intval($loteData['idProducto']);
+                    }
+                }
+
+                // Observaciones limpias usando el concepto real seleccionado por el usuario
+                $observaciones = $conceptoSalida . " - Cliente ID: " . ($datos['id_cliente'] ?? 'General');
+
+                // 1. Insertar en la tabla temporal guardando el idLote de forma explícita
+                $queryTemp = "INSERT INTO inventariotemporalsalida 
+                              (idProducto, idLote, cantidadCajas, cantidadPeso, cantidadPiezas, observaciones) 
+                              VALUES (:idProducto, :idLote, :cantidadCajas, :cantidadPeso, :cantidadPiezas, :observaciones)";
+                
+                $db->consulta($queryTemp, [
+                    ':idProducto'     => $idProducto > 0 ? $idProducto : null,
+                    ':idLote'         => $idLote > 0 ? $idLote : null,
+                    ':cantidadCajas'  => $cantidadCajas,
+                    ':cantidadPeso'   => $cantidadPeso,
+                    ':cantidadPiezas' => $cantidadPiezas,
+                    ':observaciones'  => $observaciones
                 ]);
-                exit;
 
-            } catch (Exception $ex) {
-                if (isset($db) && method_exists($db, 'inTransaction') && $db->inTransaction()) {
-                    $db->rollBack();
+                // 2. Descontar stock general de la tabla producto
+                if ($idProducto > 0) {
+                    $queryUpdateProd = "UPDATE producto 
+                                        SET totalCajas = GREATEST(0, IFNULL(totalCajas, 0) - ?), 
+                                            totalPeso = GREATEST(0, IFNULL(totalPeso, 0) - ?) 
+                                        WHERE idProducto = ?";
+                    $db->consulta($queryUpdateProd, [$cantidadCajas, $cantidadPeso, $idProducto]);
                 }
-                echo json_encode(['error' => 'Error al procesar el traspaso temporal: ' . $ex->getMessage()]);
-                exit;
-            }
-        }
 
-        // 🛢️ FLUJO NORMAL (Ventas, Mermas, Combos y Manteca)
-        $idUsuario = $_SESSION['idCuenta'] ?? 2;
-        $apodoUsuario = $_SESSION['apodoUsuario'] ?? 'Usuario';
-        
-        $resultado = $service->registrarSalidaCompleta($datos, $idUsuario, $apodoUsuario);
-        
-        echo json_encode($resultado);
-        exit;
+                // 3. Descontar peso y actualizar estado del lote (tabla lote)
+                if ($idLote > 0) {
+                    $queryUpdateLote = "UPDATE lote 
+                                        SET pesoActual = GREATEST(0, pesoActual - ?), 
+                                            activo = IF(pesoActual - ? <= 0, 0, 1) 
+                                        WHERE idLote = ?";
+                    $db->consulta($queryUpdateLote, [$cantidadPeso, $cantidadPeso, $idLote]);
+                }
+            }
+
+            $db->commit();
+            echo json_encode([
+                'success' => true, 
+                'mensaje' => 'Salida procesada correctamente con su lote y stock actualizados.'
+            ]);
+            exit;
+
+        } catch (Exception $ex) {
+            if (isset($db) && method_exists($db, 'inTransaction') && $db->inTransaction()) {
+                $db->rollBack();
+            }
+            echo json_encode(['error' => 'Error al procesar la salida: ' . $ex->getMessage()]);
+            exit;
+        }
     }
 
     echo json_encode(['error' => 'Acción no válida.']);

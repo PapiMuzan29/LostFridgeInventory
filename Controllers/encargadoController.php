@@ -1,4 +1,8 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // Controllers/EncargadoController.php
 require_once '../Models/modeloEncargado.php';
 
@@ -123,6 +127,100 @@ switch ($action) {
         }
         break;
 
+    case 'listarInvTemporal':
+        try {
+            $inventario = $modelo->obtenerInventarioTemporalSalMazo();
+            echo json_encode(['success' => true, 'inventario' => $inventario]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'actualizarInvTemporal':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
+            exit;
+        }
+        
+        $idTemp = (int)($_POST['id_temporal'] ?? 0);
+        $idProd = (int)($_POST['id_producto'] ?? 0); // <-- NUEVO
+        $piezas = (int)($_POST['piezas'] ?? 0);
+        $cajas = (int)($_POST['cajas'] ?? 0);
+        $kilos = (float)($_POST['kilos'] ?? 0);
+
+        // Ahora evaluamos si tenemos cualquiera de los dos IDs
+        if ($idTemp > 0 || $idProd > 0) {
+            try {
+                $modelo->actualizarInventarioTemporal($idTemp, $idProd, $piezas, $cajas, $kilos);
+                echo json_encode(['success' => true, 'message' => 'Inventario ajustado correctamente.']);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Datos de producto inválidos.']);
+        }
+        break;
+    case 'verificarAutorizaciones':
+        try {
+            $total = $modelo->contarAutorizacionesPendientes();
+            echo json_encode(['success' => true, 'total' => $total]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'listarAutorizaciones':
+        try {
+            $notas = $modelo->obtenerAutorizacionesPendientes();
+            echo json_encode(['success' => true, 'notas' => $notas]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+   case 'procesarAutorizacion':
+        $idNota = (int)($_POST['id_nota'] ?? 0);
+        $accionAuth = $_POST['accion_auth'] ?? ''; // 'aprobar' o 'denegar'
+
+        if ($accionAuth === 'aprobar') {
+            $pwd = $_POST['password'] ?? '';
+            
+            // 1. Obtenemos el ID del Encargado desde su propia sesión
+            $idUsuarioActual = (int)($_SESSION['idCuenta'] ?? $_SESSION['id_usuario'] ?? $_SESSION['id'] ?? 0);
+            
+            if ($idUsuarioActual === 0) {
+                echo json_encode(['success' => false, 'message' => 'Error de sesión: No se detectó tu usuario activo.']);
+                exit;
+            }
+
+            // 2. Traemos la contraseña de la base de datos
+            $hashBD = $modelo->obtenerHashEncargado($idUsuarioActual);
+            
+            if (empty($hashBD)) {
+                echo json_encode(['success' => false, 'message' => 'Error BD: No se encontró la contraseña del usuario.']);
+                exit;
+            }
+
+            // 3. Verificamos la contraseña (Soporta bcrypt, texto plano y MD5)
+            if (password_verify($pwd, $hashBD) || $pwd === $hashBD || md5($pwd) === $hashBD) {
+                $modelo->cambiarEstadoNota($idNota, 'PENDIENTE');
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Contraseña incorrecta. Inténtalo de nuevo.']);
+            }
+            
+        } elseif ($accionAuth === 'denegar') {
+            $modelo->cambiarEstadoNota($idNota, 'CANCELADA');
+            
+            require_once __DIR__ . '/../Models/modeloVendedor.php';
+            $mv = new modeloVendedor();
+            $mv->reversarInventarioNota($idNota);
+            
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Acción desconocida.']);
+        }
+        break;
     default:
         echo json_encode(['success' => false, 'message' => 'Acción no válida.']);
         break;

@@ -162,4 +162,74 @@ class modeloEncargado {
             throw new Exception("Error en la transacción: " . $e->getMessage());
         }
     }
+
+   public function obtenerInventarioTemporalSalMazo(): array {
+        // LEFT JOIN garantiza que siempre salgan en la lista, aunque no tengan inventario temporal (saldrán con 0)
+        $sql = "SELECT 
+                    p.idProducto,
+                    IFNULL(i.idSalidaTemporal, 0) AS idSalidaTemporal, 
+                    p.nombreProducto, 
+                    IFNULL(i.cantidadPiezas, 0) AS cantidadPiezas, 
+                    IFNULL(i.cantidadCajas, 0) AS cantidadCajas, 
+                    IFNULL(i.cantidadPeso, 0) AS cantidadPeso 
+                FROM Producto p 
+                LEFT JOIN InventarioTemporalSalida i ON p.idProducto = i.idProducto 
+                WHERE p.nombreProducto LIKE '%Mazo%' OR p.nombreProducto LIKE '%Sal%'";
+        
+        return $this->db->select($sql) ?: [];
+    }
+
+    public function actualizarInventarioTemporal(int $idTemp, int $idProd, int $piezas, int $cajas, float $kilos): bool {
+        // Si no hay fila previa y tampoco están metiendo datos, no hacemos nada para no ensuciar la BD
+        if ($idTemp === 0 && $piezas === 0 && $cajas === 0 && $kilos == 0) {
+            return true; 
+        }
+
+        if ($idTemp > 0) {
+            // Ya existía la fila, hacemos un UPDATE
+            $sql = "UPDATE InventarioTemporalSalida 
+                    SET cantidadPiezas = ?, cantidadCajas = ?, cantidadPeso = ? 
+                    WHERE idSalidaTemporal = ?";
+            $resultado = $this->db->update($sql, [$piezas, $cajas, $kilos, $idTemp]);
+        } else {
+            // No existía (estaba en 0 absoluto), hacemos un INSERT
+            $sql = "INSERT INTO InventarioTemporalSalida (idProducto, cantidadCajas, cantidadPiezas, cantidadPeso) 
+                    VALUES (?, ?, ?, ?)";
+            $resultado = $this->db->insert($sql, [$idProd, $cajas, $piezas, $kilos]);
+        }
+        
+        return $resultado !== false;
+    }
+
+    public function contarAutorizacionesPendientes(): int {
+        $sql = "SELECT COUNT(*) as total FROM notas WHERE estado = 'PREVAUTORIZAR'";
+        $res = $this->db->select($sql);
+        return (int)($res[0]['total'] ?? 0);
+    }
+
+    public function obtenerAutorizacionesPendientes(): array {
+        $sql = "SELECT id_nota, folio, nombre_cliente, observacion_especial 
+                FROM notas 
+                WHERE estado = 'PREVAUTORIZAR' 
+                ORDER BY fecha_creacion ASC";
+        return $this->db->select($sql) ?: [];
+    }
+
+    public function obtenerHashEncargado(int $idCuenta): string {
+        // CAMBIO: Ahora busca la columna correcta 'contrasenaUsuario'
+        $sqlAuth = "SELECT contrasenaUsuario FROM cuenta WHERE idCuenta = ?";
+        $res = $this->db->select($sqlAuth, [$idCuenta]);
+        
+        // CAMBIO: Lee la propiedad con el nombre exacto
+        if (!empty($res) && is_array($res) && isset($res[0]['contrasenaUsuario'])) {
+            return $res[0]['contrasenaUsuario'];
+        }
+        return '';
+    }
+
+    public function cambiarEstadoNota(int $idNota, string $nuevoEstado): bool {
+        $sql = "UPDATE notas SET estado = ? WHERE id_nota = ?";
+        $this->db->update($sql, [$nuevoEstado, $idNota]);
+        return true;
+    }
 }

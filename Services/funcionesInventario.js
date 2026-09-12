@@ -658,8 +658,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${escaparHTML(prod.codigoProducto)}</td>
                     <td><strong>${escaparHTML(prod.nombreProducto)}</strong></td>
                     <td>${escaparHTML(prod.nombreProveedor)}</td>
-                    <td><span style="background: #e2e8f0; padding: 4px 8px; border-radius: 6px; font-weight: bold; color: #0f172a;">${presentacion} kg</span></td>
-                    <td><span style="font-weight:700; color: #0f172a; font-size: 15px;">${totalCajas} unidad(es)</span></td> 
+                    <td><span class="badge-extra">${presentacion} kg</span></td>
+                    <td><span style="font-weight:700; font-size: 15px;">${totalCajas} unidad(es)</span></td> 
                     <td><strong>${totalPeso.toFixed(2)} kg</strong></td>
                     <td><span class="estado ${esActivo ? 'activo' : 'inactivo'}">${esActivo ? 'Activo' : 'Inactivo'}</span></td>
                     <td>
@@ -700,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const esActivo = parseInt(prod.activo) === 1;
 
             const categoriaTexto = prod.nombreCategoria 
-                ? `<span style="background: #f1f5f9; color: #334155; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">${escaparHTML(prod.nombreCategoria)}</span>`
+                ? `<span class="badge-categoria">${escaparHTML(prod.nombreCategoria)}</span>`
                 : '<span style="color: #94a3b8; font-style: italic;">Sin asignar</span>';
 
             html += `<tr>
@@ -708,7 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><strong>${escaparHTML(prod.nombreProducto)}</strong></td>
                 <td>${categoriaTexto}</td>
                 <td>${escaparHTML(prod.nombreProveedor)}</td>
-                <td><span style="font-weight:700; color: #0f172a;">${cantidadMostrar}</span></td> 
+                <td><span style="font-weight:700;">${cantidadMostrar}</span></td> 
                 <td><strong>${pesoDb.toFixed(2)} kg</strong></td>
                 <td><span class="estado ${esActivo ? 'activo' : 'inactivo'}">${esActivo ? 'Activo' : 'Inactivo'}</span></td>
                 <td>

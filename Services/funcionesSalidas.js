@@ -110,16 +110,23 @@ async function cargarCombosDisponibles() {
         const respuesta = await fetch('../Controllers/salidasController.php?action=obtenerCombosDisponibles');
         const combos = await respuesta.json();
 
+        console.log("🔍 Datos crudos recibidos de combos:", combos);
+
         selectCombo.innerHTML = '<option value="">-- Seleccione un combo disponible --</option>';
         if (Array.isArray(combos)) {
-            combos.forEach(combo => {
+            combos.forEach((combo, index) => {
                 const opt = document.createElement('option');
-                opt.value = combo.idLote || combo.idCombo || combo.id;
-                opt.dataset.idProducto = combo.idProducto || '';
-                opt.dataset.pesoBruto = combo.pesoActual || combo.pesoBruto || 0;
-                opt.dataset.codigoLote = combo.codigoLote || 'N/A';
                 
-                opt.textContent = `Lote: ${combo.codigoLote || 'N/A'} — ${combo.nombreProducto || 'Combo'} (${combo.pesoActual || 0} kg)`;
+                const idLoteVal = combo.idLote || combo.id_lote || combo.idCombo || combo.id || combo.lote_id || (index + 1);
+                const idProdVal = combo.idProducto || combo.id_producto || combo.producto_id || 0;
+                
+                opt.value = idLoteVal;
+                opt.dataset.idLote = idLoteVal;
+                opt.dataset.idProducto = idProdVal;
+                opt.dataset.pesoBruto = combo.pesoActual || combo.pesoBruto || combo.peso || 0;
+                opt.dataset.codigoLote = combo.codigoLote || combo.codigo || combo.lote || `LOTE-${idLoteVal}`;
+                
+                opt.textContent = `Lote: ${opt.dataset.codigoLote} — ${combo.nombreProducto || combo.nombre || 'Combo'} (${opt.dataset.pesoBruto} kg)`;
                 selectCombo.appendChild(opt);
             });
         }
@@ -131,10 +138,12 @@ async function cargarCombosDisponibles() {
         const selectedOption = this.options[this.selectedIndex];
         if (!selectedOption.value) return;
 
-        const idLote = selectedOption.value;
-        const idProducto = selectedOption.dataset.idProducto;
+        const idLote = parseInt(selectedOption.dataset.idLote) || parseInt(selectedOption.value) || 1;
+        const idProducto = parseInt(selectedOption.dataset.idProducto) || 0;
         const codigoLote = selectedOption.dataset.codigoLote;
         const pesoBruto = parseFloat(selectedOption.dataset.pesoBruto) || 0;
+
+        console.log("🟢 Combo seleccionado -> idLote:", idLote, "idProducto:", idProducto, "Código:", codigoLote);
 
         agregarFilaComboSalida(idLote, idProducto, codigoLote, pesoBruto);
         this.value = ""; 
@@ -165,10 +174,13 @@ async function cargarMantecaDisponibles() {
                 return;
             }
 
-            botes.forEach(bote => {
+            botes.forEach((bote, index) => {
                 const opt = document.createElement('option');
-                opt.value = bote.idProducto;
-                opt.dataset.idProducto = bote.idProducto;
+                const idLoteVal = bote.idLote || bote.id_lote || bote.id || (index + 1);
+                
+                opt.value = idLoteVal;
+                opt.dataset.idLote = idLoteVal;
+                opt.dataset.idProducto = bote.idProducto || bote.id_producto || 0;
                 
                 let pesoUnitario = parseFloat(bote.totalCajas) > 0 ? (parseFloat(bote.totalPeso) / parseFloat(bote.totalCajas)) : 15;
                 if (bote.nombreProducto.includes('10')) pesoUnitario = 10;
@@ -191,12 +203,13 @@ async function cargarMantecaDisponibles() {
         const selectedOption = this.options[this.selectedIndex];
         if (!selectedOption.value) return;
 
-        const idProducto = selectedOption.value;
+        const idLote = parseInt(selectedOption.dataset.idLote) || parseInt(selectedOption.value) || 1;
+        const idProducto = parseInt(selectedOption.dataset.idProducto) || 0;
         const codigo = selectedOption.dataset.codigoProducto;
         const nombre = selectedOption.dataset.nombreProducto;
         const pesoUnitario = parseFloat(selectedOption.dataset.pesoUnitario) || 15;
 
-        agregarFilaMantecaSalida(idProducto, codigo, nombre, pesoUnitario);
+        agregarFilaMantecaSalida(idLote, idProducto, codigo, nombre, pesoUnitario);
         this.value = ""; 
     };
 }
@@ -312,6 +325,7 @@ function agregarFilaComboSalida(idLote, idProducto, codigoLote, pesoActual) {
     const tr = document.createElement('tr');
     tr.style.background = "#ffffff";
     tr.style.borderBottom = "1px solid #e2e8f0";
+    
     tr.dataset.idLote = idLote;
     tr.dataset.idProducto = idProducto;
 
@@ -338,7 +352,7 @@ function agregarFilaComboSalida(idLote, idProducto, codigoLote, pesoActual) {
     actualizarTotalesSalidas();
 }
 
-function agregarFilaMantecaSalida(idProducto, codigo, nombreProducto, pesoUnitario) {
+function agregarFilaMantecaSalida(idLote, idProducto, codigo, nombreProducto, pesoUnitario) {
     const tbody = document.getElementById('tablaPartidasBody');
     if (!tbody) return;
 
@@ -354,6 +368,8 @@ function agregarFilaMantecaSalida(idProducto, codigo, nombreProducto, pesoUnitar
     const tr = document.createElement('tr');
     tr.style.background = "#ffffff";
     tr.style.borderBottom = "1px solid #e2e8f0";
+    
+    tr.dataset.idLote = idLote;
     tr.dataset.idProducto = idProducto;
     tr.dataset.pesoUnitario = pesoUnitario;
 
@@ -415,7 +431,7 @@ function actualizarTotalesSalidas() {
         });
     } else {
         document.querySelectorAll('#tablaPartidasBody tr').forEach(tr => {
-            acumuladorKgs += parseFloat(tr.querySelector('.partida-cantidad')?.textContent) || 0;
+            acumuladorKgs += parseFloat(tr.querySelector('.partida-cantidad')?.innerText) || 0;
             contadorItems += parseInt(tr.querySelector('.partida-cajas')?.value) || 1;
         });
     }
@@ -464,11 +480,12 @@ function inicializarBotonesSalidas() {
                 if (tipoDespacho === 'manteca') {
                     const botesVal = parseInt(fila.querySelector('.val-cantidad-botes')?.value) || 1;
                     const pesoUnitario = parseFloat(fila.dataset.pesoUnitario) || 0;
-                    const idProducto = fila.dataset.idProducto || 0;
+                    const idProducto = parseInt(fila.dataset.idProducto) || 0;
+                    const idLote = parseInt(fila.dataset.idLote) || 0;
                     
                     detalle.push({ 
                         partida: index + 1, 
-                        id_lote: idProducto,
+                        id_lote: idLote,
                         id_producto: idProducto,
                         cantidad: botesVal,
                         cajas: botesVal,
@@ -476,9 +493,11 @@ function inicializarBotonesSalidas() {
                     });
                 } else if (esTablaCombos()) {
                     const pesoNetoVal = parseFloat(fila.querySelector('.val-peso-neto')?.value) || 0;
-                    const idLote = fila.dataset.idLote || 0;
-                    const idProducto = fila.dataset.idProducto || 0;
+                    const idLote = parseInt(fila.dataset.idLote) || 0;
+                    const idProducto = parseInt(fila.dataset.idProducto) || 0;
                     
+                    console.log(`📦 Empaquetando Fila ${index + 1} -> id_lote: ${idLote}, id_producto: ${idProducto}`);
+
                     detalle.push({ 
                         partida: index + 1, 
                         id_lote: idLote,
@@ -493,7 +512,9 @@ function inicializarBotonesSalidas() {
                         partida: index + 1,
                         codigo_producto: fila.querySelector('.partida-codigo')?.innerText.trim() || 'GENERAL',
                         kgs: cantidadKgs,
-                        cantidad: cajasVal 
+                        cantidad: cajasVal,
+                        id_lote: 0,
+                        id_producto: 0
                     });
                 }
             });
@@ -510,6 +531,8 @@ function inicializarBotonesSalidas() {
                 id_almacen: 1,
                 detalle: detalle
             };
+
+            console.log("📤 Detalle de los ítems a enviar:", JSON.stringify(payload.detalle, null, 2));
 
             try {
                 this.disabled = true;

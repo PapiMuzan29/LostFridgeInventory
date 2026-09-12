@@ -628,40 +628,212 @@ function cargarResumenDelDia(fechaString) {
 // ==========================================
 let totalNotasActuales = -1;
 let intervaloPolling = null;
+let totalAutorizacionesAnterior = -1;
 
-function iniciarEscaneoDeNotas() {
-  if (intervaloPolling) clearInterval(intervaloPolling);
+function iniciarEscaneoDeNotas() { 
+  if (intervaloPolling) clearInterval(intervaloPolling); 
 
-  intervaloPolling = setInterval(() => {
-    const inputBusqueda = document.getElementById('buscarNota');
-    if (inputBusqueda && inputBusqueda.value !== '') return;
+  intervaloPolling = setInterval(() => { 
+    // 1. Control del buscador
+    const inputBusqueda = document.getElementById('buscarNota'); 
+    if (inputBusqueda && inputBusqueda.value !== '') return; 
 
-    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=verificarNuevasNotas')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const nuevoTotal = parseInt(data.total);
+    // 2. Fetch de Nuevas Notas
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=verificarNuevasNotas') 
+      .then(res => res.json()) 
+      .then(data => { 
+        if (data.success) { 
+          const nuevoTotal = parseInt(data.total); 
+          if (totalNotasActuales === -1) { 
+            totalNotasActuales = nuevoTotal; 
+            return; 
+          } 
+          if (nuevoTotal !== totalNotasActuales) { 
+            totalNotasActuales = nuevoTotal; 
+            const tabInicio = document.querySelector('.nav-item[onclick*="inicio"] i'); 
+            if (tabInicio) { 
+              tabInicio.classList.add('fa-bounce'); 
+              setTimeout(() => tabInicio.classList.remove('fa-bounce'), 1000); 
+            } 
+            cargarNotasRevision(); 
+          } 
+        } 
+      }) 
+      .catch(err => console.error("Error en polling:", err)); 
 
-          if (totalNotasActuales === -1) {
-            totalNotasActuales = nuevoTotal;
-            return;
-          }
+    // 3. Fetch de Autorizaciones (Se ejecuta en el mismo ciclo de 4s)
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=verificarAutorizaciones') 
+      .then(res => res.json()) 
+      .then(data => { 
+        if (data.success) { 
+          const total = parseInt(data.total); 
+          const badge = document.getElementById('badge-autorizaciones'); 
+          const campana = document.getElementById('campana-noti'); 
 
-          if (nuevoTotal !== totalNotasActuales) {
-            totalNotasActuales = nuevoTotal;
+          if (total > 0) { 
+            badge.textContent = total; 
+            badge.style.display = 'block'; 
 
-            const tabInicio = document.querySelector('.nav-item[onclick*="inicio"] i');
-            if (tabInicio) {
-              tabInicio.classList.add('fa-bounce');
-              setTimeout(() => tabInicio.classList.remove('fa-bounce'), 1000);
+            if (totalAutorizacionesAnterior !== -1 && total > totalAutorizacionesAnterior) { 
+              document.getElementById('audio-noti').play().catch(e => console.log('Audio bloqueado')); 
+              campana.classList.add('fa-shake'); 
+              setTimeout(() => campana.classList.remove('fa-shake'), 1500); 
+              cargarListaAutorizaciones(); 
+            } 
+          } else { 
+            badge.style.display = 'none'; 
+          } 
+          totalAutorizacionesAnterior = total; 
+        } 
+      })
+      .catch(err => console.error("Error en autorizaciones:", err));
+
+  }, 4000); 
+}
+
+function abrirModalAutorizaciones() {
+    document.getElementById('modalAutorizaciones').classList.add('active');
+    cargarListaAutorizaciones();
+}
+
+function cargarListaAutorizaciones() {
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=listarAutorizaciones')
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('lista-autorizaciones-container');
+            if (!data.success || data.notas.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No hay autorizaciones pendientes.</p></div>';
+                return;
             }
 
-            cargarNotasRevision();
-          }
+            container.innerHTML = data.notas.map(n => `
+                <div style="border: 1px solid var(--border-color); padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+                    <div style="display:flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px;">
+                        <span>${n.folio} - ${n.nombre_cliente}</span>
+                    </div>
+                    <div style="background: #ebf8ff; color: #2b6cb0; padding: 10px; border-left: 4px solid #3182ce; border-radius: 4px; font-size: 0.9rem; margin-bottom: 10px;">
+                        <strong>Motivo:</strong> ${n.observacion_especial}
+                    </div>
+                    <div style="display:flex; gap: 10px;">
+                        <button class="btn-primary" style="flex:1;" onclick="pedirPasswordParaNota(${n.id_nota})">Aprobar</button>
+                        <button class="btn-secondary-sm" style="flex:1; background: #e53e3e; color: white;" onclick="denegarAutorizacion(${n.id_nota})">Denegar</button>
+                    </div>
+                </div>
+            `).join('');
+        });
+}
+
+function pedirPasswordParaNota(id) {
+    document.getElementById('auth_id_nota').value = id;
+    document.getElementById('auth_password').value = '';
+    
+    document.getElementById('auth_error_msg').style.display = 'none';
+    document.getElementById('auth_password').style.border = '1px solid var(--border-color)';
+    
+    document.getElementById('modalPasswordAutorizacion').classList.add('active');
+    setTimeout(() => document.getElementById('auth_password').focus(), 100);
+}
+
+function confirmarPasswordAutorizacion() {
+    const pwd = document.getElementById('auth_password').value;
+    const id = document.getElementById('auth_id_nota').value;
+    const btn = document.querySelector('#modalPasswordAutorizacion .btn-primary');
+
+    if (pwd.trim() === '') {
+        mostrarErrorPassword('Por favor, ingresa tu contraseña.');
+        return;
+    }
+
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('id_nota', id);
+    formData.append('password', pwd);
+    formData.append('accion_auth', 'aprobar');
+
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=procesarAutorizacion', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.innerHTML = 'Autorizar Nota';
+        btn.disabled = false;
+
+        if (data.success) {
+            document.getElementById('modalPasswordAutorizacion').classList.remove('active');
+            cargarListaAutorizaciones();
+        } else {
+            mostrarErrorPassword(data.message);
         }
-      })
-      .catch(err => console.error("Error en polling:", err));
-  }, 4000);
+    });
+}
+
+function mostrarErrorPassword(mensaje) {
+    const spanError = document.getElementById('auth_error_msg');
+    const inputPwd = document.getElementById('auth_password');
+    
+    spanError.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${mensaje}`;
+    spanError.style.display = 'block';
+    
+    inputPwd.style.border = '1px solid #e53e3e';
+    inputPwd.value = ''; 
+    inputPwd.focus();
+}
+
+function denegarAutorizacion(id) {
+    // Abrir el nuevo modal de confirmación en lugar del confirm() nativo
+    document.getElementById('rechazo_id_nota').value = id;
+    document.getElementById('modalConfirmarRechazo').classList.add('active');
+}
+
+function ejecutarRechazo() {
+    const id = document.getElementById('rechazo_id_nota').value;
+    const btn = document.querySelector('#modalConfirmarRechazo .btn-primary');
+    
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cancelando...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('id_nota', id);
+    formData.append('accion_auth', 'denegar');
+    
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=procesarAutorizacion', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('modalConfirmarRechazo').classList.remove('active');
+        btn.innerHTML = 'Sí, rechazar';
+        btn.disabled = false;
+
+        if(data.success) {
+            cargarListaAutorizaciones();
+        } else {
+            alert("Error al denegar: " + data.message);
+        }
+    });
+}
+
+function ejecutarAccionAutorizacion(formData) {
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=procesarAutorizacion', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById('modalPasswordAutorizacion').classList.remove('active');
+            cargarListaAutorizaciones();
+        } else {
+            const modal = document.getElementById('modalPasswordAutorizacion').querySelector('.modal-content');
+            modal.style.border = '2px solid red';
+            setTimeout(() => modal.style.border = 'none', 1000);
+            alert(data.message);
+        }
+    });
 }
 
 // ==========================================
@@ -944,16 +1116,19 @@ window.addEventListener("popstate", (e) => {
   const modalAprobar = document.getElementById("modalAprobarNota");
   const modalEditar = document.getElementById("modalEditarProducto");
   const modalPiernas = document.getElementById("modal-modulo-piernas");
+  const modalInvTemp = document.getElementById("modalEditarInvTemp");
 
   const hayModalAbierto =
     (modalAprobar && modalAprobar.classList.contains("active")) ||
     (modalEditar && modalEditar.classList.contains("active")) ||
-    (modalPiernas && modalPiernas.classList.contains("active"));
+    (modalPiernas && modalPiernas.classList.contains("active")) ||
+    (modalInvTemp && modalInvTemp.classList.contains("active"));
 
   if (hayModalAbierto) {
     if (modalAprobar) modalAprobar.classList.remove("active");
     if (modalEditar) modalEditar.classList.remove("active");
     if (modalPiernas) modalPiernas.classList.remove("active");
+    if (modalInvTemp) modalInvTemp.classList.remove("active");
     return;
   }
 
@@ -1045,3 +1220,140 @@ window.toggleDarkMode = function (isDark) {
     });
   }
 })();
+
+// ==========================================
+// MINI INVENTARIO TEMPORAL (MAZOS Y SAL)
+// ==========================================
+
+function cargarInventarioTemporalRuta() {
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=listarInvTemporal')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('tabla-inventario-temporal');
+            if (!data.success || data.inventario.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:15px; color:#64748b;">No hay productos configurados.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.inventario.map(item => {
+                const esSal = item.nombreProducto.toLowerCase().includes('sal');
+                let stockVisual = '';
+                
+                if (esSal) {
+                    stockVisual = `<span style="font-weight:bold; color:var(--text-main);">${item.cantidadCajas}</span> bultos`;
+                } else {
+                    stockVisual = `<span style="font-weight:bold; color:var(--text-main);">${item.cantidadPiezas}</span> pzs`;
+                }
+
+                const nombreSeguro = item.nombreProducto.replace(/'/g, "\\'");
+
+                return `
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 12px 15px; font-weight:600;">${item.nombreProducto}</td>
+                        <td style="padding: 12px 15px;">${stockVisual}</td>
+                        <td style="padding: 12px 15px; text-align: center;">
+                            <!-- NUEVO: Pasamos también item.idProducto -->
+                            <button type="button" class="btn-edit-inv" onclick="abrirModalInvTemp(${item.idSalidaTemporal}, ${item.idProducto}, '${nombreSeguro}', ${item.cantidadPiezas}, ${item.cantidadCajas})">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        })
+        .catch(err => console.error("Error al cargar inventario ruta:", err));
+}
+
+function abrirModalInvTemp(idTemp, idProducto, nombre, piezas, cajas) {
+    registrarModalEnHistorial(); 
+    
+    document.getElementById('modal_inv_id').value = idTemp;
+    document.getElementById('modal_inv_id_producto').value = idProducto; // <-- NUEVO
+    document.getElementById('modal_inv_nombre').value = nombre;
+    
+    const esSal = nombre.toLowerCase().includes('sal');
+    const divPiezas = document.getElementById('grupo_inv_piezas');
+    const divCajas = document.getElementById('grupo_inv_cajas');
+    
+    if (esSal) {
+        divPiezas.style.display = 'none';
+        divCajas.style.display = 'block';
+        
+        document.getElementById('modal_inv_cajas').value = cajas || 0;
+        document.getElementById('modal_inv_piezas').value = 0;
+    } else {
+        divPiezas.style.display = 'block';
+        divCajas.style.display = 'none';
+        
+        document.getElementById('modal_inv_piezas').value = piezas || 0;
+        document.getElementById('modal_inv_cajas').value = 0;
+    }
+
+    document.getElementById('modalEditarInvTemp').classList.add('active');
+}
+
+function cerrarModalInvTemp() {
+    document.getElementById('modalEditarInvTemp').classList.remove('active');
+}
+
+
+
+// Guardar el formulario
+document.getElementById('formEditarInvTemp')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=actualizarInvTemporal', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            cerrarModalInvTemp();
+            cargarInventarioTemporalRuta(); // Refresca la tabla
+        } else {
+            alert("Error: " + data.message);
+        }
+    });
+});
+
+// Inicializar la tabla al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    cargarInventarioTemporalRuta();
+});
+
+// ==========================================
+// BLOQUEO DE SCROLL AUTOMÁTICO PARA MODALES
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Inyectamos la regla CSS de bloqueo automáticamente
+    const style = document.createElement('style');
+    style.innerHTML = `
+        body.no-scroll {
+            overflow: hidden !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 2. Creamos el vigilante (Observer)
+    const observer = new MutationObserver(() => {
+        // Buscamos si hay CUALQUIER modal abierto en la pantalla
+        const modalesAbiertos = document.querySelectorAll(
+            '.modal-overlay.active, ' + 
+            '.modal-alert-overlay[style*="display: flex"], ' + 
+            '.modal-overlay[style*="display: flex"]'
+        );
+        
+        if (modalesAbiertos.length > 0) {
+            document.body.classList.add('no-scroll'); // Bloquea la pantalla trasera
+        } else {
+            document.body.classList.remove('no-scroll'); // Libera la pantalla trasera
+        }
+    });
+
+    // 3. Asignamos el vigilante a todos los modales de la página
+    document.querySelectorAll('.modal-overlay, .modal-alert-overlay').forEach(modal => {
+        observer.observe(modal, { attributes: true, attributeFilter: ['class', 'style'] });
+    });
+});

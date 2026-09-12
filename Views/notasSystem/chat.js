@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let ultimoTotalNoLeidos = null; 
 
-    const CONTROLLER_URL = '../../Controllers/ChatController.php';
+    const CONTROLLER_URL = '/LostFridgeInventory/Controllers/ChatController.php';
 
     // Elementos del DOM
     const chatContainer = document.getElementById('chat-messages');
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const groupUserSearch = document.getElementById('group-user-search');
 
     // --- SISTEMA DE NOTIFICACIÓN SONORA ---
-    const RUTA_SONIDO_WAV = '../../SRC/sounds/noti.wav'; 
+    const RUTA_SONIDO_WAV = '/LostFridgeInventory/SRC/sounds/noti.wav';
     const sonidoNotificacion = new Audio(RUTA_SONIDO_WAV);
     let usuarioInteractuo = false;
 

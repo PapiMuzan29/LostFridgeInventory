@@ -1,6 +1,4 @@
 <?php
-// Services/entradasServicio.php
-
 class entradasServicio {
     private $conexion;
 
@@ -129,6 +127,10 @@ class entradasServicio {
 
             $stmtDetalle = $this->conexion->prepare("INSERT INTO entradas_detalle (id_entrada, partida, id_producto, cantidad, kgs) VALUES (?, ?, ?, ?, ?)");
             $stmtUpdateStock = $this->conexion->prepare("UPDATE producto SET totalCajas = IFNULL(totalCajas, 0) + ?, totalPeso = IFNULL(totalPeso, 0) + ? WHERE idProducto = ?");
+            $stmtInsLote = $this->conexion->prepare("INSERT INTO lote (idProducto, codigoLote, pesoActual, activo) VALUES (?, ?, ?, 1)");
+
+            $contadorPartida = 1;
+            $fechaHoy = date('Ymd');
 
             foreach ($datos['detalle'] as $item) {
                 $cantidadItem = $item['cantidad'] ?? 1;
@@ -136,7 +138,6 @@ class entradasServicio {
                 $idProducto = intval($item['id_producto'] ?? 0);
                 $codigoBase = $item['codigo_producto'] ?? '';
 
-                // 🎯 BÚSQUEDA INTELIGENTE RESPETANDO EL PROVEEDOR Y LA PRESENTACIÓN DE MANTECA
                 if (stripos($codigoBase, 'MANT') !== false || stripos($codigoBase, 'MANTECA') !== false || $idProducto <= 0) {
                     $presentacionKgs = 18;
                     if ($kgsItem <= 12) {
@@ -147,7 +148,6 @@ class entradasServicio {
                         $presentacionKgs = 18;
                     }
 
-                    // Buscar el producto de manteca específico para este proveedor y su presentación
                     $sqlMantecaProv = "SELECT idProducto FROM producto 
                                        WHERE (nombreProducto LIKE '%MANTECA%' OR codigoProducto LIKE '%MANT%') 
                                        AND (nombreProducto LIKE ? OR codigoProducto LIKE ?)";
@@ -166,7 +166,6 @@ class entradasServicio {
                     if ($prodManteca) {
                         $idProducto = $prodManteca['idProducto'];
                     } else {
-                        // Resguardo si no encuentra la medida exacta del proveedor, busca una genérica del proveedor
                         $sqlGen = "SELECT idProducto FROM producto WHERE nombreProducto LIKE '%MANTECA%'";
                         $paramsGen = [];
                         if (!empty($idProveedor)) {
@@ -181,7 +180,6 @@ class entradasServicio {
                         $idProducto = $prodGen ? $prodGen['idProducto'] : ($item['id_producto'] ?? 1);
                     }
                 } else {
-                    // Búsqueda estándar por código y proveedor para otros productos
                     $stmtProd = $this->conexion->prepare("SELECT idProducto FROM producto WHERE TRIM(codigoProducto) = TRIM(?) AND (idProveedor = ? OR idProveedor IS NULL) LIMIT 1");
                     $stmtProd->execute([$codigoBase, $idProveedor]);
                     $productoBD = $stmtProd->fetch(PDO::FETCH_ASSOC);
@@ -190,7 +188,7 @@ class entradasServicio {
 
                 $stmtDetalle->execute([
                     $idEntrada,
-                    $item['partida'],
+                    $item['partida'] ?? $contadorPartida,
                     $idProducto,
                     $cantidadItem,
                     $kgsItem
@@ -201,6 +199,19 @@ class entradasServicio {
                     $kgsItem,
                     $idProducto
                 ]);
+
+                if ($kgsItem > 0) {
+                    $numComboStr = str_pad($item['partida'] ?? $contadorPartida, 2, '0', STR_PAD_LEFT);
+                    $codigoLote = "{$numComboStr}-{$idProveedor}-{$fechaHoy}";
+                    
+                    $stmtInsLote->execute([
+                        $idProducto,
+                        $codigoLote,
+                        $kgsItem
+                    ]);
+                }
+
+                $contadorPartida++;
             }
 
             $desc = "Se registró la Entrada Folio {$siguienteFolio} con {$totalCajas} cajas ({$totalKgs} Kgs).";
@@ -229,29 +240,32 @@ class entradasServicio {
             $idProveedor = $datos['id_proveedor'] ?? $datos['idProveedor'] ?? null;
             $idAlmacen = $datos['id_almacen'] ?? 1; 
             $totalKgs = $datos['total_kgs'] ?? 0;
-            $totalPesoOrigen = $datos['peso_origen'] ?? 0; 
             $totalCombos = count($datos['detalle']);
 
             $stmtFolio = $this->conexion->query("SELECT IFNULL(MAX(folio), 0) + 1 AS siguiente_folio FROM entradas");
             $siguienteFolio = $stmtFolio->fetch(PDO::FETCH_ASSOC)['siguiente_folio'];
 
-            $sqlEntrada = "INSERT INTO entradas (folio, id_proveedor, id_almacen, id_usuario, totalPeso, peso_origen, total_combos, status, fecha_hora_registro) VALUES (?, ?, ?, ?, ?, ?, ?, 'A', NOW())";
+            $sqlEntrada = "INSERT INTO entradas (folio, id_proveedor, id_almacen, id_usuario, totalPeso, status, fecha_hora_registro) VALUES (?, ?, ?, ?, ?, 'A', NOW())";
             $stmtEntrada = $this->conexion->prepare($sqlEntrada);
             $stmtEntrada->execute([
                 $siguienteFolio,
                 $idProveedor,
                 $idAlmacen,
                 $idUsuario,
-                $totalKgs,
-                $totalPesoOrigen,
-                $totalCombos
+                $totalKgs
             ]);
 
             $idEntrada = $this->conexion->lastInsertId();
 
             $stmtProd = $this->conexion->prepare("SELECT idProducto FROM producto WHERE TRIM(codigoProducto) = TRIM(?) LIMIT 1");
-            $stmtDetalle = $this->conexion->prepare("INSERT INTO entradas_detalle (id_entrada, partida, id_producto, cantidad, kgs, peso_origen, diferencia) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmtDetalle = $this->conexion->prepare("INSERT INTO entradas_detalle (id_entrada, partida, id_producto, cantidad, kgs) VALUES (?, ?, ?, ?, ?)");
             $stmtUpdateStock = $this->conexion->prepare("UPDATE producto SET totalCajas = IFNULL(totalCajas, 0) + ?, totalPeso = IFNULL(totalPeso, 0) + ? WHERE idProducto = ?");
+            
+            // 🎯 Lote configurado con: [Número de Combo (01, 02...)] - [Código de Proveedor] - [Fecha AAAAMMDD]
+            $stmtInsLote = $this->conexion->prepare("INSERT INTO lote (idProducto, codigoLote, pesoActual, activo) VALUES (?, ?, ?, 1)");
+
+            $fechaHoy = date('Ymd');
+            $contadorCombo = 1;
 
             foreach ($datos['detalle'] as $item) {
                 $idProducto = intval($item['id_producto'] ?? 0);
@@ -260,24 +274,39 @@ class entradasServicio {
                 if ($idProducto <= 0 && !empty($codigoProd)) {
                     $stmtProd->execute([$codigoProd]);
                     $productoBD = $stmtProd->fetch(PDO::FETCH_ASSOC);
-                    $idProducto = $productoBD ? $productoBD['idProducto'] : 1;
-                } else if ($idProducto <= 0) {
-                    $idProducto = 1;
+                    if ($productoBD) {
+                        $idProducto = intval($productoBD['idProducto']);
+                    }
+                }
+
+                if ($idProducto <= 0) {
+                    $sqlCombo = "SELECT idProducto FROM producto WHERE (nombreProducto LIKE '%PIERNA%' OR nombreProducto LIKE '%CODILLO%')";
+                    $paramsCombo = [];
+                    if (!empty($idProveedor)) {
+                        $sqlCombo .= " AND (idProveedor = ? OR idProveedor IS NULL)";
+                        $paramsCombo[] = $idProveedor;
+                    }
+                    $sqlCombo .= " LIMIT 1";
+                    $stmtC = $this->conexion->prepare($sqlCombo);
+                    $stmtC->execute($paramsCombo);
+                    $resC = $stmtC->fetch(PDO::FETCH_ASSOC);
+                    if ($resC) {
+                        $idProducto = intval($resC['idProducto']);
+                    } else {
+                        $idProducto = 1;
+                    }
                 }
 
                 $cantidadItem = $item['cantidad'] ?? 1;
-                $pesoBrutoItem = $item['peso_bruto'] ?? $item['kgs'] ?? 0;
-                $pesoOrigenItem = $item['peso_origen'] ?? $item['pesoOrigen'] ?? 0;
-                $diferenciaItem = $item['diferencia'] ?? 0;
+                $pesoBrutoItem = floatval($item['peso_bruto'] ?? ($item['kgs'] ?? 0));
+                $numeroPartida = $item['partida'] ?? $contadorCombo;
 
                 $stmtDetalle->execute([
                     $idEntrada,
-                    $item['partida'],
+                    $numeroPartida,
                     $idProducto,
                     $cantidadItem,
-                    $pesoBrutoItem,
-                    $pesoOrigenItem,
-                    $diferenciaItem
+                    $pesoBrutoItem
                 ]);
 
                 $stmtUpdateStock->execute([
@@ -285,6 +314,20 @@ class entradasServicio {
                     $pesoBrutoItem,
                     $idProducto
                 ]);
+
+                if ($pesoBrutoItem > 0) {
+                    // Formato: 01-PROV_ID-20260912
+                    $numComboStr = str_pad($numeroPartida, 2, '0', STR_PAD_LEFT);
+                    $codigoLote = "{$numComboStr}-{$idProveedor}-{$fechaHoy}";
+
+                    $stmtInsLote->execute([
+                        $idProducto,
+                        $codigoLote,
+                        $pesoBrutoItem
+                    ]);
+                }
+
+                $contadorCombo++;
             }
 
             $desc = "Se registró la Entrada de Combos Folio {$siguienteFolio} con {$totalCombos} partidas ({$totalKgs} Kgs).";
