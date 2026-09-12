@@ -20,6 +20,15 @@ switch ($action) {
     case 'busqueda':
         $tipoBusqueda = $_GET['tipo_busqueda'] ?? 'producto'; // 'producto' o 'proveedor'
         $tipoInventario = $_GET['tipo_inventario'] ?? 'cajas'; // 'cajas', 'pierna', 'codillo'
+
+$service = new modeloInventario();
+$action = $_GET['action'] ?? '';
+
+header('Content-Type: application/json');
+
+switch ($action) {
+    case 'busqueda':
+        $tipo = $_GET['tipo_busqueda'] ?? 'producto';
         $busqueda = $_GET['busqueda'] ?? '';
         $estado = $_GET['estado'] ?? '';
         $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
@@ -33,6 +42,10 @@ switch ($action) {
             } else {
                 $datos = $service->getProducts($busqueda, $estado, $pagina);
             }
+        if ($tipo === 'proveedor') {
+            $datos = $service->getAllProviders($busqueda, $estado, $pagina);
+        } else {
+            $datos = $service->getProducts($busqueda, $estado, $pagina);
         }
         
         echo json_encode(['datos' => $datos, 'totalPaginas' => 1, 'pagina' => $pagina]);
@@ -46,6 +59,7 @@ switch ($action) {
             }
 
             $service->agregarProducto($datos);
+            $service->agregarProducto($_POST);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -62,6 +76,8 @@ switch ($action) {
             }
 
             $service->actualizarProducto($id, $datos);
+            $id = (int)$_POST['idProducto'];
+            $service->actualizarProducto($id, $_POST);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -71,6 +87,7 @@ switch ($action) {
     case 'eliminarProducto':
         try {
             $id = (int)($_GET['id'] ?? 0);
+            $id = (int)$_GET['id'];
             $service->eliminarProducto($id);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
@@ -86,6 +103,7 @@ switch ($action) {
             }
 
             $service->agregarProveedor($datos);
+            $service->agregarProveedor($_POST);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -111,6 +129,20 @@ switch ($action) {
     case 'eliminarProveedor':
         try {
             $id = (int)($_GET['id'] ?? 0);
+    // 🔥 AGREGAMOS ESTE BLOQUE NUEVO PARA ACTUALIZAR PROVEEDORES
+    case 'actualizarProveedor':
+        try {
+            $id = (int)$_POST['idProveedor']; // Asegúrate de que el input hidden se llame idProveedor
+            $service->actualizarProveedor($id, $_POST); // Asegúrate de tener este método en tu modeloInventario
+            echo json_encode(['status' => 'success']);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'eliminarProveedor':
+        try {
+            $id = (int)$_GET['id'];
             $service->eliminarProveedor($id);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {

@@ -12,6 +12,9 @@ class modeloInventario {
      * 📦 MÓDULO PRODUCTOS: Obtención y Gestión con soporte para Pestañas (Cajas, Pierna, Codillo, Mantecas)
      */
     public function getProducts($textoBusqueda = '', $estado = '', $pagina = 1, $tipoInventario = 'cajas') {
+     * 📦 MÓDULO PRODUCTOS: Obtención y Gestión
+     */
+    public function getProducts($textoBusqueda = '', $estado = '', $pagina = 1) {
         $porPagina = 4;
         $offset = ($pagina - 1) * $porPagina;
 
@@ -40,6 +43,8 @@ class modeloInventario {
                   
         $params = [];
 
+                  
+        $params = [];
         if (!empty($textoBusqueda)) {
             $query .= " AND (p.nombreProducto LIKE ? OR p.codigoProducto LIKE ?)";
             $params[] = "%$textoBusqueda%";

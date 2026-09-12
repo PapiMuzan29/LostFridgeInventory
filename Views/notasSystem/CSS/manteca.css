@@ -1,0 +1,444 @@
+/* ===================================================================
+   VARIABLES DE COLOR - MÓDULO MANTECA
+=================================================================== */
+:root {
+    --primary-manteca: #f59e0b;
+    --primary-manteca-dark: #d97706;
+    --bg-dark-header: #0f172a;
+
+    /* Variables dinámicas (Modo Claro por defecto) */
+    --manteca-bg: #f1f5f9;
+    --manteca-card-bg: #ffffff;
+    --manteca-card-border: #e2e8f0;
+    --manteca-text-main: #1e293b;
+    --manteca-text-muted: #64748b;
+    
+    --manteca-total-bg: #fffbeb;
+    --manteca-total-border: #fde68a;
+    --manteca-total-title: #b45309;
+    --manteca-total-val: #78350f;
+
+    --manteca-btn-pres-bg: #ffffff;
+    --manteca-btn-pres-text: #334155;
+    --manteca-btn-pres-active-bg: #fef3c7;
+
+    --manteca-input-bg: #ffffff;
+    --manteca-input-border: #cbd5e1;
+    --manteca-counter-bg: #f1f5f9;
+
+    --manteca-badge-bg: #fef3c7;
+    --manteca-badge-text: #b45309;
+    --manteca-empty-bg: #f8fafc;
+}
+
+/* ===================================================================
+   SOPORTE MODO OSCURO (CUANDO SE ACTIVA EL BOTÓN DE ENCARGADO)
+=================================================================== */
+body.dark-mode, html.dark-mode body {
+    --manteca-bg: #090d16;
+    --manteca-card-bg: #151d2a;
+    --manteca-card-border: #334155;
+    --manteca-text-main: #f8fafc;
+    --manteca-text-muted: #94a3b8;
+
+    --manteca-total-bg: rgba(245, 158, 11, 0.12);
+    --manteca-total-border: rgba(245, 158, 11, 0.3);
+    --manteca-total-title: #fbbf24;
+    --manteca-total-val: #fef3c7;
+
+    --manteca-btn-pres-bg: #1e293b;
+    --manteca-btn-pres-text: #cbd5e1;
+    --manteca-btn-pres-active-bg: rgba(245, 158, 11, 0.25);
+
+    --manteca-input-bg: #1e293b;
+    --manteca-input-border: #475569;
+    --manteca-counter-bg: #334155;
+
+    --manteca-badge-bg: rgba(245, 158, 11, 0.2);
+    --manteca-badge-text: #fef3c7;
+    --manteca-empty-bg: #131b2e;
+}
+
+body {
+    background-color: var(--manteca-bg);
+    color: var(--manteca-text-main);
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding-bottom: 100px; /* Espacio reservado para la barra fija inferior */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* HEADER INTEGRADO CON BOTÓN VOLVER */
+.manteca-header {
+    background: var(--bg-dark-header);
+    color: #ffffff;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.manteca-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.manteca-header h1 {
+    font-size: 1.1rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.12);
+    border: none;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s ease;
+}
+
+.btn-back:hover,
+.btn-back:active {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.date-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+/* BARRA DEL CALENDARIO FIJA ARRIBA */
+.sticky-date-bar {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background-color: var(--manteca-bg);
+    padding: 10px 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.container {
+    padding: 16px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--manteca-text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+/* SELECCIÓN DE PRESENTACIÓN (3 COLUMNAS ALINEADAS) */
+.grid-presentaciones {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.btn-presentacion {
+    background: var(--manteca-btn-pres-bg);
+    border: 2px solid var(--manteca-card-border);
+    border-radius: 12px;
+    padding: 12px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: var(--manteca-btn-pres-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-presentacion.active {
+    background: var(--manteca-btn-pres-active-bg);
+    border-color: var(--primary-manteca);
+    color: var(--primary-manteca);
+}
+
+/* CARD DE TOTAL DÍA */
+.card-total-dia {
+    background: var(--manteca-total-bg);
+    border: 1px solid var(--manteca-total-border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.card-total-dia .info h3 {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--manteca-total-title);
+    text-transform: uppercase;
+}
+
+.card-total-dia .info .val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--manteca-total-val);
+    margin-top: 4px;
+}
+
+.card-total-dia .icon {
+    font-size: 2.2rem;
+    color: var(--primary-manteca);
+}
+
+/* FORMULARIO DE REGISTRO */
+.card-form {
+    background: var(--manteca-card-bg);
+    border: 1px solid var(--manteca-card-border);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--manteca-text-muted);
+    margin-bottom: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--manteca-text-muted);
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    background-color: var(--manteca-input-bg);
+    border: 1px solid var(--manteca-input-border);
+    color: var(--manteca-text-main);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-manteca);
+}
+
+/* CONTADOR INCREMENTAL */
+.counter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-counter {
+    width: 44px;
+    height: 44px;
+    background: var(--manteca-counter-bg);
+    border: 1px solid var(--manteca-input-border);
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--manteca-text-main);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-counter:active {
+    background: var(--manteca-card-border);
+}
+
+.input-counter {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.btn-submit {
+    width: 100%;
+    background: var(--primary-manteca);
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.btn-submit:active {
+    background: var(--primary-manteca-dark);
+}
+
+/* RESUMEN POR PRESENTACIÓN */
+.resumen-card {
+    background: var(--manteca-card-bg);
+    border: 1px solid var(--manteca-card-border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.resumen-card-header {
+    font-weight: 800;
+    color: var(--manteca-text-main);
+    border-left: 4px solid var(--primary-manteca);
+    padding-left: 8px;
+    margin-bottom: 10px;
+}
+
+.resumen-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--manteca-card-border);
+    font-size: 0.9rem;
+    color: var(--manteca-text-muted);
+}
+
+.resumen-item-sub {
+    font-size: 0.75rem;
+    color: var(--manteca-text-muted);
+}
+
+.resumen-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    padding-top: 8px;
+    color: var(--manteca-text-main);
+}
+
+/* TOTAL GENERAL FIJO INFERIOR */
+.fixed-bottom-total-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--manteca-bg);
+    padding: 10px 15px 15px 15px;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+}
+
+.fixed-bottom-total-container .total-general-card {
+    margin: 0;
+}
+
+.total-general-card {
+    background: var(--manteca-total-bg);
+    border: 1px solid var(--manteca-total-border);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    font-weight: bold;
+    color: var(--manteca-total-val);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.contenedor-tarjetas-ventas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.venta-card-item {
+    background: var(--manteca-card-bg);
+    border: 1px solid var(--manteca-card-border);
+    border-radius: 10px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--primary-manteca);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.venta-card-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.venta-cliente {
+    font-weight: 700;
+    color: var(--manteca-text-main);
+    font-size: 0.95rem;
+}
+
+.venta-ticket {
+    font-size: 0.85rem;
+    color: var(--manteca-text-muted);
+}
+
+.venta-badge-pzs {
+    background-color: var(--manteca-badge-bg);
+    color: var(--manteca-badge-text);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.empty-state-card {
+    text-align: center;
+    padding: 15px;
+    color: var(--manteca-text-muted);
+    font-size: 0.9rem;
+    background: var(--manteca-empty-bg);
+    border-radius: 8px;
+    border: 1px dashed var(--manteca-card-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}

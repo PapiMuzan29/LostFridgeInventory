@@ -48,6 +48,16 @@ $esAdmin = (stripos($nombreRol, 'admin') !== false || $apodo === 'admin_sistema'
 
             <!-- 🔒 MÓDULOS RESTRINGIDOS: Solo se muestran si es Administrador -->
             <?php if ($esAdmin): ?>
+            <li class="nav-link" onclick="cargarModulo('configuracion')">
+                    <i class="fa-solid fa-gear"></i> CONFIGURACION
+                </li>
+
+            <!-- 🔒 MÓDULOS RESTRINGIDOS: Solo se muestran si es Administrador -->
+            <?php if ($esAdmin): ?>
+                <li class="nav-link" onclick="cargarModulo('ubicaciones')">
+                    <i class="fa-solid fa-location-dot"></i> UBICACIONES
+                </li>
+
                 <li class="nav-link" onclick="cargarModulo('movimientos')">
                     <i class="fa-solid fa-retweet"></i> MOVIMIENTOS
                 </li>
@@ -59,6 +69,8 @@ $esAdmin = (stripos($nombreRol, 'admin') !== false || $apodo === 'admin_sistema'
                 <li class="nav-link" onclick="cargarModulo('usuarios')">
                     <i class="fa-solid fa-users"></i> USUARIOS
                 </li>
+
+                
             <?php endif; ?>
         </ul>
 

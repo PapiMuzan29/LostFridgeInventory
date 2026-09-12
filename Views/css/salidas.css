@@ -58,6 +58,12 @@ body {
     display: block;
     margin: 0 auto 20px auto; 
     margin-top: 10px;      
+    width: 140px;          /* Ajusta este valor al ancho ideal para tu barra */
+    height: 140px;         /* Manténlo igual al width para que sea un cuadrado perfecto */
+    object-fit: contain;   /* ESTO ES CLAVE: hace que toda la imagen quepa dentro del espacio sin recortar */
+    display: block;
+    margin: 0 auto 20px auto; 
+    margin-top: 10px;      /* Ajusté un poco el margen para que no toque el borde superior */
 }
 
 .titulo-lfi {
@@ -429,4 +435,7 @@ body.dark-theme #tablaPartidasBody input {
     background-color: #18181b !important;
     color: #ffffff !important;
     border: 1px solid #27272a !important;
+/* Campos que ocupan las dos columnas completas (como Motivo y Almacén) */
+.text-span-2 {
+    grid-column: span 2;
 }

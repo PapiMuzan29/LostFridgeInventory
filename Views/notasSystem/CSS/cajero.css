@@ -1,0 +1,313 @@
+/* Importa los estilos base de la app para mantener consistencia */
+@import url("vendedor.css");
+
+/* ==========================================
+   VARIABLES DE COLOR (MÓDULO CAJERO)
+   ========================================== */
+:root {
+    --caja-bg: #f8fafc;
+    --caja-card-bg: #ffffff;
+    --caja-text-main: #1e293b;
+    --caja-text-muted: #64748b;
+    --caja-border: #e2e8f0;
+    --caja-detalles-bg: #f8fafc;
+    --caja-badge-bg: #fef3c7;
+    --caja-badge-text: #d97706;
+    --caja-modal-bg: #ffffff;
+    --caja-modal-footer: #f7fafc;
+}
+
+/* MODO OSCURO (Paleta Azul Marino / Slate) */
+body.dark-mode, 
+html.dark-mode {
+    --caja-bg: #0f131d;
+    --caja-card-bg: #1c2333;
+    --caja-text-main: #ffffff;
+    --caja-text-muted: #8b9bb4;
+    --caja-border: #2a3449;
+    --caja-detalles-bg: #131924;
+    --caja-badge-bg: rgba(217, 119, 6, 0.2);
+    --caja-badge-text: #fbbf24;
+    --caja-modal-bg: #1c2333;
+    --caja-modal-footer: #0f1420;
+}
+
+/* ==========================================
+   ESTILOS ESPECÍFICOS DEL MÓDULO DE CAJA
+   ========================================== */
+.badge-pending {
+    background-color: var(--caja-badge-bg);
+    color: var(--caja-badge-text);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.nota-card {
+    background-color: var(--caja-card-bg);
+    border: 1px solid var(--caja-border);
+    border-left: 5px solid #f59e0b;
+    margin-bottom: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.nota-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--caja-border);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.nota-title {
+    font-size: 1.1rem;
+    color: var(--caja-text-main);
+}
+
+.nota-date {
+    display: block;
+    color: var(--caja-text-muted);
+}
+
+.nota-info {
+    margin-bottom: 5px;
+    color: var(--caja-text-main);
+}
+
+.nota-info strong {
+    color: var(--caja-text-main);
+}
+
+.detalles-list {
+    font-size: 0.95rem;
+    color: var(--caja-text-main);
+    background-color: var(--caja-detalles-bg);
+    padding: 10px;
+    border-radius: 6px;
+    margin: 10px 0;
+    line-height: 1.5;
+    border: 1px solid var(--caja-border);
+}
+
+.caja-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.caja-toolbar-title {
+    font-size: 1.1rem;
+    color: var(--caja-text-main);
+    margin: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--caja-text-muted);
+    background-color: var(--caja-card-bg);
+    border: 1px solid var(--caja-border);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    color: var(--caja-text-muted);
+}
+
+.btn-success {
+    background-color: #16a34a;
+    color: #ffffff;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-success:hover {
+    background-color: #15803d;
+}
+
+.btn-success:active {
+    background-color: #166534;
+}
+
+/* ==========================================
+   INTERRUPTOR MODO OSCURO (SWITCH)
+   ========================================== */
+.toggle-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 4px 0;
+    margin-top: 12px;
+    border-top: 1px solid var(--caja-border);
+}
+
+.toggle-control label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--caja-text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle-control label i {
+    color: #f472b6;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+input:checked + .slider {
+    background-color: #e11d48;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+/* ==========================================
+   ANIMACIÓN DE ENTRADA Y DESTELLO
+   ========================================== */
+.nota-nueva-alerta {
+    animation: slideInAlert 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards, resplandorVerde 1.5s ease-out forwards;
+}
+
+@keyframes slideInAlert {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes resplandorVerde {
+    0% {
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+        border-left-color: #16a34a;
+    }
+    50% {
+        box-shadow: 0 0 15px 3px rgba(22, 163, 74, 0.4);
+        border-left-color: #16a34a;
+    }
+    100% {
+        box-shadow: none;
+    }
+}
+
+/* ==========================================
+   MODAL DE ALERTAS PERSONALIZADO
+   ========================================== */
+.modal-alert-overlay {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6); 
+    z-index: 3000;
+    display: none; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.modal-alert-content {
+    background: var(--caja-modal-bg); 
+    border-radius: 12px; 
+    width: 90%; 
+    max-width: 380px;
+    overflow: hidden; 
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    text-align: center; 
+    animation: modalPop 0.2s ease-out;
+    border: 1px solid var(--caja-border);
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-alert-header { 
+    padding: 20px 20px 10px 20px; 
+}
+
+.modal-alert-icon { 
+    font-size: 2.5rem; 
+    margin-bottom: 8px; 
+}
+
+.modal-alert-title { 
+    margin: 0; 
+    font-size: 1.2rem; 
+    font-weight: bold; 
+    color: var(--caja-text-main); 
+}
+
+.modal-alert-body { 
+    padding: 0 20px 20px 20px; 
+    color: var(--caja-text-muted); 
+    font-size: 0.95rem; 
+    line-height: 1.4; 
+}
+
+.modal-alert-footer { 
+    padding: 12px 20px; 
+    background: var(--caja-modal-footer); 
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    border-top: 1px solid var(--caja-border); 
+}

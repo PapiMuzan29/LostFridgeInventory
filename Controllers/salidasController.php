@@ -39,7 +39,7 @@ try {
         exit;
     }
 
-    // BUSCAR PRODUCTO PARA SALIDA
+    // BUSCAR PRODUCTO PARA SALIDA (VALIDADO POR CLIENTE Y PESO EXACTO)
     if ($action === 'buscarProducto') {
         $codigoTrama = $_GET['codigo'] ?? '';
         $idCliente = $_GET['idCliente'] ?? '';
@@ -74,11 +74,39 @@ try {
             'nombreProducto'  => $producto['nombreProducto'] ?? 'Producto Desconocido',
             'codigoEnteros'   => ltrim($enteros, '0') ?: '0',
             'codigoDecimales' => $decimales
+        
+        // 1. Buscamos el producto filtrando por el cliente/proveedor
+        // Asegúrate de que tu método obtenerProductoPorCodigo en el servicio
+        // realice un: WHERE codigo = :codigo AND idCliente = :idCliente
+        $producto = $service->obtenerProductoPorCodigo($codigoTrama, $idCliente);
+        
+        if (!$producto) {
+            echo json_encode(['error' => 'Producto no encontrado o no pertenece a este proveedor.']);
+            exit;
+        }
+
+        // 2. EXTRACCIÓN DE PESO EXACTA (Basado en trama 071641041752 -> 16.41)
+        // Posiciones: Indice 2 y 3 para "16", Indice 4 y 5 para "41"
+        $enteros = "0";
+        $decimales = "00";
+
+        if (strlen($codigoTrama) >= 6) {
+            $enteros = substr($codigoTrama, 2, 2); 
+            $decimales = substr($codigoTrama, 4, 2);
+        }
+
+        // 3. Respuesta final
+        echo json_encode([
+            'codigoProducto' => $producto['codigoProducto'] ?? $producto['codigo'] ?? $codigoTrama,
+            'nombreProducto' => $producto['nombreProducto'] ?? $producto['nombre'] ?? 'Producto Desconocido',
+            'codigoEnteros'  => (string)$enteros,
+            'codigoDecimales' => (string)$decimales
         ]);
         exit;
     }
 
     // GUARDAR SALIDA O TRASPASO A MAYOREO
+    // GUARDAR SALIDA
     if ($action === 'guardarSalida') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['error' => 'Método no permitido.']);
@@ -178,6 +206,8 @@ try {
         $apodoUsuario = $_SESSION['apodoUsuario'] ?? 'Usuario';
         
         $resultado = $service->registrarSalidaCompleta($datos, $idUsuario, $apodoUsuario);
+        $idUsuario = $_SESSION['idCuenta'] ?? 2;
+        $resultado = $service->registrarSalidaCompleta($datos, $idUsuario, $_SESSION['apodoUsuario'] ?? 'Usuario');
         
         echo json_encode($resultado);
         exit;

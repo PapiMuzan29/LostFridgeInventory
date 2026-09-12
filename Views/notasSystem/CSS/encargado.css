@@ -1,0 +1,949 @@
+/* ===================================================================
+    VARIABLES DE COLOR LFI (LOST FRIDGE INVENTORY)
+=================================================================== */
+:root {
+    --primary-color: #255CD0;
+    --primary-dark: #1a4299;
+    --navy-header: #1a365d;
+    --background: #f8fafc;
+    --card-bg: #ffffff;
+    --card-inner-bg: #f8fafc;
+    --text-main: #334155;
+    --text-muted: #64748b;
+    --border-color: #cbd5e1;
+    --focus-ring: rgba(37, 92, 208, 0.15);
+    
+    /* Variables del Toggle Switch */
+    --switch-bg-off: #cbd5e1;
+    --switch-bg-on: #255CD0;
+    --switch-circle: #ffffff;
+
+    /* Colores para estados (Badges) */
+    --warning-bg: #fef3c7;
+    --warning-text: #b45309;
+    --warning-border: #fde68a;
+    
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    --success-border: #bbf7d0;
+    
+    --info-bg: #e0f2fe;
+    --info-text: #0369a1;
+    --info-border: #bae6fd;
+}
+
+/* ===================================================================
+    MODO OSCURO (DARK MODE)
+=================================================================== */
+body.dark-mode {
+    --primary-color: #3b82f6;
+    --primary-dark: #2563eb;
+    --navy-header: #0b0f19;
+    --background: #090d16;          /* Fondo general oscuro profundo */
+    --card-bg: #151d2a;             /* Tarjeta principal */
+    --card-inner-bg: #1e293b;       /* Tarjeta interna */
+    --text-main: #f8fafc;           /* Texto blanco brillante */
+    --text-muted: #94a3b8;          /* Texto secundario */
+    --border-color: #334155;        /* Bordes sutiles */
+    --focus-ring: rgba(59, 130, 246, 0.4);
+
+    /* Toggle en Modo Oscuro */
+    --switch-bg-off: #475569;
+    --switch-bg-on: #3b82f6;
+
+    /* Badges en Modo Oscuro */
+    --warning-bg: rgba(245, 158, 11, 0.2);
+    --warning-text: #fbbf24;
+    --warning-border: rgba(245, 158, 11, 0.3);
+
+    --success-bg: rgba(34, 197, 94, 0.2);
+    --success-text: #4ade80;
+    --success-border: rgba(34, 197, 94, 0.3);
+
+    --info-bg: rgba(56, 189, 248, 0.2);
+    --info-text: #38bdf8;
+    --info-border: rgba(56, 189, 248, 0.3);
+}
+
+/* Reglas específicas para Modo Oscuro */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode select,
+body.dark-mode .form-control {
+    border-color: var(--border-color);
+    color: var(--text-main);
+    background-color: #0f172a;
+}
+
+body.dark-mode input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode .form-control:focus {
+    border-color: #60a5fa;
+    background-color: var(--card-inner-bg);
+}
+
+body.dark-mode .btn-secondary-sm {
+    background-color: rgba(59, 130, 246, 0.15);
+    border-color: var(--primary-color);
+    color: #60a5fa;
+}
+
+/* Corrección para contenedores con fondo estático inline en notas (Modo Oscuro) */
+body.dark-mode .note-card div[style*="background"],
+body.dark-mode .card div[style*="background"] {
+    background-color: var(--card-inner-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-mode .note-card div[style*="background"] *,
+body.dark-mode .card div[style*="background"] * {
+    color: var(--text-main) !important;
+}
+
+/* Reset básico para móviles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text-main);
+    overflow-x: hidden; 
+    padding-bottom: 70px; /* Espacio para navegación inferior */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===================================================================
+    ESTILOS GENERALES DE CONTENEDORES Y HEADER
+=================================================================== */
+.app-header {
+    background-color: var(--navy-header);
+    color: white;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.app-header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.app-header p {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+
+.app-content {
+    padding: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.card h2, .card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-inner {
+    background-color: var(--card-inner-bg);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border-color);
+}
+
+/* Formularios */
+.form-group { 
+    margin-bottom: 16px; 
+}
+
+label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-main);
+}
+
+.form-control {
+    width: 100%;
+    min-height: 48px; 
+    padding: 10px 14px;
+    font-size: 1rem;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--card-bg);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s ease;
+    appearance: none;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.sticky-search {
+    position: sticky; 
+    top: 68px;
+    z-index: 90;
+    padding: 12px 18px;
+}
+
+/* ===================================================================
+    BOTÓN DE PALANCA DESLIZABLE (TOGGLE SWITCH)
+=================================================================== */
+.toggle-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+}
+
+/* Oculta el checkbox nativo de HTML */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Fondo/Carril de la barra */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--switch-bg-off);
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 34px;
+}
+
+/* Botón/Círculo deslizable */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--switch-circle);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Estado Activado (Checked) */
+input:checked + .slider {
+    background-color: var(--switch-bg-on);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* ===================================================================
+    TARJETAS DE NOTAS (INICIO / REVISIÓN)
+=================================================================== */
+.note-card {
+    transition: all 0.3s ease-out;
+    max-height: 1000px;
+    opacity: 1;
+    transform: scale(1);
+    overflow: hidden;
+}
+
+.note-card.removing {
+    opacity: 0;
+    transform: scale(0.9);
+    max-height: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-color: transparent;
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
+}
+
+.note-body {
+    margin-bottom: 12px;
+}
+
+.note-cliente {
+    font-size: 1.05rem;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.note-date, .note-total {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.note-total {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.note-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ===================================================================
+    LISTA DE PRODUCTOS (CONFIGURACIÓN)
+=================================================================== */
+.product-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.product-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.btn-edit {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
+/* ===================================================================
+    VISTA DE RESUMEN Y GESTIÓN (FECHAS, CARRUSEL Y TARJETAS)
+=================================================================== */
+
+/* Selector de fecha superior */
+.date-picker-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card-bg);
+    padding: 10px 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.date-picker-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 1.05rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.date-picker-display i {
+    color: var(--text-main);
+    font-size: 1.2rem;
+}
+
+.btn-date-nav {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.btn-date-nav:active {
+    background: var(--card-inner-bg);
+}
+
+/* Carrusel Horizontal de Categorías */
+.categories-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.categories-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.category-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    min-width: 72px;
+    cursor: pointer;
+    gap: 8px;
+    outline: none;
+}
+
+.chip-icon-box {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background-color: var(--card-inner-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #b91c1c;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    padding: 3px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.category-chip span {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.category-chip.active .chip-icon-box {
+    background-color: rgba(37, 92, 208, 0.1);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(37, 92, 208, 0.15);
+}
+
+.category-chip.active span {
+    color: var(--primary-color);
+}
+
+/* Encabezado del Resumen del Día */
+.resumen-section-header {
+    margin-bottom: 15px;
+}
+
+.resumen-section-header h3 {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+#contenedor-resumen-dia {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Tarjetas Interactivas de Resumen */
+.resumen-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.2s ease, 
+                box-shadow 0.2s ease,
+                background-color 0.3s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Animación hover (Escritorio) */
+.resumen-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Animación y borde al presionar (Active) */
+.resumen-card:active {
+    transform: translateY(2px) scale(0.99);
+    border-left-color: var(--primary-color);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.resumen-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background-color: var(--card-inner-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #dc2626;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+/* Renderizado adaptable de imágenes */
+.img-producto {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.resumen-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.resumen-card-details h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.resumen-metrics {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.highlight-qty {
+    color: #dc2626;
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+.metric-dot {
+    color: var(--text-muted);
+    font-weight: bold;
+}
+
+.weight-qty {
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.resumen-card-arrow {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+/* ===================================================================
+    BADGES (ETIQUETAS) Y BOTONES
+=================================================================== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: fit-content;
+}
+.badge-warning { background-color: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
+.badge-success { background-color: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+.badge-info { background-color: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
+.badge-secondary { background-color: var(--card-inner-bg); color: var(--text-muted); border: 1px solid var(--border-color); }
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+    min-height: 52px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(37, 92, 208, 0.2);
+    transition: all 0.2s ease-in-out;
+}
+.btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(37, 92, 208, 0.2); }
+.btn-primary:disabled { background-color: var(--border-color); cursor: not-allowed; box-shadow: none; }
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-outline:active { background-color: var(--card-inner-bg); }
+
+.btn-danger-block {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 8px;
+    background-color: #ef4444; 
+    color: white; 
+    text-decoration: none;
+    width: 100%; 
+    min-height: 48px; 
+    border-radius: 6px; 
+    font-weight: bold;
+    border: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-muted);
+}
+.empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    color: var(--border-color);
+}
+
+/* ===================================================================
+    NAVEGACIÓN DE PESTAÑAS Y BARRA INFERIOR
+=================================================================== */
+.tab-content { display: none; }
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.bottom-nav {
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 65px;
+    background-color: var(--card-bg); 
+    border-top: 1px solid var(--border-color);
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center;
+    z-index: 1000; 
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.nav-item {
+    background: transparent; 
+    border: none; 
+    flex: 1; 
+    height: 100%;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 4px;
+    color: var(--text-muted); 
+    cursor: pointer; 
+    transition: color 0.2s, background-color 0.2s;
+}
+.nav-item i { font-size: 1.25rem; }
+.nav-item span { font-size: 0.75rem; font-weight: 600; }
+.nav-item.active { color: var(--primary-color); font-weight: 600; }
+.nav-item:active { background-color: var(--card-inner-bg); }
+
+.spacer { height: 75px; }
+
+/* ===================================================================
+    PAGINACIÓN UNIVERSAL
+=================================================================== */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.page-btn {
+    background-color: var(--card-inner-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-btn:hover:not(:disabled) {
+    background-color: var(--border-color);
+}
+
+.page-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-ellipsis {
+    color: var(--text-muted);
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+/* ===================================================================
+    MODALES (VENTANAS EMERGENTES)
+=================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    overflow: hidden;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    background-color: var(--navy-header);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    border: none;
+    padding: 0;
+    color: white;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.label-warning {
+    color: #d97706;
+}
+
+/* ===================================================================
+    SISTEMA DE TICKET (MODO OSCURO)
+=================================================================== */
+@media (prefers-color-scheme: dark) {
+    .ticket-container {
+        background-color: #1a202c !important;
+        border-color: #4a5568 !important;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .ticket-container h3 {
+        color: #f7fafc !important;
+        border-bottom-color: #2d3748 !important;
+    }
+
+    #ticket-items {
+        color: #e2e8f0 !important;
+    }
+
+    #ticket-items span {
+        color: #a0aec0 !important;
+    }
+
+    .ticket-container div[style*="border-top"] {
+        border-top-color: #4a5568 !important;
+    }
+
+    .ticket-container strong[style*="color: #2d3748"] {
+        color: #f7fafc !important;
+    }
+
+    #ticket-total {
+        color: #48bb78 !important;
+    }
+
+    .ticket-container p {
+        color: #a0aec0 !important;
+    }
+
+    button[value="guardar_espera"] {
+        background-color: #2d3748 !important;
+        color: #e2e8f0 !important;
+    }
+}
+
+/* ===================================================================
+    ANIMACIÓN DE ENTRADA Y UTILIDADES
+=================================================================== */
+.fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.word-break-fix {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Evita selección accidental de texto mientras se desliza en el área principal */
+.app-content {
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* 1. Elimina el recuadro azul/gris por defecto al tocar en móviles */
+.bottom-nav .nav-item,
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+/* 2. Feedback táctil suave para los botones del menú inferior */
+.bottom-nav .nav-item {
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* Micro-animación al presionar (presión física) */
+.bottom-nav .nav-item:active {
+    transform: scale(0.92);
+    opacity: 0.8;
+}
+
+/* 3. Animación ligera para el ícono/texto cuando se activa */
+.bottom-nav .nav-item.active i {
+    animation: bounceIcon 0.25s ease-out;
+}
+
+@keyframes bounceIcon {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
