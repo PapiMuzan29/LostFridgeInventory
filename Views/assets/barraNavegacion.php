@@ -19,8 +19,8 @@ $esAdmin = (stripos($nombreRol, 'admin') !== false || $apodo === 'admin_sistema'
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <div class="sidebar">
 
-        <div class="sidebar-header">
-            <img src="../SRC/Logo LFI - copia.png" alt="Logo LFI" class="logo-america">
+        <div class="sidebar-header" style="padding: 15px 20px; text-align: center; flex-shrink: 0; width: 100%; box-sizing: border-box;">
+            <img src="../SRC/Logo LFI - copia.png" alt="Logo LFI" class="logo-america" style="width: 90px !important; height: 90px !important; min-width: 90px !important; min-height: 90px !important; max-width: 90px !important; max-height: 90px !important; border-radius: 50% !important; object-fit: cover !important; display: block !important; margin: 0 auto !important; flex-shrink: 0 !important;">
         </div>
 
         <ul class="nav-menu">
@@ -41,10 +41,9 @@ $esAdmin = (stripos($nombreRol, 'admin') !== false || $apodo === 'admin_sistema'
             </li>
 
             <li class="nav-link" onclick="cargarModulo('configuracion')">
-                    <i class="fa-solid fa-gear"></i> CONFIGURACION
-                </li>
+                <i class="fa-solid fa-gear"></i> CONFIGURACION
+            </li>
 
-            <!-- 🔒 MÓDULOS RESTRINGIDOS: Solo se muestran si es Administrador -->
             <?php if ($esAdmin): ?>
                 <li class="nav-link" onclick="cargarModulo('ubicaciones')">
                     <i class="fa-solid fa-location-dot"></i> UBICACIONES
@@ -61,8 +60,6 @@ $esAdmin = (stripos($nombreRol, 'admin') !== false || $apodo === 'admin_sistema'
                 <li class="nav-link" onclick="cargarModulo('usuarios')">
                     <i class="fa-solid fa-users"></i> USUARIOS
                 </li>
-
-                
             <?php endif; ?>
         </ul>
 
@@ -122,7 +119,6 @@ $esAdmin = (stripos($nombreRol, 'admin') !== false || $apodo === 'admin_sistema'
 
     </div>
 
-<!-- 🔥 MODAL CON FONDO BLANCO SÓLIDO Y Z-INDEX MÁXIMO -->
 <div class="modal" id="modalCerrarSesion" style="display: none; position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.6); z-index: 999999 !important; justify-content: center; align-items: center;">
     <div class="modal-contenido modal-logout" style="max-width: 400px; text-align: center; padding-top: 30px; background-color: #ffffff !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
 
@@ -153,7 +149,6 @@ $esAdmin = (stripos($nombreRol, 'admin') !== false || $apodo === 'admin_sistema'
     </div>
 </div>
 
-<!-- 🔥 CURSOR CON Z-INDEX SUPERIOR PARA QUE NUNCA QUEDE ATRÁS -->
 <div id="cerditoCursor" style="z-index: 9999999 !important; pointer-events: none; position: fixed;">🐷</div>
 
 <script src="../Services/cerdito.js"></script>

@@ -1,42 +1,48 @@
 <?php
+// Controllers/movimientosController.php
 session_start();
-
+date_default_timezone_set('America/Mexico_City');
 header('Content-Type: application/json; charset=utf-8');
-ini_set('display_errors', '0');
 
 if (!isset($_SESSION['apodoUsuario'])) {
-    echo json_encode(['error' => 'Acceso denegado. No se encontró una sesión activa.']);
-    exit;
+    echo json_encode(['success' => false, 'error' => 'No autorizado']);
+    exit();
 }
 
-try {
-    require_once __DIR__ . '/../Services/movimientosServicio.php';
-    $service = new movimientosServicio();
-    
-    $action = $_GET['action'] ?? '';
+require_once __DIR__ . '/../Services/movimientosServicio.php';
+$movService = new movimientosServicio();
 
-    if ($action === 'buscar') {
-        $tipo = $_GET['tipo_movimiento'] ?? 'todos';
-        $usuario = $_GET['busqueda_usuario'] ?? '';
-        $fecha = $_GET['fecha_filtro'] ?? date('Y-m-d');
-        $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$action = $_GET['action'] ?? 'buscar';
+$fecha = $_GET['fecha_filtro'] ?? date('Y-m-d');
+$tipo = $_GET['tipo_movimiento'] ?? 'todos';
+$usuario = $_GET['busqueda_usuario'] ?? '';
+$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 
-        $resultado = $service->consultarBitacora($tipo, $usuario, $fecha, $pagina);
-        $contadores = $service->obtenerResumenTarjetas($fecha);
+if ($action === 'buscar' || $action === 'listar') {
+    try {
+        // 1. Obtener listado de movimientos y paginación
+        $resultado = $movService->consultarBitacora($tipo, $usuario, $fecha, $pagina);
+        
+        // 2. Obtener contadores reales para las tarjetas superiores
+        $stats = $movService->obtenerResumenTarjetas($fecha);
 
         echo json_encode([
-            'datos' => $resultado['datos'],
-            'paginas' => $resultado['paginas'],
-            'total' => $resultado['total'],
-            'contadores' => $contadores
+            'success' => true,
+            'datos' => $resultado['datos'] ?? [],
+            'total' => $resultado['total'] ?? 0,
+            'paginas' => $resultado['paginas'] ?? 1,
+            'contadores' => [
+                'movimientosDia' => $stats['movimientosDia'] ?? 0,
+                'cajasIngresadas' => $stats['cajasIngresadas'] ?? 0,
+                'cajasDespachadas' => $stats['cajasDespachadas'] ?? 0
+            ]
         ]);
-        exit;
+        exit();
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        exit();
     }
-
-    echo json_encode(['error' => 'Acción no válida.']);
-    exit;
-
-} catch (Throwable $e) {
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
 }
+
+echo json_encode(['success' => false, 'error' => 'Acción no válida']);
+exit();

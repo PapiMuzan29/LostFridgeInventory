@@ -162,33 +162,81 @@
     background: #ffffff;
     overflow-x: auto;
     transition: background-color 0.3s ease;
+    width: 100% !important;
 }
 
-.tablaUsuarios {
-    width: 100%;
-    border-collapse: collapse;
+/* ================================================= */
+/* CORRECCIÓN DE ALINEACIÓN Y LIMPIEZA DE LA TABLA   */
+/* ================================================= */
+#tablaEstandar {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
 }
 
-.tablaUsuarios thead {
-    background: #f8fafc;
-    transition: background-color 0.3s ease;
+#tablaEstandar th:nth-child(1), #tablaEstandar td:nth-child(1) { width: 5% !important; }
+#tablaEstandar th:nth-child(2), #tablaEstandar td:nth-child(2) { width: 8% !important; }
+#tablaEstandar th:nth-child(3), #tablaEstandar td:nth-child(3) { width: 16% !important; }
+#tablaEstandar th:nth-child(4), #tablaEstandar td:nth-child(4) { width: 33% !important; }
+#tablaEstandar th:nth-child(5), #tablaEstandar td:nth-child(5) { width: 13% !important; }
+#tablaEstandar th:nth-child(6), #tablaEstandar td:nth-child(6) { width: 11% !important; }
+#tablaEstandar th:nth-child(7), #tablaEstandar td:nth-child(7) { width: 12% !important; }
+#tablaEstandar th:nth-child(8), #tablaEstandar td:nth-child(8) { width: 8% !important; }
+
+#tablaEstandar th {
+    background-color: #f8fafc !important;
+    color: #1f2f56 !important;
+    padding: 12px 6px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
 }
 
-.tablaUsuarios th {
-    padding: 12px 16px;
-    color: #1f2f56;
-    font-size: 13px;
-    font-weight: 600;
-    border-bottom: 1px solid #cbd5e1;
-    transition: color 0.3s ease, border-color 0.3s ease;
+#tablaEstandar td {
+    padding: 8px 6px !important;
+    color: #334155 !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    vertical-align: middle !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 }
 
-.tablaUsuarios td {
-    padding: 12px 16px;
-    color: #334155;
-    font-size: 14px;
-    border-bottom: 1px solid #f1f5f9;
-    transition: color 0.3s ease, border-color 0.3s ease;
+/* QUITAR CUADROS / BORDES A LOS INPUTS DE LA TABLA ESTÁNDAR */
+#tablaEstandar .input-cantidad, 
+#tablaEstandar .input-costo-partida {
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 14px !important;
+    color: #1e293b !important;
+    padding: 4px !important;
+    border-radius: 0 !important;
+    text-align: right !important;
+}
+
+#tablaEstandar .input-cantidad:focus, 
+#tablaEstandar .input-costo-partida:focus {
+    background: #ffffff !important;
+    border: 1px solid #94a3b8 !important;
+    border-radius: 4px !important;
+}
+
+#tablaEstandar td:nth-child(5), #tablaEstandar th:nth-child(5),
+#tablaEstandar td:nth-child(6), #tablaEstandar th:nth-child(6),
+#tablaEstandar td:nth-child(7), #tablaEstandar th:nth-child(7) {
+    text-align: right !important;
+}
+
+#tablaEstandar td:nth-child(1), #tablaEstandar th:nth-child(1),
+#tablaEstandar td:nth-child(2), #tablaEstandar th:nth-child(2),
+#tablaEstandar td:nth-child(8), #tablaEstandar th:nth-child(8) {
+    text-align: center !important;
 }
 
 .text-right { text-align: right; }
@@ -305,10 +353,119 @@
 }
 
 
-/* ===================================================================
-   CORRECCIONES EXCLUSIVAS PARA MODO OSCURO (ENTRADAS / MATRIZ)
-=================================================================== */
+/* =================================================================== */
+/* ESTILOS COMPACTOS PARA EL MÓDULO DE COMBOS                        */
+/* =================================================================== */
+.tabla-combos-scroll-container {
+    max-height: 380px !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
 
+.tabla-combos-interactiva {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    background: #ffffff !important;
+}
+
+.tabla-combos-interactiva th:nth-child(1), .tabla-combos-interactiva td:nth-child(1) { width: 6% !important; }
+.tabla-combos-interactiva th:nth-child(2), .tabla-combos-interactiva td:nth-child(2) { width: 13% !important; }
+.tabla-combos-interactiva th:nth-child(3), .tabla-combos-interactiva td:nth-child(3) { width: 9% !important; }
+.tabla-combos-interactiva th:nth-child(4), .tabla-combos-interactiva td:nth-child(4) { width: 11% !important; }
+.tabla-combos-interactiva th:nth-child(5), .tabla-combos-interactiva td:nth-child(5) { width: 12% !important; }
+.tabla-combos-interactiva th:nth-child(6), .tabla-combos-interactiva td:nth-child(6) { width: 13% !important; }
+.tabla-combos-interactiva th:nth-child(7), .tabla-combos-interactiva td:nth-child(7) { width: 12% !important; }
+.tabla-combos-interactiva th:nth-child(8), .tabla-combos-interactiva td:nth-child(8) { width: 10% !important; }
+.tabla-combos-interactiva th:nth-child(9), .tabla-combos-interactiva td:nth-child(9) { width: 14% !important; }
+
+.tabla-combos-interactiva th {
+    background-color: #334155 !important;
+    color: white;
+    padding: 10px 4px !important;
+    font-size: 9.5pt;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tabla-combos-interactiva td {
+    border: 1px solid #cbd5e1;
+    padding: 4px 6px !important;
+    text-align: center;
+    font-size: 9.5pt;
+    color: #334155;
+    background-color: #ffffff !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.input-combo-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 28px;
+    text-align: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 9.5pt;
+    background-color: #ffffff;
+    color: #1e293b;
+    padding: 2px 4px !important;
+    box-sizing: border-box !important;
+}
+
+.input-combo-grid:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.fila-total-combo {
+    background-color: #e2e8f0;
+    font-weight: bold;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    color: #1e293b;
+}
+
+.fila-total-combo td {
+    background-color: #e2e8f0 !important;
+    border: 1.5px solid #94a3b8 !important;
+    color: #1e293b !important;
+}
+
+.btn-excel-panel {
+    background-color: #10b981 !important;
+    color: white !important;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    transition: background 0.2s;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.btn-excel-panel:hover {
+    background-color: #059669 !important;
+}
+
+
+/* =================================================================== */
+/* CORRECCIONES EXCLUSIVAS PARA MODO OSCURO (ENTRADAS / MATRIZ)        */
+/* =================================================================== */
 body.dark-theme .contenedor {
     background-color: #0a0a0c !important;
 }
@@ -371,42 +528,42 @@ body.dark-theme .radio-inline input[type="radio"] {
 }
 
 /* ENCABEZADOS DE LA TABLA EN MODO OSCURO */
-body.dark-theme .tablaUsuarios thead,
-body.dark-theme .tablaUsuarios thead tr {
+body.dark-theme #tablaEstandar thead,
+body.dark-theme #tablaEstandar thead tr {
     background-color: #18181b !important;
 }
 
-body.dark-theme .tablaUsuarios th {
+body.dark-theme #tablaEstandar th {
     background-color: #18181b !important;
     color: #ffffff !important;
     border-bottom-color: #27272a !important;
 }
 
-/* FILAS Y CELDAS DINÁMICAS (TBODY) EN MODO OSCURO */
-body.dark-theme .tablaUsuarios tbody tr,
-body.dark-theme .tablaUsuarios tbody td {
+/* FILAS Y CELDAS ESTÁNDAR (TBODY) EN MODO OSCURO */
+body.dark-theme #tablaEstandar tbody tr,
+body.dark-theme #tablaEstandar tbody td {
     background-color: #121215 !important;
     color: #ffffff !important;
     border-bottom-color: #27272a !important;
 }
 
-body.dark-theme .tablaUsuarios tbody tr:hover,
-body.dark-theme .tablaUsuarios tbody tr:hover td {
+body.dark-theme #tablaEstandar tbody tr:hover,
+body.dark-theme #tablaEstandar tbody tr:hover td {
     background-color: #18181b !important;
 }
 
-body.dark-theme .tablaUsuarios tbody td *,
-body.dark-theme .tablaUsuarios tbody td {
+body.dark-theme #tablaEstandar .input-cantidad,
+body.dark-theme #tablaEstandar .input-costo-partida {
     color: #ffffff !important;
 }
 
 /* EXCEPCIÓN DEL BOTÓN DE BORRAR */
-body.dark-theme .tablaUsuarios tbody td .btn-borrar-partida {
+body.dark-theme #tablaEstandar tbody td .btn-borrar-partida {
     background-color: rgba(220, 38, 38, 0.15) !important;
 }
 
-body.dark-theme .tablaUsuarios tbody td .btn-borrar-partida,
-body.dark-theme .tablaUsuarios tbody td .btn-borrar-partida i {
+body.dark-theme #tablaEstandar tbody td .btn-borrar-partida,
+body.dark-theme #tablaEstandar tbody td .btn-borrar-partida i {
     color: #f87171 !important;
 }
 
@@ -440,4 +597,43 @@ body.dark-theme .btnLimpiar.btn-block-matriz {
 
 body.dark-theme .btnLimpiar.btn-block-matriz:hover {
     background-color: #27272a !important;
+}
+
+/* MODO OSCURO - MÓDULO DE COMBOS */
+body.dark-theme .tabla-combos-scroll-container {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .tabla-combos-interactiva {
+    background-color: #121215 !important;
+}
+
+body.dark-theme .tabla-combos-interactiva th {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme .tabla-combos-interactiva td {
+    border-color: #27272a !important;
+    color: #ffffff !important;
+    background-color: #121215 !important;
+}
+
+body.dark-theme .input-combo-grid {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .fila-total-combo {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .fila-total-combo td {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-top: 1px solid #27272a !important;
 }

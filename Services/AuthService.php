@@ -21,6 +21,12 @@ class AuthService {
 
         if (
             $user !== null &&
+            isset($user['idCuenta']) &&  // 👈 Validamos que el ID exista en la base de datos
+            isset($user['contrasenaUsuario']) &&
+            isset($user['apodoUsuario']) &&
+            isset($user['nombreRol']) &&
+            isset($user['estado']) &&
+            $user['estado'] == 1 &&
             isset($user['contrasenaUsuario']) &&
             isset($user['apodoUsuario']) &&
             isset($user['nombreRol']) &&
@@ -37,6 +43,9 @@ class AuthService {
             // Regenera el ID de la sesión para prevenir Session Hijacking
             session_regenerate_id(true);
 
+            // 🔑 AQUÍ GUARDAMOS EL ID EN LA SESIÓN (Solución al error de llaves foráneas)
+            $_SESSION['idCuenta'] = $user['idCuenta']; 
+            
             // REGISTROS DE SESIÓN CON DATOS Y ROLES DE USUARIO
             $_SESSION['idCuenta']     = $user['idCuenta'];
             $_SESSION['idRol']        = (int)$user['idRol'];
@@ -62,7 +71,6 @@ class AuthService {
 
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
-
             setcookie(
                 session_name(),
                 '',

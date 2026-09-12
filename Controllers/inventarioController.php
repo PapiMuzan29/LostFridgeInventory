@@ -5,19 +5,34 @@ require_once __DIR__ . '/../Models/modeloInventario.php';
 $service = new modeloInventario();
 $action = $_GET['action'] ?? '';
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
+
+// Función auxiliar para obtener datos ya sea por $_POST o JSON (fetch)
+function obtenerDatosEntrada() {
+    if (!empty($_POST)) {
+        return $_POST;
+    }
+    $json = file_get_contents('php://input');
+    return json_decode($json, true) ?? [];
+}
 
 switch ($action) {
     case 'busqueda':
-        $tipo = $_GET['tipo_busqueda'] ?? 'producto';
+        $tipoBusqueda = $_GET['tipo_busqueda'] ?? $_GET['tipo'] ?? 'producto'; // Soporta ambos nombres de parámetro
+        $tipoInventario = $_GET['tipo_inventario'] ?? 'cajas'; 
         $busqueda = $_GET['busqueda'] ?? '';
         $estado = $_GET['estado'] ?? '';
         $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 
-        if ($tipo === 'proveedor') {
+        if ($tipoBusqueda === 'proveedor') {
             $datos = $service->getAllProviders($busqueda, $estado, $pagina);
         } else {
-            $datos = $service->getProducts($busqueda, $estado, $pagina);
+            // Verifica si el modelo soporta filtrado por tipo de inventario
+            if (method_exists($service, 'getProductsByType')) {
+                $datos = $service->getProductsByType($tipoInventario, $busqueda, $estado, $pagina);
+            } else {
+                $datos = $service->getProducts($busqueda, $estado, $pagina);
+            }
         }
         
         echo json_encode(['datos' => $datos, 'totalPaginas' => 1, 'pagina' => $pagina]);
@@ -25,7 +40,12 @@ switch ($action) {
 
     case 'crearProducto':
         try {
-            $service->agregarProducto($_POST);
+            $datos = obtenerDatosEntrada();
+            if (empty($datos)) {
+                throw new Exception("No se recibieron datos para crear el producto.");
+            }
+
+            $service->agregarProducto($datos);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -34,8 +54,14 @@ switch ($action) {
 
     case 'actualizarProducto':
         try {
-            $id = (int)$_POST['idProducto'];
-            $service->actualizarProducto($id, $_POST);
+            $datos = obtenerDatosEntrada();
+            $id = (int)($datos['idProducto'] ?? $_POST['idProducto'] ?? 0);
+            
+            if ($id <= 0) {
+                throw new Exception("ID de producto no válido para actualizar.");
+            }
+
+            $service->actualizarProducto($id, $datos);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -44,7 +70,10 @@ switch ($action) {
 
     case 'eliminarProducto':
         try {
-            $id = (int)$_GET['id'];
+            $id = (int)($_GET['id'] ?? 0);
+            if ($id <= 0) {
+                throw new Exception("ID de producto no válido.");
+            }
             $service->eliminarProducto($id);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
@@ -54,18 +83,28 @@ switch ($action) {
 
     case 'agregarProveedor':
         try {
-            $service->agregarProveedor($_POST);
+            $datos = obtenerDatosEntrada();
+            if (empty($datos)) {
+                throw new Exception("No se recibieron datos para el proveedor.");
+            }
+
+            $service->agregarProveedor($datos);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
         break;
 
-    // 🔥 AGREGAMOS ESTE BLOQUE NUEVO PARA ACTUALIZAR PROVEEDORES
     case 'actualizarProveedor':
         try {
-            $id = (int)$_POST['idProveedor']; // Asegúrate de que el input hidden se llame idProveedor
-            $service->actualizarProveedor($id, $_POST); // Asegúrate de tener este método en tu modeloInventario
+            $datos = obtenerDatosEntrada();
+            $id = (int)($datos['idProveedor'] ?? $_POST['idProveedor'] ?? 0);
+            
+            if ($id <= 0) {
+                throw new Exception("ID de proveedor no válido para actualizar.");
+            }
+
+            $service->actualizarProveedor($id, $datos);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -74,7 +113,10 @@ switch ($action) {
 
     case 'eliminarProveedor':
         try {
-            $id = (int)$_GET['id'];
+            $id = (int)($_GET['id'] ?? 0);
+            if ($id <= 0) {
+                throw new Exception("ID de proveedor no válido.");
+            }
             $service->eliminarProveedor($id);
             echo json_encode(['status' => 'success']);
         } catch (Exception $e) {

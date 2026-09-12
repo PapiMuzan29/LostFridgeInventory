@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login</title>
+        <title>Login - LFI</title>
         <link rel="icon" type="image/png" href="../SRC/Logo LFI - copia.png">
         <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="css/login.css">
@@ -123,7 +123,7 @@
                 <h2>Acerca de</h2>
                 <p>Sistema de inventario.</p>
                 <p>Versión 1.0</p>
-                <p>Desarrollado por Emmanuel Arroyo, Carlos Montes y Ricardo Emmanuel Perez.</p>                                                    
+                <p>Desarrollado por Emmanuel Arroyo, Carlos Montes y Ricardo Emmanuel Perez.</p>                             
                 <p><i class="fa-duotone fa-regular fa-copyright"></i> Todos los derechos reservados</p>
             </div>
         </div>

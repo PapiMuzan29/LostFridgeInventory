@@ -1,5 +1,6 @@
 <?php
 session_start();
+date_default_timezone_set('America/Mexico_City');
 
 if (!isset($_SESSION['apodoUsuario'])) {
     header('Location: ../login.php');

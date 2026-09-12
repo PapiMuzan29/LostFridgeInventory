@@ -9,9 +9,9 @@ class modeloInventario {
     }
 
     /**
-     * 📦 MÓDULO PRODUCTOS: Obtención y Gestión
+     * 📦 MÓDULO PRODUCTOS: Obtención y Gestión con soporte para Pestañas (Cajas, Pierna, Codillo, Mantecas)
      */
-    public function getProducts($textoBusqueda = '', $estado = '', $pagina = 1) {
+    public function getProducts($textoBusqueda = '', $estado = '', $pagina = 1, $tipoInventario = 'cajas') {
         $porPagina = 4;
         $offset = ($pagina - 1) * $porPagina;
 
@@ -24,6 +24,19 @@ class modeloInventario {
                   LEFT JOIN categoria c ON p.idCategoria = c.idCategoria
                   LEFT JOIN proveedor prov ON p.idProveedor = prov.idProveedor
                   WHERE 1 = 1";
+
+        // 🎯 Filtro robusto por cada pestaña
+        if ($tipoInventario === 'mantecas') {
+            $query .= " AND (p.nombreProducto LIKE '%MANTECA%' OR p.codigoProducto LIKE '%MANT%')";
+        } elseif ($tipoInventario === 'pierna') {
+            $query .= " AND (p.nombreProducto LIKE '%PIERNA%' OR p.codigoProducto LIKE '%CMBO%' OR p.nombreProducto LIKE '%COMBO%')";
+        } elseif ($tipoInventario === 'codillo') {
+            $query .= " AND (p.nombreProducto LIKE '%CODILLO%' OR p.codigoProducto LIKE '%COD%')";
+        } else {
+            // Pestaña Cajas / General: Excluye explícitamente mantecas y combos para no mezclarlos
+            $query .= " AND p.nombreProducto NOT LIKE '%MANTECA%' AND p.codigoProducto NOT LIKE '%MANT%' 
+                        AND p.nombreProducto NOT LIKE '%PIERNA%' AND p.nombreProducto NOT LIKE '%CODILLO%' AND p.nombreProducto NOT LIKE '%COMBO%'";
+        }
                   
         $params = [];
         if (!empty($textoBusqueda)) {
@@ -45,6 +58,10 @@ class modeloInventario {
             error_log("Error en getProducts: " . $e->getMessage());
             return [];
         }
+    }
+
+    public function getProductsByType($tipoInventario, $textoBusqueda = '', $estado = '', $pagina = 1) {
+        return $this->getProducts($textoBusqueda, $estado, $pagina, $tipoInventario);
     }
 
     public function agregarProducto(array $data): int {

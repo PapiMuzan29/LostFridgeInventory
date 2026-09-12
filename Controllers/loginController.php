@@ -1,8 +1,6 @@
 <?php
-
 session_start();
 require_once __DIR__ . '/../Services/AuthService.php';
-// 🔔 Importamos el servicio de movimientos para auditar el acceso
 require_once __DIR__ . '/../Services/movimientosServicio.php';
 
 $auth = new AuthService();
@@ -43,16 +41,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($usuario && $password) {
         if ($auth->login($usuario, $password)) {
+            
             // 🔔 Login correcto → Registramos la auditoría de acceso antes de redirigir
             $usuarioResponsable = $_SESSION['apodoUsuario'] ?? $usuario;
             
-            $movimientos->registrarMovimiento(
-                'usuario', 
-                $usuarioResponsable, 
-                'Inicio de sesión exitoso en el sistema', 
-                'Autenticación'
-            );
+            // 🔍 CAPTURA DE ERRORES PARA DIAGNÓSTICO
+            try {
+                $resultado = $movimientos->registrarMovimiento(
+                    'usuario', 
+                    $usuarioResponsable, 
+                    'Inicio de sesión exitoso en el sistema', 
+                    'Autenticación'
+                );
+                
+                // Si quieres ver un mensaje de éxito en pantalla antes de entrar, descomenta la línea de abajo:
+                // echo "Registrado con éxito. Resultado: " . ($resultado ? 'TRUE' : 'FALSE'); exit();
 
+            } catch (Throwable $e) {
+                // 🛑 Si hay un error en la base de datos o en el servicio, lo imprimirá en pantalla
+                echo "<h3>Error al registrar en la bitácora:</h3>";
+                echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
+                exit();
+            }
+
+            // Redirige al dashboard principal
+            header("Location: ../Views/inicio.php");
             // 🔀 REDIRECCIÓN SEGÚN EL ROL DE USUARIO
             $idRol = (int)($_SESSION['idRol'] ?? 0);
 
@@ -81,12 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
 
         } else {
-            // Login incorrecto → regresa al login con mensaje
             header("Location: ../Views/login.php?error=1");
             exit;
         }
     } else {
-        // Si no se mandaron datos
         header("Location: ../Views/login.php?error=2");
         exit;
     }

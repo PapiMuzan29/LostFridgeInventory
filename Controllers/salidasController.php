@@ -1,18 +1,20 @@
 <?php
+// salidasController.php
 session_start();
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+header('Content-Type: application/json; charset=utf-8');
+
 if (!isset($_SESSION['apodoUsuario'])) {
-    header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['error' => 'Acceso denegado.']);
     exit;
 }
 
-header('Content-Type: application/json; charset=utf-8');
-ini_set('display_errors', '0');
-error_reporting(E_ALL);
-
 try {
     require_once __DIR__ . '/../Services/salidasServicio.php';
+    require_once __DIR__ . '/../Config/BD.php'; 
     $service = new salidasServicio();
     
     $action = $_GET['action'] ?? '';
@@ -20,6 +22,20 @@ try {
     // OBTENER CLIENTES PARA EL SELECT
     if ($action === 'obtenerClientes') {
         $datos = $service->listarClientesParaSelect();
+        echo json_encode($datos);
+        exit;
+    }
+
+    // 🎯 OBTENER COMBOS Y LOTES DISPONIBLES PARA EL SELECT DE SALIDAS
+    if ($action === 'obtenerCombosDisponibles') {
+        $datos = $service->listarCombosDisponiblesParaSalida();
+        echo json_encode($datos);
+        exit;
+    }
+
+    // 🛢️ OBTENER MANTECAS DISPONIBLES PARA EL SELECT DE SALIDAS (POR BOTE/PRODUCTO)
+    if ($action === 'obtenerMantecaDisponibles') {
+        $datos = $service->listarMantecaDisponiblesParaSalida();
         echo json_encode($datos);
         exit;
     }
@@ -33,33 +49,39 @@ try {
             echo json_encode(['error' => 'Datos incompletos.']);
             exit;
         }
-        
-        // 1. Buscamos el producto filtrando por el cliente/proveedor
-        // Asegúrate de que tu método obtenerProductoPorCodigo en el servicio
-        // realice un: WHERE codigo = :codigo AND idCliente = :idCliente
-        $producto = $service->obtenerProductoPorCodigo($codigoTrama, $idCliente);
-        
-        if (!$producto) {
-            echo json_encode(['error' => 'Producto no encontrado o no pertenece a este proveedor.']);
-            exit;
-        }
 
-        // 2. EXTRACCIÓN DE PESO EXACTA (Basado en trama 071641041752 -> 16.41)
-        // Posiciones: Indice 2 y 3 para "16", Indice 4 y 5 para "41"
+        $longitudTotal = mb_strlen($codigoTrama, 'UTF-8');
+        
+        $inicioCodigo = $longitudTotal >= 4 ? $longitudTotal - 4 : 0;
+        $codigoProductoExtraido = mb_substr($codigoTrama, $inicioCodigo, 4, 'UTF-8');
+
         $enteros = "0";
         $decimales = "00";
 
-        if (strlen($codigoTrama) >= 6) {
+        if ($longitudTotal >= 12) {
+            $enteros = mb_substr($codigoTrama, 5, 5, 'UTF-8');
+            $decimales = mb_substr($codigoTrama, 10, 2, 'UTF-8');
+        } elseif (strlen($codigoTrama) >= 6) {
             $enteros = substr($codigoTrama, 2, 2); 
             $decimales = substr($codigoTrama, 4, 2);
         }
 
-        // 3. Respuesta final
+        $producto = $service->obtenerProductoPorCodigo($codigoProductoExtraido, $idCliente);
+        
+        if (!$producto) {
+            $producto = $service->obtenerProductoPorCodigo($codigoTrama, $idCliente);
+        }
+
+        if (!$producto) {
+            echo json_encode(['error' => 'Producto no encontrado o no pertenece a este proveedor. (Código buscado: ' . $codigoProductoExtraido . ')']);
+            exit;
+        }
+
         echo json_encode([
-            'codigoProducto' => $producto['codigoProducto'] ?? $producto['codigo'] ?? $codigoTrama,
-            'nombreProducto' => $producto['nombreProducto'] ?? $producto['nombre'] ?? 'Producto Desconocido',
-            'codigoEnteros'  => (string)$enteros,
-            'codigoDecimales' => (string)$decimales
+            'codigoProducto'  => $producto['codigoProducto'] ?? $producto['codigo'] ?? $codigoProductoExtraido,
+            'nombreProducto'  => $producto['nombreProducto'] ?? $producto['nombre'] ?? 'Producto Desconocido',
+            'codigoEnteros'   => ltrim($enteros, '0') ?: '0',
+            'codigoDecimales' => $decimales
         ]);
         exit;
     }
@@ -79,8 +101,89 @@ try {
             exit;
         }
 
+        $conceptoSalida = $datos['concepto'] ?? '';
+
+        // 📦 SI EL CONCEPTO ES TRASPASO A MAYOREO -> GUARDAR EN TEMPORAL Y RESTAR STOCK / LOTES
+        if ($conceptoSalida === 'inventariotemporalsalida') {
+            try {
+                $db = BD::obtenerInstancia();
+                $db->beginTransaction();
+
+                foreach ($datos['detalle'] as $item) {
+                    $idProducto = intval($item['id_producto'] ?? ($item['idProducto'] ?? ($item['id'] ?? ($item['id_lote'] ?? 0))));
+                    $idLote = intval($item['id_lote'] ?? ($item['idLote'] ?? 0));
+                    
+                    // Cantidad mapeada correctamente a cantidadPiezas
+                    $cantidadPiezas = intval($item['cantidad'] ?? ($item['cajas'] ?? ($item['cantidadCajas'] ?? ($item['piezas'] ?? 1))));
+                    
+                    $cantidadCajas = intval($item['cajas'] ?? ($item['cantidad'] ?? 0));
+                    $cantidadPeso = floatval($item['kgs'] ?? ($item['peso'] ?? 0.00));
+                    
+                    if ($idProducto <= 0 && (!empty($item['codigo_producto']) || !empty($item['codigoProducto']))) {
+                        $codigoBusqueda = trim($item['codigo_producto'] ?? $item['codigoProducto']);
+                        $stmtBuscaProd = $db->prepare("SELECT idProducto FROM producto WHERE TRIM(codigoProducto) = ? LIMIT 1");
+                        $stmtBuscaProd->execute([$codigoBusqueda]);
+                        $prodEncontrado = $stmtBuscaProd->fetch(PDO::FETCH_ASSOC);
+                        if ($prodEncontrado) {
+                            $idProducto = intval($prodEncontrado['idProducto']);
+                        }
+                    }
+
+                    $observaciones = "Traspaso a mayoreo - Cliente ID: " . ($datos['id_cliente'] ?? 'General');
+
+                    // 1. Insertar usando la columna real de la tabla: cantidadPiezas
+                    $queryTemp = "INSERT INTO inventariotemporalsalida 
+                                  (idProducto, cantidadCajas, cantidadPeso, cantidadPiezas, observaciones) 
+                                  VALUES (:idProducto, :cantidadCajas, :cantidadPeso, :cantidadPiezas, :observaciones)";
+                    
+                    $db->consulta($queryTemp, [
+                        ':idProducto'     => $idProducto > 0 ? $idProducto : null,
+                        ':cantidadCajas'  => $cantidadCajas,
+                        ':cantidadPeso'   => $cantidadPeso,
+                        ':cantidadPiezas' => $cantidadPiezas,
+                        ':observaciones'  => $observaciones
+                    ]);
+
+                    // 2. Descontar stock general de la tabla producto
+                    if ($idProducto > 0) {
+                        $queryUpdateProd = "UPDATE producto 
+                                            SET totalCajas = GREATEST(0, IFNULL(totalCajas, 0) - ?), 
+                                                totalPeso = GREATEST(0, IFNULL(totalPeso, 0) - ?) 
+                                            WHERE idProducto = ?";
+                        $db->consulta($queryUpdateProd, [$cantidadCajas, $cantidadPeso, $idProducto]);
+                    }
+
+                    // 3. Descontar peso y desactivar el lote si aplica (tabla lote)
+                    if ($idLote > 0) {
+                        $queryUpdateLote = "UPDATE lote 
+                                            SET pesoActual = GREATEST(0, pesoActual - ?), 
+                                                activo = IF(pesoActual - ? <= 0, 0, 1) 
+                                            WHERE idLote = ?";
+                        $db->consulta($queryUpdateLote, [$cantidadPeso, $cantidadPeso, $idLote]);
+                    }
+                }
+
+                $db->commit();
+                echo json_encode([
+                    'success' => true, 
+                    'mensaje' => 'Traspaso a mayoreo almacenado y stock/lotes descontados correctamente.'
+                ]);
+                exit;
+
+            } catch (Exception $ex) {
+                if (isset($db) && method_exists($db, 'inTransaction') && $db->inTransaction()) {
+                    $db->rollBack();
+                }
+                echo json_encode(['error' => 'Error al procesar el traspaso temporal: ' . $ex->getMessage()]);
+                exit;
+            }
+        }
+
+        // 🛢️ FLUJO NORMAL (Ventas, Mermas, Combos y Manteca)
         $idUsuario = $_SESSION['idCuenta'] ?? 2;
-        $resultado = $service->registrarSalidaCompleta($datos, $idUsuario, $_SESSION['apodoUsuario'] ?? 'Usuario');
+        $apodoUsuario = $_SESSION['apodoUsuario'] ?? 'Usuario';
+        
+        $resultado = $service->registrarSalidaCompleta($datos, $idUsuario, $apodoUsuario);
         
         echo json_encode($resultado);
         exit;
@@ -91,6 +194,7 @@ try {
 
 } catch (Exception $e) {
     error_log("Error en salidasController: " . $e->getMessage());
-    echo json_encode(['error' => 'Falla interna del servidor.']);
+    echo json_encode(['error' => 'Falla interna del servidor: ' . $e->getMessage()]);
     exit;
 }
+?>
