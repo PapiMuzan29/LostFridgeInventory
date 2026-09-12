@@ -70,6 +70,7 @@ class modeloVendedor {
             
             $esPorPiezas = intval($res[0]['porPiezas']) === 1; 
             $esCajaPechos = ($nombreMinus === 'caja pechos');
+            $esSal = (strpos($nombreMinus, 'sal') !== false);
 
             // Identificar de dónde sacar las unidades
             $limiteUnidades = $dbCajas > 0 ? $dbCajas : $dbPiezas;
@@ -80,6 +81,13 @@ class modeloVendedor {
                 if ($piezas > $limiteUnidades) return ['exito' => false, 'mensaje' => "Solo hay $limiteUnidades cajas de $nombre en sistema."];
                 if ($kilos <= 0) return ['exito' => false, 'mensaje' => "Debes ingresar el peso total de las cajas de $nombre."];
             
+            } elseif ($esSal) {
+                // VALIDACIÓN ESTRICTA PARA SAL (MINIMO 1KG Y BASADO EN BULTOS)
+                $totalKilosDisponibles = ($dbCajas * 10) + $dbKilos;
+                
+                if ($kilos < 1) return ['exito' => false, 'mensaje' => "El mínimo de venta para $nombre es 1 kg."];
+                if ($kilos > $totalKilosDisponibles) return ['exito' => false, 'mensaje' => "Solo hay " . number_format($totalKilosDisponibles, 2) . " kg disponibles de $nombre (equivalente a $dbCajas bultos cerrados)."];
+                
             } elseif ($esPorPiezas) {
                 // PRODUCTOS POR PIEZA (Manteca, Mazos, etc.)
                 if ($piezas <= 0) return ['exito' => false, 'mensaje' => "Debes ingresar la cantidad de piezas para $nombre."];
@@ -94,6 +102,8 @@ class modeloVendedor {
                 if ($kilos > $limiteMaxKilos) return ['exito' => false, 'mensaje' => "Límite excedido para $nombre. (Max: $limiteMaxKilos kg)."];
                 
             }
+
+
         }
         return ['exito' => true];
     }
@@ -115,7 +125,7 @@ class modeloVendedor {
                 $this->db->insert($sqlDetalle, [$idNota, $idProd, $kilos, $piezas]);
 
                 // Descontar del inventario temporal (Reserva)
-                $sqlInv = "SELECT idSalidaTemporal, cantidadPeso, cantidadPiezas, cantidadCajas, p.porPiezas 
+                $sqlInv = "SELECT idSalidaTemporal, cantidadPeso, cantidadPiezas, cantidadCajas, p.porPiezas, p.nombreProducto 
                            FROM InventarioTemporalSalida i
                            INNER JOIN Producto p ON i.idProducto = p.idProducto
                            WHERE i.idProducto = ?";
@@ -124,13 +134,24 @@ class modeloVendedor {
                 if (!empty($resInv)) {
                     $idTemp = $resInv[0]['idSalidaTemporal'];
                     $esPorPieza = intval($resInv[0]['porPiezas']) === 1;
+                    $esSal = (strpos(strtolower($resInv[0]['nombreProducto']), 'sal') !== false);
                     
                     $cajasActuales = intval($resInv[0]['cantidadCajas']);
                     $piezasActuales = intval($resInv[0]['cantidadPiezas']);
                     $pesoActual = floatval($resInv[0]['cantidadPeso']);
 
                     // 1. Restar lo correspondiente según el tipo
-                    if ($esPorPieza) {
+                    if ($esSal) {
+                        // Desglosamos todo el inventario a kilos, restamos, y volvemos a empacar en bultos
+                        $kilosTotales = ($cajasActuales * 10) + $pesoActual;
+                        $kilosTotales -= $kilos;
+                        
+                        $kilosTotales = max(0, $kilosTotales); // Prevenir negativos
+                        
+                        $cajasActuales = (int)floor($kilosTotales / 10);
+                        $pesoActual = $kilosTotales - ($cajasActuales * 10);
+
+                    } elseif ($esPorPieza) {
                         if ($cajasActuales > 0) {
                             $cajasActuales -= $piezas;
                         } else {
@@ -167,6 +188,7 @@ class modeloVendedor {
     }
 
     // 2. Devolver inventario a la tabla temporal (Reversa al editar o cancelar)
+    // 2. Devolver inventario a la tabla temporal (Reversa al editar o cancelar)
     public function reversarInventarioNota(int $idNota): bool {
         $sqlDetalles = "SELECT idProducto, kilos, piezas FROM detalle_notas WHERE id_nota = ?";
         $detalles = $this->db->select($sqlDetalles, [$idNota]);
@@ -179,11 +201,12 @@ class modeloVendedor {
             $piezasDev = intval($det['piezas']);
 
             // Verificar si el producto es por pieza o granel
-            $sqlProd = "SELECT porPiezas FROM Producto WHERE idProducto = ?";
+            $sqlProd = "SELECT porPiezas, nombreProducto FROM Producto WHERE idProducto = ?";
             $resProd = $this->db->select($sqlProd, [$idProd]);
             if (empty($resProd)) continue;
 
             $esPorPieza = intval($resProd[0]['porPiezas']) === 1;
+            $esSal = (strpos(strtolower($resProd[0]['nombreProducto']), 'sal') !== false);
 
             // Revisar si ya existe en InventarioTemporalSalida
             $sqlTemp = "SELECT idSalidaTemporal, cantidadPeso, cantidadPiezas, cantidadCajas FROM InventarioTemporalSalida WHERE idProducto = ?";
@@ -191,12 +214,20 @@ class modeloVendedor {
 
             if (!empty($resTemp)) {
                 $idTemp = $resTemp[0]['idSalidaTemporal'];
-                if ($esPorPieza) {
-                    // Si es producto por pieza, decidimos si sumamos a cajas o piezas basándonos en cómo venía
-                    // Por seguridad de control, si manejaba cajas o piezas los devolvemos a donde corresponda
+
+                if ($esSal) {
+                    // Reintegramos los kilos y re-calculamos bultos
+                    $kilosTotales = ($resTemp[0]['cantidadCajas'] * 10) + $resTemp[0]['cantidadPeso'];
+                    $kilosTotales += $kilosDev;
+                    
+                    $nuevasCajas = (int)floor($kilosTotales / 10);
+                    $nuevoPeso = $kilosTotales - ($nuevasCajas * 10);
+                    
+                    $this->db->update("UPDATE InventarioTemporalSalida SET cantidadCajas = ?, cantidadPeso = ? WHERE idSalidaTemporal = ?", [$nuevasCajas, $nuevoPeso, $idTemp]);
+                    
+                } elseif ($esPorPieza) {
                     $cajasActuales = intval($resTemp[0]['cantidadCajas']);
                     if ($cajasActuales > 0 || $piezasDev > 0) {
-                        // Si era de tipo caja o pieza genérica
                         if ($cajasActuales > 0) {
                             $this->db->update("UPDATE InventarioTemporalSalida SET cantidadCajas = cantidadCajas + ? WHERE idSalidaTemporal = ?", [$piezasDev, $idTemp]);
                         } else {
@@ -207,10 +238,18 @@ class modeloVendedor {
                     $this->db->update("UPDATE InventarioTemporalSalida SET cantidadPeso = cantidadPeso + ? WHERE idSalidaTemporal = ?", [$kilosDev, $idTemp]);
                 }
             } else {
-                // Si ya no existe en la temporal, lo reinserción
-                $cajasIns = $esPorPieza ? $piezasDev : 0;
-                $piezasIns = 0;
-                $pesoIns = !$esPorPieza ? $kilosDev : 0.00;
+                // Si ya no existe en la temporal, lo reinsertamos desde cero
+                if ($esSal) {
+                    // Empacamos los kilos devueltos en bultos de 10kg
+                    $cajasIns = (int)floor($kilosDev / 10);
+                    $pesoIns = $kilosDev - ($cajasIns * 10);
+                    $piezasIns = 0;
+                } else {
+                    $cajasIns = $esPorPieza ? $piezasDev : 0;
+                    $piezasIns = 0;
+                    $pesoIns = !$esPorPieza ? $kilosDev : 0.00;
+                }
+                
                 $this->db->insert("INSERT INTO InventarioTemporalSalida (idProducto, cantidadCajas, cantidadPiezas, cantidadPeso) VALUES (?, ?, ?, ?)", [$idProd, $cajasIns, $piezasIns, $pesoIns]);
             }
         }

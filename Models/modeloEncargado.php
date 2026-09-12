@@ -162,4 +162,22 @@ class modeloEncargado {
             throw new Exception("Error en la transacción: " . $e->getMessage());
         }
     }
+
+    public function obtenerInventarioTemporalSalMazo(): array {
+        $sql = "SELECT i.idSalidaTemporal, p.nombreProducto, i.cantidadPiezas, i.cantidadCajas, i.cantidadPeso 
+                FROM InventarioTemporalSalida i 
+                INNER JOIN Producto p ON i.idProducto = p.idProducto 
+                WHERE p.nombreProducto LIKE '%Mazo%' OR p.nombreProducto LIKE '%Sal%'";
+        
+        return $this->db->select($sql) ?: [];
+    }
+
+    public function actualizarInventarioTemporal(int $idTemp, int $piezas, int $cajas, float $kilos): bool {
+        $sql = "UPDATE InventarioTemporalSalida 
+                SET cantidadPiezas = ?, cantidadCajas = ?, cantidadPeso = ? 
+                WHERE idSalidaTemporal = ?";
+        
+        $resultado = $this->db->update($sql, [$piezas, $cajas, $kilos, $idTemp]);
+        return $resultado !== false;
+    }
 }

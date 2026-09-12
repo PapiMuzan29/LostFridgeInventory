@@ -944,16 +944,19 @@ window.addEventListener("popstate", (e) => {
   const modalAprobar = document.getElementById("modalAprobarNota");
   const modalEditar = document.getElementById("modalEditarProducto");
   const modalPiernas = document.getElementById("modal-modulo-piernas");
+  const modalInvTemp = document.getElementById("modalEditarInvTemp");
 
   const hayModalAbierto =
     (modalAprobar && modalAprobar.classList.contains("active")) ||
     (modalEditar && modalEditar.classList.contains("active")) ||
-    (modalPiernas && modalPiernas.classList.contains("active"));
+    (modalPiernas && modalPiernas.classList.contains("active")) ||
+    (modalInvTemp && modalInvTemp.classList.contains("active"));
 
   if (hayModalAbierto) {
     if (modalAprobar) modalAprobar.classList.remove("active");
     if (modalEditar) modalEditar.classList.remove("active");
     if (modalPiernas) modalPiernas.classList.remove("active");
+    if (modalInvTemp) modalInvTemp.classList.remove("active");
     return;
   }
 
@@ -1045,3 +1048,110 @@ window.toggleDarkMode = function (isDark) {
     });
   }
 })();
+
+// ==========================================
+// MINI INVENTARIO TEMPORAL (MAZOS Y SAL)
+// ==========================================
+
+// ==========================================
+// MINI INVENTARIO TEMPORAL (MAZOS Y SAL)
+// ==========================================
+
+function cargarInventarioTemporalRuta() {
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=listarInvTemporal')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('tabla-inventario-temporal');
+            if (!data.success || data.inventario.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:15px; color:#64748b;">No hay Mazos ni Sal en ruta.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.inventario.map(item => {
+                const esSal = item.nombreProducto.toLowerCase().includes('sal');
+                let stockVisual = '';
+                
+                if (esSal) {
+                    // Solo mostramos Bultos
+                    stockVisual = `<span style="font-weight:bold; color:var(--text-main);">${item.cantidadCajas}</span> bultos`;
+                } else {
+                    stockVisual = `<span style="font-weight:bold; color:var(--text-main);">${item.cantidadPiezas}</span> pzs`;
+                }
+
+                // Escapar comillas para el onclick
+                const nombreSeguro = item.nombreProducto.replace(/'/g, "\\'");
+
+                return `
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 12px 15px; font-weight:600;">${item.nombreProducto}</td>
+                        <td style="padding: 12px 15px;">${stockVisual}</td>
+                        <td style="padding: 12px 15px; text-align: center;">
+                            <button type="button" class="btn-edit-inv" onclick="abrirModalInvTemp(${item.idSalidaTemporal}, '${nombreSeguro}', ${item.cantidadPiezas}, ${item.cantidadCajas})">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        })
+        .catch(err => console.error("Error al cargar inventario ruta:", err));
+}
+
+function abrirModalInvTemp(id, nombre, piezas, cajas) {
+    registrarModalEnHistorial(); // Protección del botón atrás del celular
+    
+    document.getElementById('modal_inv_id').value = id;
+    document.getElementById('modal_inv_nombre').value = nombre;
+    
+    const esSal = nombre.toLowerCase().includes('sal');
+    
+    const divPiezas = document.getElementById('grupo_inv_piezas');
+    const divCajas = document.getElementById('grupo_inv_cajas');
+    
+    if (esSal) {
+        divPiezas.style.display = 'none';
+        divCajas.style.display = 'block';
+        
+        document.getElementById('modal_inv_cajas').value = cajas || 0;
+        document.getElementById('modal_inv_piezas').value = 0;
+    } else {
+        divPiezas.style.display = 'block';
+        divCajas.style.display = 'none';
+        
+        document.getElementById('modal_inv_piezas').value = piezas || 0;
+        document.getElementById('modal_inv_cajas').value = 0;
+    }
+
+    document.getElementById('modalEditarInvTemp').classList.add('active');
+}
+
+function cerrarModalInvTemp() {
+    document.getElementById('modalEditarInvTemp').classList.remove('active');
+}
+
+
+
+// Guardar el formulario
+document.getElementById('formEditarInvTemp')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch('/LostFridgeInventory/Controllers/encargadoController.php?action=actualizarInvTemporal', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            cerrarModalInvTemp();
+            cargarInventarioTemporalRuta(); // Refresca la tabla
+        } else {
+            alert("Error: " + data.message);
+        }
+    });
+});
+
+// Inicializar la tabla al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    cargarInventarioTemporalRuta();
+});

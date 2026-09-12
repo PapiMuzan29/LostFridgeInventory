@@ -845,6 +845,38 @@ input:checked + .slider:before {
     color: #d97706;
 }
 
+/* Botón estilizado para la tabla de inventario temporal */
+.btn-edit-inv {
+    background-color: rgba(59, 130, 246, 0.1); /* Fondo azul translúcido */
+    color: #3b82f6; /* Ícono azul */
+    border: none;
+    border-radius: 50%; /* Botón completamente circular */
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-edit-inv:hover {
+    background-color: #3b82f6;
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+body.dark-mode .btn-edit-inv {
+    background-color: rgba(96, 165, 250, 0.15);
+    color: #60a5fa;
+}
+
+body.dark-mode .btn-edit-inv:hover {
+    background-color: #60a5fa;
+    color: #ffffff;
+}
+
 /* ===================================================================
     SISTEMA DE TICKET (MODO OSCURO)
 =================================================================== */

@@ -447,6 +447,7 @@ if (!isset($productos) || !isset($estibadores)) {
                     
                     const esMazo = optVal.includes('mazo');
                     const esManteca = optVal.includes('manteca');
+                    const esSal = optVal.includes('sal');
 
                     if (optVal === "caja pechos") {
                         inputKilos.readOnly = false;
@@ -466,7 +467,24 @@ if (!isset($productos) || !isset($estibadores)) {
                             btnAbrir.innerHTML = '<i class="fa-solid fa-box-open"></i> Abrir 1 Caja a Granel';
                         }
                         
-                    } else if (esManteca) {
+                    } else if (esSal) {
+                        const stockCajas = parseInt(opt.getAttribute('data-stock-cajas')) || 0;
+                        const stockKilosBD = parseFloat(opt.getAttribute('data-stock-peso')) || 0;
+                        const totalKilosDisponibles = (stockCajas * 10) + stockKilosBD;
+
+                        inputKilos.readOnly = false;
+                        inputKilos.disabled = false;
+                        inputKilos.required = true;
+                        inputKilos.min = 1; // Mínimo 1 kilo exigido por el navegador
+                        inputKilos.placeholder = `Max: ${totalKilosDisponibles.toFixed(2)} kg`;
+                        
+                        inputPiezas.readOnly = true;
+                        inputPiezas.disabled = true;
+                        inputPiezas.required = false;
+                        inputPiezas.placeholder = `${stockCajas} bultos disp.`;
+                        inputPiezas.value = '';
+                    
+                    }else if (esManteca) {
                         const matchNumeros = optVal.match(/\d+/);
                         const kilosPorPieza = matchNumeros ? parseFloat(matchNumeros[0]) : 0;
 

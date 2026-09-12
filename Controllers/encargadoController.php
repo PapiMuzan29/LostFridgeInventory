@@ -123,6 +123,38 @@ switch ($action) {
         }
         break;
 
+    case 'listarInvTemporal':
+        try {
+            $inventario = $modelo->obtenerInventarioTemporalSalMazo();
+            echo json_encode(['success' => true, 'inventario' => $inventario]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'actualizarInvTemporal':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
+            exit;
+        }
+        
+        $idTemp = (int)($_POST['id_temporal'] ?? 0);
+        $piezas = (int)($_POST['piezas'] ?? 0);
+        $cajas = (int)($_POST['cajas'] ?? 0);
+        $kilos = (float)($_POST['kilos'] ?? 0);
+
+        if ($idTemp > 0) {
+            try {
+                $modelo->actualizarInventarioTemporal($idTemp, $piezas, $cajas, $kilos);
+                echo json_encode(['success' => true, 'message' => 'Inventario ajustado correctamente.']);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'ID de inventario inválido.']);
+        }
+        break;
+
     default:
         echo json_encode(['success' => false, 'message' => 'Acción no válida.']);
         break;

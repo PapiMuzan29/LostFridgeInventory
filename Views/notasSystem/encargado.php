@@ -159,6 +159,26 @@ require_once __DIR__ . '/../../Config/cadenero.php';
                 </div>
             </div>
 
+            <!-- MINI INVENTARIO EN RUTA -->
+            <div class="resumen-section-header" style="margin-top: 25px;">
+                <h3>INVENTARIO MAYOREO</h3>
+            </div>
+            
+            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead style="background-color: var(--bg-dark-header, #0f172a); color: white;">
+                        <tr>
+                            <th style="padding: 12px 15px;">Producto</th>
+                            <th style="padding: 12px 15px;">Stock en Ruta</th>
+                            <th style="padding: 12px 15px; text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-inventario-temporal">
+                        <tr><td colspan="3" style="text-align:center; padding: 15px;">Cargando inventario...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
 
         <!-- VISTA 3: CONFIGURACIÓN -->
@@ -315,6 +335,46 @@ require_once __DIR__ . '/../../Config/cadenero.php';
                     <div style="margin-top: 25px;">
                         <button type="submit" class="btn-primary" id="btnGuardarProducto">
                             <i class="fa-solid fa-floppy-disk"></i> Guardar Configuración
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR INVENTARIO TEMPORAL -->
+    <div id="modalEditarInvTemp" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-pen"></i> Ajustar Inventario</h2>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalInvTemp()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarInvTemp">
+                    <input type="hidden" id="modal_inv_id" name="id_temporal">
+                    
+                    <div class="form-group">
+                        <label>Producto</label>
+                        <input type="text" id="modal_inv_nombre" class="form-control" disabled style="background:#f1f5f9;">
+                    </div>
+
+                    <!-- Campos para Mazo -->
+                    <div class="form-group" id="grupo_inv_piezas">
+                        <label>Piezas Actuales</label>
+                        <input type="number" id="modal_inv_piezas" name="piezas" class="form-control" min="0">
+                    </div>
+
+                    <!-- Campos para Sal -->
+                    <div class="form-group" id="grupo_inv_cajas" style="display: none;">
+                        <label>Bultos Cerrados (Cajas de 10kg)</label>
+                        <input type="number" id="modal_inv_cajas" name="cajas" class="form-control" min="0">
+                        <!-- Mandamos 0 kilos en automático para no afectar la Base de Datos -->
+                        <input type="hidden" name="kilos" value="0">
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <button type="submit" class="btn-primary" id="btnGuardarInvTemp">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Ajuste
                         </button>
                     </div>
                 </form>
