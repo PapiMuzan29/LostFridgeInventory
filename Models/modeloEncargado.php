@@ -1,0 +1,300 @@
+<?php
+require_once __DIR__ . '/../Config/BD.php'; 
+
+class modeloEncargado {
+    private $db;
+
+    public function __construct() {
+        $this->db = BD::obtenerInstancia(); 
+    }
+
+    public function obtenerTodos() {
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT idProducto, nombreProducto FROM producto ORDER BY nombreProducto ASC";
+        return $this->db->select($sql);
+    }
+
+    public function actualizarEstadoProducto($idProducto, $porPiezas, $factura) {
+        // 💡 Corrección: Producto -> producto
+        $sql = "UPDATE producto SET porPiezas = ?, factura = ? WHERE idProducto = ?";
+        return $this->db->update($sql, [$porPiezas, $factura, $idProducto]);
+    }
+    
+    public function obtenerTotalProductos($busqueda = '') {
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT COUNT(*) as total FROM producto";
+        $params = [];
+        
+        if (!empty($busqueda)) {
+            $sql .= " WHERE nombreProducto LIKE ?";
+            $params[] = "%" . $busqueda . "%";
+        }
+        
+        $resultado = $this->db->select($sql, $params);
+        return isset($resultado[0]['total']) ? (int)$resultado[0]['total'] : 0;
+    }
+
+    public function obtenerPaginados($limite, $offset, $busqueda = '') {
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT idProducto, nombreProducto, porPiezas, factura FROM producto";
+        $params = [];
+        
+        if (!empty($busqueda)) {
+            $sql .= " WHERE nombreProducto LIKE ?";
+            $params[] = "%" . $busqueda . "%";
+        }
+    
+        $sql .= " ORDER BY nombreProducto ASC LIMIT $limite OFFSET $offset";
+        return $this->db->select($sql, $params);
+    }
+
+    private function obtenerProductosPorNota($idNota) {
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT 
+                    dn.id_detalle,
+                    dn.idProducto,
+                    p.nombreProducto,
+                    dn.kilos,
+                    dn.piezas
+                FROM detalle_notas dn
+                JOIN producto p ON dn.idProducto = p.idProducto
+                WHERE dn.id_nota = ?";
+        
+        return $this->db->select($sql, [$idNota]);
+    }
+
+    private function obtenerEstibadoresPorNota($idNota) {
+        $sql = "SELECT 
+                    e.id_estibador,
+                    CONCAT(c.nombreUsuario, ' ', c.apellidoPaternoUsuario) AS nombre_estibador
+                FROM nota_estibadores e
+                JOIN cuenta c ON e.id_estibador = c.idCuenta
+                WHERE e.id_nota = ?";
+        
+        return $this->db->select($sql, [$idNota]);
+    }
+
+    public function obtenerNotasPorEstado($estado, $busqueda = '', $limite = null, $offset = null) {
+        $params = [];
+        
+        if (is_array($estado)) {
+            $placeholders = implode(',', array_fill(0, count($estado), '?'));
+            $condicionEstado = "n.estado IN ($placeholders)";
+            $params = array_merge($params, $estado);
+        } else {
+            $condicionEstado = "n.estado = ?";
+            $params[] = $estado;
+        }
+        
+        $sql = "SELECT 
+                n.id_nota, 
+                n.folio, 
+                n.nombre_cliente, 
+                n.fecha_creacion,
+                n.estado, 
+                n.observacion_especial,
+                CONCAT(v.nombreUsuario, ' ', v.apellidoPaternoUsuario, ' ', v.apellidoMaternoUsuario) AS nombre_vendedor,
+                CONCAT(ur.nombreUsuario, ' ', ur.apellidoPaternoUsuario) AS nombre_quien_rechazo,
+                (SELECT nombreRol FROM rol WHERE idRol = ur.idRol LIMIT 1) AS rol_quien_rechazo
+            FROM notas n
+            LEFT JOIN cuenta v ON n.id_vendedor = v.idCuenta
+            LEFT JOIN cuenta ur ON n.id_usuario_rechazo = ur.idCuenta
+            WHERE $condicionEstado";
+                
+        if (!empty($busqueda)) {
+            $sql .= " AND (n.folio LIKE ? OR n.nombre_cliente LIKE ?)";
+            $termino = "%" . $busqueda . "%";
+            $params[] = $termino;
+            $params[] = $termino;
+        }
+        
+        $sql .= " ORDER BY n.fecha_creacion DESC";
+        
+        if ($limite !== null && $offset !== null) {
+            $sql .= " LIMIT " . (int)$limite . " OFFSET " . (int)$offset;
+        }
+                
+        $notasBase = $this->db->select($sql, $params);
+        $notasCompletas = [];
+        
+        if (!empty($notasBase)) {
+            foreach ($notasBase as $nota) {
+                $idNota = $nota['id_nota'];
+                $nota['productos'] = $this->obtenerProductosPorNota($idNota);
+                $nota['estibadores'] = $this->obtenerEstibadoresPorNota($idNota);
+                $notasCompletas[] = $nota;
+            }
+        }
+        
+        return $notasCompletas;
+    }
+
+    public function contarNotasPorEstado($estado, $busqueda = '') {
+        $params = [];
+        
+        if (is_array($estado)) {
+            $placeholders = implode(',', array_fill(0, count($estado), '?'));
+            $condicionEstado = "estado IN ($placeholders)";
+            $params = array_merge($params, $estado);
+        } else {
+            $condicionEstado = "estado = ?";
+            $params[] = $estado;
+        }
+
+        $sql = "SELECT COUNT(*) as total FROM notas WHERE $condicionEstado";
+        
+        if (!empty($busqueda)) {
+            $sql .= " AND (folio LIKE ? OR nombre_cliente LIKE ?)";
+            $termino = "%" . $busqueda . "%";
+            $params[] = $termino;
+            $params[] = $termino;
+        }
+        
+        $resultado = $this->db->select($sql, $params);
+        
+        return isset($resultado[0]['total']) ? (int)$resultado[0]['total'] : 0;
+    }
+
+
+    public function requiereFactura($idNota) {
+        // 💡 Corrección: Producto -> producto
+        $sql = "SELECT COUNT(*) as total_facturables 
+                FROM detalle_notas dn
+                JOIN producto p ON dn.idProducto = p.idProducto
+                WHERE dn.id_nota = ? AND p.factura = 1";
+                
+        $resultado = $this->db->select($sql, [$idNota]);
+        return (isset($resultado[0]['total_facturables']) && (int)$resultado[0]['total_facturables'] > 0);
+    }
+
+    public function aprobarNotaConFolios($idNota, $folios) {
+        try {
+            if (method_exists($this->db, 'beginTransaction')) {
+                $this->db->beginTransaction();
+            }
+
+            date_default_timezone_set('America/Mexico_City'); 
+            $fechaMexico = date('Y-m-d H:i:s');
+            $sqlNota = "UPDATE notas SET estado = 'APROBADO', fecha_salida = ? WHERE id_nota = ?";
+            $this->db->update($sqlNota, [$fechaMexico, $idNota]);
+
+            $sqlFolio = "INSERT INTO folios_tickets (id_nota, folio_ticket) VALUES (?, ?)";
+            
+            foreach ($folios as $folio) {
+                $folioLimpio = trim($folio);
+                if ($folioLimpio !== '') {
+                    $this->db->insert($sqlFolio, [$idNota, $folioLimpio]);
+                }
+            }
+
+            if (method_exists($this->db, 'commit')) {
+                $this->db->commit();
+            }
+            return true;
+
+        } catch (Exception $e) {
+            if (method_exists($this->db, 'rollBack')) {
+                $this->db->rollBack();
+            }
+            throw new Exception("Error en la transacción: " . $e->getMessage());
+        }
+    }
+
+    public function verificarPassword($idCuenta, $password) {
+        $sql = "SELECT contrasenaUsuario FROM cuenta WHERE idCuenta = ?";
+        $res = $this->db->select($sql, [$idCuenta]);
+        if (empty($res)) return false;
+        
+        $hash = $res[0]['contrasenaUsuario'];
+        // Esta línea es aprueba de balas: verifica si tu BD usa BCRYPT, MD5 o texto plano.
+        return (password_verify($password, $hash) || md5($password) === $hash || $password === $hash);
+    }
+
+    public function cambiarEstadoNota($idNota, $nuevoEstado) {
+        $sql = "UPDATE notas SET estado = ? WHERE id_nota = ?";
+        return $this->db->update($sql, [$nuevoEstado, $idNota]);
+    }
+
+    public function rechazarNotaYDevolverInventario(int $idNota, int $idUsuarioActivo): bool {
+        // 1. Matamos la nota cambiando su estado y registramos a quién la rechazó
+        $sqlRechazo = "UPDATE notas SET estado = 'RECHAZADA', id_usuario_rechazo = ? WHERE id_nota = ?";
+        $this->db->update($sqlRechazo, [$idUsuarioActivo, $idNota]);
+        
+        // 2. Extraemos todos los productos que tenía
+        $sqlDetalles = "SELECT idProducto, kilos, piezas FROM detalle_notas WHERE id_nota = ?";
+        $detalles = $this->db->select($sqlDetalles, [$idNota]);
+
+        if (empty($detalles)) return true;
+
+        // 3. Devolvemos uno por uno al inventario
+        foreach ($detalles as $det) {
+            $idProd = (int)$det['idProducto'];
+            $kilosDev = floatval($det['kilos']);
+            $piezasDev = intval($det['piezas']);
+
+            $sqlProd = "SELECT porPiezas, nombreProducto FROM producto WHERE idProducto = ?";
+            $resProd = $this->db->select($sqlProd, [$idProd]);
+            if (empty($resProd)) continue;
+
+            $esPorPieza = intval($resProd[0]['porPiezas']) === 1;
+            $esSal = (strpos(strtolower($resProd[0]['nombreProducto']), 'sal') !== false);
+
+            $sqlTemp = "SELECT idSalidaTemporal, cantidadPeso, cantidadPiezas, cantidadCajas FROM InventarioTemporalSalida WHERE idProducto = ?";
+            $resTemp = $this->db->select($sqlTemp, [$idProd]);
+
+            if (!empty($resTemp)) {
+                $idTemp = $resTemp[0]['idSalidaTemporal'];
+                if ($esSal) {
+                    $kilosTotales = ($resTemp[0]['cantidadCajas'] * 10) + $resTemp[0]['cantidadPeso'];
+                    $kilosTotales += $kilosDev;
+                    $nuevasCajas = (int)floor($kilosTotales / 10);
+                    $nuevoPeso = $kilosTotales - ($nuevasCajas * 10);
+                    $this->db->update("UPDATE InventarioTemporalSalida SET cantidadCajas = ?, cantidadPeso = ? WHERE idSalidaTemporal = ?", [$nuevasCajas, $nuevoPeso, $idTemp]);
+                } else {
+                    $nuevasCajas = intval($resTemp[0]['cantidadCajas']);
+                    $nuevasPiezas = intval($resTemp[0]['cantidadPiezas']);
+                    $nuevoPeso = floatval($resTemp[0]['cantidadPeso']) + $kilosDev; 
+                    
+                    if ($esPorPieza || $piezasDev > 0) {
+                        if ($nuevasCajas > 0) {
+                            $nuevasCajas += $piezasDev;
+                        } else {
+                            $nuevasPiezas += $piezasDev;
+                        }
+                    }
+                    $this->db->update("UPDATE InventarioTemporalSalida SET cantidadCajas = ?, cantidadPiezas = ?, cantidadPeso = ? WHERE idSalidaTemporal = ?", [$nuevasCajas, $nuevasPiezas, $nuevoPeso, $idTemp]);
+                }
+            } else {
+                if ($esSal) {
+                    $cajasIns = (int)floor($kilosDev / 10);
+                    $pesoIns = $kilosDev - ($cajasIns * 10);
+                    $piezasIns = 0;
+                } else {
+                    $cajasIns = 0;
+                    $piezasIns = $piezasDev;
+                    $pesoIns = $kilosDev;
+                }
+                $this->db->insert("INSERT INTO InventarioTemporalSalida (idProducto, cantidadCajas, cantidadPiezas, cantidadPeso) VALUES (?, ?, ?, ?)", [$idProd, $cajasIns, $piezasIns, $pesoIns]);
+            }
+        }
+        return true;
+    }
+
+    public function obtenerInventarioTemporalSalMazo(): array {
+        $sql = "SELECT i.idSalidaTemporal, p.nombreProducto, i.cantidadPiezas, i.cantidadCajas, i.cantidadPeso 
+                FROM InventarioTemporalSalida i 
+                INNER JOIN Producto p ON i.idProducto = p.idProducto 
+                WHERE p.nombreProducto LIKE '%Mazo%' OR p.nombreProducto LIKE '%Sal%'";
+        
+        return $this->db->select($sql) ?: [];
+    }
+
+    public function actualizarInventarioTemporal(int $idTemp, int $piezas, int $cajas, float $kilos): bool {
+        $sql = "UPDATE InventarioTemporalSalida 
+                SET cantidadPiezas = ?, cantidadCajas = ?, cantidadPeso = ? 
+                WHERE idSalidaTemporal = ?";
+        
+        $resultado = $this->db->update($sql, [$piezas, $cajas, $kilos, $idTemp]);
+        return $resultado !== false;
+    }
+}

@@ -1,0 +1,450 @@
+<?php
+session_start();
+
+$rolesPermitidos = [1, 5];
+require_once __DIR__ . '/../../Config/cadenero.php';
+
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Módulo Encargado - Grupo Cárnico América</title>
+    <link rel="stylesheet" href="CSS/encargado.css">
+    
+    
+    <script src="https://kit.fontawesome.com/646ac4fad6.js" crossorigin="anonymous"></script>
+</head>
+
+<?php include __DIR__ . '/chat.php'; ?>
+
+<body>
+    
+  
+
+    <header class="app-header">
+        <h1>Grupo Cárnico América</h1>
+        <p id="header-subtitle">Revisión de Notas</p>
+
+        <div style="display:flex; align-items:center; gap: 15px;">
+            <div style="position: relative; cursor: pointer;" onclick="abrirModalAutorizaciones()">
+                <i class="fa-solid fa-bell" id="campana-noti" style="font-size: 1.4rem; color: #fff;"></i>
+                <span id="badge-autorizaciones" style="display:none; position: absolute; top: -5px; right: -8px; background: #e53e3e; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 50%;">0</span>
+            </div>
+            <div style="background-color: rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 8px; color: #ffffff; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">
+                    <i class="fa-solid fa-circle-user" style="font-size: 1.1rem;"></i>
+                    <span><?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Encargado') ?></span>
+            </div>
+        </div>
+        
+        <audio id="audio-noti" src="/LostFridgeInventory/SRC/sounds/noti1.wav" preload="auto"></audio>
+                    
+    </header>
+
+    <main class="app-content">
+
+        <!-- VISTA 1: INICIO (REVISIÓN DE NOTAS) -->
+        <div id="tab-inicio" class="tab-content active">
+            <section class="card sticky-search">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="buscarNota"><i class="fa-solid fa-magnifying-glass"></i> Buscar Nota</label>
+                    <input type="text" id="buscarNota" class="form-control" placeholder="Buscar por folio o cliente..." onkeyup="filtrarNotas()">
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title"><i class="fa-solid fa-clipboard-list"></i> Notas por Aprobar</h2>
+                
+                <div id="lista-notas-container">
+                    <div style="text-align:center; padding:20px;">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x text-muted"></i>
+                    </div>
+                </div>
+
+                <div id="no-notes-results" class="empty-state" style="display: none;">
+                    <i class="fa-solid fa-magnifying-glass-minus"></i>
+                    <p>No se encontraron notas con esa búsqueda.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- VISTA 2: GESTIÓN Y RESUMEN DE PRODUCTOS -->
+        <div id="tab-gestion" class="tab-content">
+            
+            <!-- CONTROLES NAVEGACIÓN DE FECHA -->
+            <div class="date-picker-bar">
+                <button type="button" class="btn-date-nav" onclick="cambiarFecha(-1)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="date-picker-display" onclick="document.getElementById('input-fecha-gestion').showPicker()">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <span id="label-fecha-seleccionada">Cargando fecha...</span>
+                    <input type="date" id="input-fecha-gestion" style="position:absolute; opacity:0; pointer-events:none;" onchange="alSeleccionarFecha(this.value)">
+                </div>
+                <button type="button" class="btn-date-nav" onclick="cambiarFecha(1)">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- TÍTULO DE LA SECCIÓN -->
+            <div class="resumen-section-header">
+                <h3>RESUMEN DEL DÍA</h3>
+            </div>
+
+            <!-- CONTENEDOR DE TARJETAS DE RESUMEN -->
+            <div id="contenedor-resumen-dia">
+                <!-- Pierna -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloPiernas()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/pierna.jpeg" alt="Pierna" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Pierna</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty" id="resumen-pierna-pzs">...</span> <small>piezas</small>
+                            <span class="metric-dot">•</span>
+                            <span class="weight-qty" id="resumen-pierna-kg">... kg</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pecho -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloPecho()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/pecho.jpeg" alt="Pecho" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Pecho</h4>
+                        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 5px;">
+                            <p class="resumen-metrics" style="margin: 0;">
+                                <span class="highlight-qty" id="resumen-pecho-suelto-pzs">...</span> <small>pzs (suelto)</small>
+                                <span class="metric-dot">•</span>
+                                <span class="weight-qty" id="resumen-pecho-suelto-kg">... kg</span>
+                            </p>
+                            <p class="resumen-metrics" style="margin: 0;">
+                                <span class="highlight-qty" id="resumen-pecho-caja-pzs">...</span> <small>cajas</small>
+                                <span class="metric-dot">•</span>
+                                <span class="weight-qty" id="resumen-pecho-caja-kg">... kg</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mazo -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloMazos()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/mazo.jpeg" alt="Mazo" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Mazo</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty" id="resumen-mazo-pzs">...</span> <small>piezas</small>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Manteca -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloManteca()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/manteca.jpeg" alt="Manteca" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Manteca</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty" id="resumen-manteca-pzs">...</span> <small>unidades</small>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chuleta ahumada -->
+                <div class="resumen-card clickable-card" onclick="abrirModuloChuletas()">
+                    <div class="resumen-card-icon">
+                        <img src="../../SRC/productos/chuleta.jpeg" alt="Chuleta" class="img-producto">
+                    </div>
+                    <div class="resumen-card-details">
+                        <h4>Chuleta ahumada</h4>
+                        <p class="resumen-metrics">
+                            <span class="highlight-qty" id="resumen-chuleta-pzs">...</span> <small>piezas</small>
+                            <span class="metric-dot">•</span>
+                            <span class="weight-qty" id="resumen-chuleta-kg">... kg</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MINI INVENTARIO EN RUTA -->
+            <div class="resumen-section-header" style="margin-top: 25px;">
+                <h3>INVENTARIO MAYOREO</h3>
+            </div>
+            
+            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead style="background-color: var(--bg-dark-header, #0f172a); color: white;">
+                        <tr>
+                            <th style="padding: 12px 15px;">Producto</th>
+                            <th style="padding: 12px 15px;">Stock en Ruta</th>
+                            <th style="padding: 12px 15px; text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-inventario-temporal">
+                        <tr><td colspan="3" style="text-align:center; padding: 15px;">Cargando inventario...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- VISTA 3: HISTORIAL DE NOTAS APROBADAS (NUEVO) -->
+        <div id="tab-historial" class="tab-content">
+            <section class="card sticky-search">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="buscarHistorial"><i class="fa-solid fa-magnifying-glass"></i> Buscar en Historial</label>
+                    <input type="text" id="buscarHistorial" class="form-control" placeholder="Buscar por folio o cliente..." onkeyup="filtrarHistorial()">
+                </div>
+            </section>
+
+            <section class="card">
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> Historial de Notas</h2>
+                
+                <div id="lista-historial-container">
+                    <div style="text-align:center; padding:20px;">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x text-muted"></i>
+                    </div>
+                </div>
+
+            <div id="paginacion-historial" class="pagination-container" style="margin-top: 15px;"></div>
+            </section>
+        </div>
+
+        <!-- VISTA 4: CONFIGURACIÓN -->
+        <div id="tab-config" class="tab-content">
+             <section class="card">
+                <h2 class="card-title"><i class="fa-solid fa-user-gear"></i> Perfil de Usuario</h2>
+                <div class="user-info-box">
+                    <p><strong>Usuario Activo:</strong> <?= htmlspecialchars($_SESSION['apodoUsuario'] ?? 'Encargado') ?></p>
+                    <p><strong>Rol:</strong> <?= htmlspecialchars($_SESSION['nombreRol'] ?? 'Encargado') ?></p>
+                </div>
+            </section>
+
+            <section class="card sticky-search">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="buscarProducto"><i class="fa-solid fa-magnifying-glass"></i> Buscar Producto</label>
+                    <input type="text" id="buscarProducto" class="form-control" placeholder="Nombre de producto..." onkeyup="filtrarProductos()">
+                </div>
+            </section>
+            
+            <section class="card">
+                <h2 class="card-title"><i class="fa-solid fa-boxes-stacked"></i> Configuración de Venta</h2>
+                
+                <div id="lista-productos-container">
+                    <div id="loading-productos" style="text-align:center; padding:20px;">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x text-muted"></i>
+                    </div>
+                </div>
+
+                <div id="paginacion-productos" class="pagination-container"></div>
+                
+                <div id="no-products-results" class="empty-state" style="display: none;">
+                    <i class="fa-solid fa-box-open"></i>
+                    <p>No se encontraron productos.</p>
+                </div>
+            </section>
+
+             <section class="card">
+                <h2 class="card-title"><i class="fa-solid fa-sliders"></i> Ajustes de Captura</h2>
+                
+                <!-- TOGGLE DE MODO OSCURO -->
+                <div class="toggle-control" style="margin-bottom: 16px;">
+                    <label for="toggle-dark-mode" style="margin: 0; cursor: pointer;">
+                        <i class="fa-solid fa-moon"></i> Modo Oscuro
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-dark-mode" onchange="toggleDarkMode(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Modo de Conexión</label>
+                    <select class="form-control" disabled>
+                        <option>En Línea (BD LFI Principal)</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title"><i class="fa-solid fa-circle-info"></i> Sistema</h2>
+                <p style="font-size: 0.9rem; color: #64748b;"><strong>LFI Ventas Móvil:</strong> v1.0</p>
+                <p style="font-size: 0.9rem; color: #64748b; margin-top: 5px;">Desarrollado para Grupo Cárnico América</p>
+                
+                <div style="margin-top: 20px;">
+                    <a href="../../Controllers/LoginController.php?action=logout" class="btn-danger-block">
+                        <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                    </a>
+                </div>
+            </section>
+        </div>
+
+        <div class="spacer"></div>
+
+
+    </main>
+
+<!-- NAVEGACIÓN INFERIOR (ACTUALIZADA) -->
+    <nav class="bottom-nav">
+        <button type="button" class="nav-item active" onclick="switchTab('inicio', this, 'Revisión de Notas')">
+            <i class="fa-solid fa-clipboard-check"></i><span>Inicio</span>
+        </button>
+        <button type="button" class="nav-item" onclick="switchTab('gestion', this, 'Gestión de Productos')">
+            <i class="fa-solid fa-boxes-stacked"></i><span>Gestión</span>
+        </button>
+        <button type="button" class="nav-item" onclick="switchTab('historial', this, 'Historial de Notas')">
+            <i class="fa-solid fa-clock-rotate-left"></i><span>Historial</span>
+        </button>
+        <button type="button" class="nav-item" onclick="switchTab('config', this, 'Configuración')">
+            <i class="fa-solid fa-gear"></i><span>Ajustes</span>
+        </button>
+    </nav>
+
+    <!-- MODALES -->
+    <div id="modalAprobarNota" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-ticket"></i> Confirmar Salida</h2>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalAprobar()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formAprobarNota">
+                    <input type="hidden" id="modal_aprobar_id_nota" name="id_nota">
+
+                    <div class="form-group" id="grupo_folio_ticket">
+                        <label>Folio de Ticket (Entregado en Caja) *</label>
+                        <input type="text" id="folio_ticket_1" name="folios[]" class="form-control" required placeholder="Ej. TKT-00123">
+                    </div>
+
+                    <div class="form-group" id="grupo_folio_factura" style="display: none;">
+                        <label class="label-warning"><i class="fa-solid fa-file-invoice"></i> Folio de Factura *</label>
+                        <input type="text" id="folio_ticket_2" name="folios[]" class="form-control" placeholder="Ej. FAC-00456">
+                        <small>Esta nota contiene productos que requieren factura.</small>
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <button type="submit" class="btn-primary" id="btnConfirmarAprobacion">
+                            <i class="fa-solid fa-check-double"></i> Confirmar y Aprobar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEditarProducto" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-pen-to-square"></i> Configurar Producto</h2>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalProducto()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="formEditarProducto">
+                    <input type="hidden" id="modal_id_producto" name="id_producto">
+                    
+                    <div class="form-group">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="modal_nombre_producto" class="form-control" disabled style="background-color: #f1f5f9; color: #64748b;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>¿Contabilizar Producto? <small>(Venta por piezas)</small></label>
+                        <select id="modal_por_piezas" name="por_piezas" class="form-control">
+                            <option value="1">(Contable / Por piezas)</option>
+                            <option value="0">(Solo peso / Por kilo)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>¿Requiere Factura? <small>(Para notas y reportes)</small></label>
+                        <select id="modal_factura" name="factura" class="form-control">
+                            <option value="0">No facturar</option>
+                            <option value="1">Sí facturar</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <button type="submit" class="btn-primary" id="btnGuardarProducto">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Configuración
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODALES DE LA CAMPANA (AUTORIZACIONES) -->
+    <!-- ======================================================== -->
+
+    <!-- 1. MODAL PRINCIPAL DE LA CAMPANA -->
+    <div id="modalAutorizaciones" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-bell"></i> Autorizaciones Pendientes</h2>
+                <button type="button" class="btn-close-modal" onclick="document.getElementById('modalAutorizaciones').classList.remove('active')">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <div id="lista-autorizaciones-container">
+                    <div style="text-align:center; padding:20px;">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x text-muted"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MODAL CONTRASEÑA DE AUTORIZACIÓN -->
+    <div id="modalPasswordAutorizacion" class="modal-overlay" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 350px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-lock"></i> Seguridad</h2>
+                <button type="button" class="btn-close-modal" onclick="document.getElementById('modalPasswordAutorizacion').classList.remove('active')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="auth_id_nota">
+                
+                <div class="form-group" style="margin-bottom: 5px;">
+                    <label>Contraseña de Encargado</label>
+                    <input type="password" id="auth_password" class="form-control" placeholder="****">
+                </div>
+                
+                <span id="auth_error_msg" style="color: #e53e3e; font-size: 0.85rem; font-weight: bold; display: none;">
+                    <i class="fa-solid fa-circle-exclamation"></i> Contraseña incorrecta.
+                </span>
+                
+                <button type="button" class="btn-primary" style="width:100%; margin-top:15px;" onclick="confirmarPasswordAutorizacion()">Autorizar Nota</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. MODAL CONFIRMAR RECHAZO -->
+    <div id="modalConfirmarRechazo" class="modal-overlay" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 350px; text-align: center;">
+            <div style="color: #e53e3e; font-size: 3rem; margin-bottom: 15px;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h2 style="margin-bottom: 10px;">¿Rechazar esta nota?</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">El inventario será devuelto al sistema y la nota será cancelada.</p>
+            
+            <input type="hidden" id="rechazo_id_nota">
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn-secondary-sm" style="flex: 1;" onclick="document.getElementById('modalConfirmarRechazo').classList.remove('active')">Cancelar</button>
+                <button type="button" class="btn-primary" style="flex: 1; background-color: #e53e3e; border: none;" onclick="ejecutarRechazo()">Sí, rechazar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="encargado.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,320 @@
+/* ==========================================
+   VARIABLES DE COLOR (MÓDULO PECHO - ROSA/GUINDA)
+   ========================================== */
+:root {
+    --pecho-bg: #f8fafc;
+    --pecho-card-bg: #ffffff;
+    --pecho-header-bg: #0f1420; /* Barra superior azul marino fija */
+    --pecho-header-text: #ffffff;
+    --pecho-text-main: #1e293b;
+    --pecho-text-muted: #64748b;
+    --pecho-accent: #800040;
+    --pecho-accent-hover: #9f1239;
+    --pecho-badge-bg: #fce7f3;
+    --pecho-badge-text: #800040;
+    --pecho-border: #fbcfe8;
+    --pecho-shadow: 0 4px 12px rgba(128, 0, 64, 0.08);
+    --pecho-icon-color: #800040;
+    --pecho-card-total-bg: #fdf2f8;
+}
+
+/* Modo Oscuro Conservando Tonos Rosas / Guinda */
+body.dark-mode, 
+html.dark-mode {
+    --pecho-bg: #0f131d;
+    --pecho-card-bg: #1c2333;
+    --pecho-header-bg: #0f1420; /* Mantiene la barra oscura */
+    --pecho-header-text: #ffffff;
+    --pecho-text-main: #ffffff;
+    --pecho-text-muted: #8b9bb4;
+    --pecho-accent: #f472b6; /* Rosa brillante para contraste en fondo oscuro */
+    --pecho-accent-hover: #f43f5e;
+    --pecho-badge-bg: rgba(244, 114, 182, 0.15);
+    --pecho-badge-text: #f472b6;
+    --pecho-border: rgba(244, 114, 182, 0.25);
+    --pecho-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --pecho-icon-color: #f472b6;
+    --pecho-card-total-bg: #2d0a1e; /* Fondo guinda oscuro para la tarjeta de total */
+}
+
+/* Reset Global */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--pecho-bg);
+    color: var(--pecho-text-main);
+    padding-bottom: 30px;
+    min-height: 100vh;
+}
+
+/* ==========================================
+   HEADER (BARRA SUPERIOR OSCURA)
+   ========================================== */
+.chuleta-header {
+    background: var(--pecho-header-bg);
+    color: var(--pecho-header-text);
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.chuleta-header .btn-volver {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chuleta-header .btn-volver:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.chuleta-header .header-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chuleta-header .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* ===================================================================
+   PESTAÑAS DE SELECCIÓN (SUELTO / CAJAS)
+=================================================================== */
+.presentation-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-tab {
+    flex: 1;
+    padding: 12px;
+    background: var(--pecho-card-bg);
+    border: 2px solid var(--pecho-border);
+    border-radius: 10px;
+    color: var(--pecho-text-muted);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn-tab.active {
+    background: var(--pecho-card-total-bg);
+    border-color: var(--pecho-accent);
+    color: var(--pecho-accent);
+}
+
+/* ==========================================
+   CONTENEDOR PRINCIPAL Y SELECTOR DE FECHA
+   ========================================== */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.date-picker-card {
+    background: var(--pecho-card-bg);
+    border: 1px solid var(--pecho-border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    box-shadow: var(--pecho-shadow);
+}
+
+.btn-date-arrow {
+    background: transparent;
+    border: none;
+    color: var(--pecho-accent);
+    font-size: 1.1rem;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.btn-date-arrow:hover {
+    background-color: var(--pecho-badge-bg);
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--pecho-text-main);
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.date-display:hover {
+    background-color: var(--pecho-badge-bg);
+}
+
+.date-display i {
+    color: var(--pecho-accent);
+}
+
+/* ==========================================
+   TARJETA TOTAL ACUMULADO DÍA
+   ========================================== */
+.card-total-dia {
+    background: var(--pecho-card-total-bg);
+    border: 1px solid var(--pecho-border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    box-shadow: var(--pecho-shadow);
+}
+
+.card-total-dia .info h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--pecho-accent);
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.card-total-dia .info .val-piezas {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--pecho-text-main);
+    line-height: 1.1;
+}
+
+.card-total-dia .info .val-kilos {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--pecho-text-main);
+    margin-top: 2px;
+}
+
+.card-total-dia .icon {
+    font-size: 2.5rem;
+    color: var(--pecho-icon-color);
+    opacity: 1;
+}
+
+/* ==========================================
+   SECCIÓN Y LISTADO DE VENTAS
+   ========================================== */
+.section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--pecho-text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ventas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.venta-item {
+    background: var(--pecho-card-bg);
+    border: 1px solid var(--pecho-border);
+    border-left: 4px solid var(--pecho-accent);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--pecho-shadow);
+}
+
+.venta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cliente-nombre {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--pecho-text-main);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cliente-nombre i {
+    color: var(--pecho-accent);
+}
+
+.venta-sub {
+    font-size: 0.85rem;
+    color: var(--pecho-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-cantidad {
+    background: var(--pecho-badge-bg);
+    color: var(--pecho-badge-text);
+    padding: 8px 12px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--pecho-border);
+    min-width: 48px;
+}
+
+.badge-cantidad .val {
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.badge-cantidad .unit {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: lowercase;
+}

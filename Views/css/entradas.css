@@ -1,0 +1,639 @@
+/* ================================================= */
+/* CONFIGURACIÓN Y CONTENEDORES DEL PANEL DE MATRIZ */
+/* ================================================= */
+.contenedor {
+    width: calc(100% - 260px);
+    margin-left: 260px;
+    height: calc(100vh - 65px);
+    margin-top: 65px;
+    background-color: #f8fafc;
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    transition: background-color 0.3s ease;
+}
+
+.shadow-soft {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.card-entrada {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-sizing: border-box;
+    width: 100%;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ================================================= */
+/* FORMULARIO DE DATOS GENERALES (CAMPOS SUPERIORES) */
+/* ================================================= */
+.grupo-campo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.grupo-campo label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #475569;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+
+.input-captura, .select-captura {
+    width: 100%;
+    height: 38px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 14px;
+    color: #1e293b;
+    outline: none;
+    background: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
+    box-sizing: border-box;
+}
+
+.input-captura:focus, .select-captura:focus {
+    border-color: #1f2f56;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.input-readonly {
+    width: 100%;
+    height: 38px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 14px;
+    color: #64748b;
+    background: #f1f5f9;
+    outline: none;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.text-success-status {
+    color: #16a34a !important;
+}
+
+/* ================================================= */
+/* BARRA DE CAPTURA OPERATIVA (CÓDIGO DE BARRAS)    */
+/* ================================================= */
+.captura-line-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 20px;
+    background: #e2e8f0;
+    border-top: 1px solid #cbd5e1;
+    border-bottom: 1px solid #cbd5e1;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.input-with-icon-bar {
+    position: relative;
+    width: 100%;
+}
+
+.input-with-icon-bar input {
+    padding-right: 40px;
+    border-color: #94a3b8;
+}
+
+.input-with-icon-bar i {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.label-inline {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+
+.modos-captura-radios {
+    display: flex;
+    gap: 16px;
+}
+
+.radio-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.radio-inline input[type="radio"] {
+    accent-color: #1f2f56;
+}
+
+/* Desactivar pseudoelementos indeseados */
+.input-with-icon-bar::before,
+.input-with-icon-bar::after,
+.tablaUsuarios th::before,
+.tablaUsuarios th::after {
+    content: none !important;
+}
+
+/* ================================================= */
+/* REJILLA INFERIOR: TABLA Y TOTALES                 */
+/* ================================================= */
+.tabla-partidas-container {
+    background: #ffffff;
+    overflow-x: auto;
+    transition: background-color 0.3s ease;
+    width: 100% !important;
+}
+
+/* ================================================= */
+/* CORRECCIÓN DE ALINEACIÓN Y LIMPIEZA DE LA TABLA   */
+/* ================================================= */
+#tablaEstandar {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+}
+
+#tablaEstandar th:nth-child(1), #tablaEstandar td:nth-child(1) { width: 5% !important; }
+#tablaEstandar th:nth-child(2), #tablaEstandar td:nth-child(2) { width: 8% !important; }
+#tablaEstandar th:nth-child(3), #tablaEstandar td:nth-child(3) { width: 16% !important; }
+#tablaEstandar th:nth-child(4), #tablaEstandar td:nth-child(4) { width: 33% !important; }
+#tablaEstandar th:nth-child(5), #tablaEstandar td:nth-child(5) { width: 13% !important; }
+#tablaEstandar th:nth-child(6), #tablaEstandar td:nth-child(6) { width: 11% !important; }
+#tablaEstandar th:nth-child(7), #tablaEstandar td:nth-child(7) { width: 12% !important; }
+#tablaEstandar th:nth-child(8), #tablaEstandar td:nth-child(8) { width: 8% !important; }
+
+#tablaEstandar th {
+    background-color: #f8fafc !important;
+    color: #1f2f56 !important;
+    padding: 12px 6px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+#tablaEstandar td {
+    padding: 8px 6px !important;
+    color: #334155 !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    vertical-align: middle !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* QUITAR CUADROS / BORDES A LOS INPUTS DE LA TABLA ESTÁNDAR */
+#tablaEstandar .input-cantidad, 
+#tablaEstandar .input-costo-partida {
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 14px !important;
+    color: #1e293b !important;
+    padding: 4px !important;
+    border-radius: 0 !important;
+    text-align: right !important;
+}
+
+#tablaEstandar .input-cantidad:focus, 
+#tablaEstandar .input-costo-partida:focus {
+    background: #ffffff !important;
+    border: 1px solid #94a3b8 !important;
+    border-radius: 4px !important;
+}
+
+#tablaEstandar td:nth-child(5), #tablaEstandar th:nth-child(5),
+#tablaEstandar td:nth-child(6), #tablaEstandar th:nth-child(6),
+#tablaEstandar td:nth-child(7), #tablaEstandar th:nth-child(7) {
+    text-align: right !important;
+}
+
+#tablaEstandar td:nth-child(1), #tablaEstandar th:nth-child(1),
+#tablaEstandar td:nth-child(2), #tablaEstandar th:nth-child(2),
+#tablaEstandar td:nth-child(8), #tablaEstandar th:nth-child(8) {
+    text-align: center !important;
+}
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.font-bold { font-weight: 700; }
+.font-600 { font-weight: 600; }
+.txt-verde { color: #16a34a; }
+
+.btn-borrar-partida {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #fef2f2;
+    color: #dc2626;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-borrar-partida:hover {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.panel-totales-entradas {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card-total-indicador {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.card-total-indicador h3 {
+    font-size: 14px;
+    color: #475569;
+    margin: 0;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.card-total-indicador span {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    font-family: monospace, sans-serif;
+    transition: color 0.3s ease;
+}
+
+.bg-total-qty { border-left: 4px solid #1f2f56; }
+.bg-total-kgs { border-left: 4px solid #16a34a; }
+
+.grupo-botones-captura {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-block-matriz {
+    width: 100%;
+    height: 40px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.btn-block-matriz:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.15);
+}
+
+.btn-block-matriz:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.btnAplicar.btn-block-matriz {
+    background: #1f2f56;
+    color: #ffffff;
+    border: none;
+}
+
+.btnAplicar.btn-block-matriz:hover {
+    background: #0b5ed7;
+}
+
+.btnLimpiar.btn-block-matriz {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
+
+.btnLimpiar.btn-block-matriz:hover {
+    background: #f8fafc;
+}
+
+
+/* =================================================================== */
+/* ESTILOS COMPACTOS PARA EL MÓDULO DE COMBOS                        */
+/* =================================================================== */
+.tabla-combos-scroll-container {
+    max-height: 380px !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+.tabla-combos-interactiva {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    background: #ffffff !important;
+}
+
+.tabla-combos-interactiva th:nth-child(1), .tabla-combos-interactiva td:nth-child(1) { width: 6% !important; }
+.tabla-combos-interactiva th:nth-child(2), .tabla-combos-interactiva td:nth-child(2) { width: 13% !important; }
+.tabla-combos-interactiva th:nth-child(3), .tabla-combos-interactiva td:nth-child(3) { width: 9% !important; }
+.tabla-combos-interactiva th:nth-child(4), .tabla-combos-interactiva td:nth-child(4) { width: 11% !important; }
+.tabla-combos-interactiva th:nth-child(5), .tabla-combos-interactiva td:nth-child(5) { width: 12% !important; }
+.tabla-combos-interactiva th:nth-child(6), .tabla-combos-interactiva td:nth-child(6) { width: 13% !important; }
+.tabla-combos-interactiva th:nth-child(7), .tabla-combos-interactiva td:nth-child(7) { width: 12% !important; }
+.tabla-combos-interactiva th:nth-child(8), .tabla-combos-interactiva td:nth-child(8) { width: 10% !important; }
+.tabla-combos-interactiva th:nth-child(9), .tabla-combos-interactiva td:nth-child(9) { width: 14% !important; }
+
+.tabla-combos-interactiva th {
+    background-color: #334155 !important;
+    color: white;
+    padding: 10px 4px !important;
+    font-size: 9.5pt;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tabla-combos-interactiva td {
+    border: 1px solid #cbd5e1;
+    padding: 4px 6px !important;
+    text-align: center;
+    font-size: 9.5pt;
+    color: #334155;
+    background-color: #ffffff !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.input-combo-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 28px;
+    text-align: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 9.5pt;
+    background-color: #ffffff;
+    color: #1e293b;
+    padding: 2px 4px !important;
+    box-sizing: border-box !important;
+}
+
+.input-combo-grid:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.fila-total-combo {
+    background-color: #e2e8f0;
+    font-weight: bold;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    color: #1e293b;
+}
+
+.fila-total-combo td {
+    background-color: #e2e8f0 !important;
+    border: 1.5px solid #94a3b8 !important;
+    color: #1e293b !important;
+}
+
+.btn-excel-panel {
+    background-color: #10b981 !important;
+    color: white !important;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    transition: background 0.2s;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.btn-excel-panel:hover {
+    background-color: #059669 !important;
+}
+
+
+/* =================================================================== */
+/* CORRECCIONES EXCLUSIVAS PARA MODO OSCURO (ENTRADAS / MATRIZ)        */
+/* =================================================================== */
+body.dark-theme .contenedor {
+    background-color: #0a0a0c !important;
+}
+
+body.dark-theme h1,
+body.dark-theme h2 {
+    color: #ffffff !important;
+}
+
+body.dark-theme .card-entrada,
+body.dark-theme .tabla-partidas-container {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .grupo-campo label,
+body.dark-theme .label-inline,
+body.dark-theme .radio-inline,
+body.dark-theme label {
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .input-captura,
+body.dark-theme .select-captura {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+}
+
+body.dark-theme .select-captura option {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .input-readonly {
+    background-color: #0a0a0c !important;
+    border-color: #27272a !important;
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .captura-line-bar {
+    background-color: #18181b !important;
+    border-top-color: #27272a !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme .input-with-icon-bar input {
+    background-color: #0a0a0c !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .input-with-icon-bar i {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .radio-inline input[type="radio"] {
+    accent-color: #2563eb;
+}
+
+/* ENCABEZADOS DE LA TABLA EN MODO OSCURO */
+body.dark-theme #tablaEstandar thead,
+body.dark-theme #tablaEstandar thead tr {
+    background-color: #18181b !important;
+}
+
+body.dark-theme #tablaEstandar th {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+/* FILAS Y CELDAS ESTÁNDAR (TBODY) EN MODO OSCURO */
+body.dark-theme #tablaEstandar tbody tr,
+body.dark-theme #tablaEstandar tbody td {
+    background-color: #121215 !important;
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme #tablaEstandar tbody tr:hover,
+body.dark-theme #tablaEstandar tbody tr:hover td {
+    background-color: #18181b !important;
+}
+
+body.dark-theme #tablaEstandar .input-cantidad,
+body.dark-theme #tablaEstandar .input-costo-partida {
+    color: #ffffff !important;
+}
+
+/* EXCEPCIÓN DEL BOTÓN DE BORRAR */
+body.dark-theme #tablaEstandar tbody td .btn-borrar-partida {
+    background-color: rgba(220, 38, 38, 0.15) !important;
+}
+
+body.dark-theme #tablaEstandar tbody td .btn-borrar-partida,
+body.dark-theme #tablaEstandar tbody td .btn-borrar-partida i {
+    color: #f87171 !important;
+}
+
+/* TARJETAS DE TOTALES Y BOTONES */
+body.dark-theme .card-total-indicador {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .card-total-indicador h3 {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .card-total-indicador span {
+    color: #ffffff !important;
+}
+
+body.dark-theme .bg-total-qty { border-left-color: #2563eb !important; }
+body.dark-theme .bg-total-kgs { border-left-color: #22c55e !important; }
+
+body.dark-theme .btnAplicar.btn-block-matriz {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btnLimpiar.btn-block-matriz {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btnLimpiar.btn-block-matriz:hover {
+    background-color: #27272a !important;
+}
+
+/* MODO OSCURO - MÓDULO DE COMBOS */
+body.dark-theme .tabla-combos-scroll-container {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+}
+
+body.dark-theme .tabla-combos-interactiva {
+    background-color: #121215 !important;
+}
+
+body.dark-theme .tabla-combos-interactiva th {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme .tabla-combos-interactiva td {
+    border-color: #27272a !important;
+    color: #ffffff !important;
+    background-color: #121215 !important;
+}
+
+body.dark-theme .input-combo-grid {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .fila-total-combo {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .fila-total-combo td {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-top: 1px solid #27272a !important;
+}

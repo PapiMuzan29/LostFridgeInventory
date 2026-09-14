@@ -1,0 +1,258 @@
+<?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+// Controllers/EncargadoController.php
+require_once '../Models/modeloEncargado.php';
+
+header('Content-Type: application/json; charset=utf-8'); 
+$action = $_GET['action'] ?? '';
+
+try {
+    $modelo = new modeloEncargado();
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Error de conexión a la base de datos: ' . $e->getMessage()]);
+    exit;
+}
+
+switch ($action) {
+    case 'listar':
+        try {
+            $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+            if ($pagina < 1) $pagina = 1;
+            
+            $busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
+            $limite = 3;
+            $offset = ($pagina - 1) * $limite;
+
+            $totalProductos = $modelo->obtenerTotalProductos($busqueda);
+            $totalPaginas = ceil($totalProductos / $limite);
+            $productos = $modelo->obtenerPaginados($limite, $offset, $busqueda);
+
+            echo json_encode([
+                'success' => true, 
+                'productos' => $productos,
+                'paginaActual' => $pagina,
+                'totalPaginas' => $totalPaginas
+            ]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'actualizarEstado':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
+            exit;
+        }
+
+        $idProducto = $_POST['id_producto'] ?? null;
+        $porPiezas = $_POST['por_piezas'] ?? null;
+        $factura = $_POST['factura'] ?? null;
+
+        if (!$idProducto || $porPiezas === null || $factura === null) {
+            echo json_encode(['success' => false, 'message' => 'Faltan datos obligatorios.']);
+            exit;
+        }
+
+        try {
+            $resultado = $modelo->actualizarEstadoProducto($idProducto, $porPiezas, $factura);
+            echo json_encode(['success' => true, 'message' => 'Estado actualizado correctamente.']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'listarRevision':
+        try {
+            $busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
+            $notas = $modelo->obtenerNotasPorEstado('COBRADO', $busqueda);
+            echo json_encode(['success' => true, 'notas' => $notas]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'verificarFactura': 
+        $idNota = $_GET['id_nota'] ?? null;
+        if ($idNota) {
+            try {
+                $requiere = $modelo->requiereFactura($idNota);
+                echo json_encode(['success' => true, 'requiere_factura' => $requiere]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Falta ID de nota.']);
+        }
+        break;
+
+    case 'aprobar':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
+            exit;
+        }
+
+        $idNota = $_POST['id_nota'] ?? null;
+        $folios = $_POST['folios'] ?? [];
+
+        // Filtramos elementos vacíos enviando únicamente cadenas válidas
+        $foliosFiltrados = array_filter(array_map('trim', (array)$folios), function($val) {
+            return $val !== '';
+        });
+
+        if (!$idNota || empty($foliosFiltrados)) {
+            echo json_encode(['success' => false, 'message' => 'Debe ingresar al menos un folio válido.']);
+            exit;
+        }
+
+        try {
+            $resultado = $modelo->aprobarNotaConFolios($idNota, $foliosFiltrados);
+            echo json_encode(['success' => true, 'message' => 'Nota aprobada exitosamente.']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'verificarNuevasNotas':
+        try {
+            $sql = "SELECT COUNT(*) as total FROM notas WHERE estado = 'COBRADO'";
+            
+            $totalNotas = $modelo->contarNotasPorEstado('COBRADO'); 
+
+            echo json_encode(['success' => true, 'total' => $totalNotas]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false]);
+        }
+        break;
+
+    case 'listarInvTemporal':
+        try {
+            $inventario = $modelo->obtenerInventarioTemporalSalMazo();
+            echo json_encode(['success' => true, 'inventario' => $inventario]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'actualizarInvTemporal':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
+            exit;
+        }
+        
+        $idTemp = (int)($_POST['id_temporal'] ?? 0);
+        $piezas = (int)($_POST['piezas'] ?? 0);
+        $cajas = (int)($_POST['cajas'] ?? 0);
+        $kilos = (float)($_POST['kilos'] ?? 0);
+
+        if ($idTemp > 0) {
+            try {
+                $modelo->actualizarInventarioTemporal($idTemp, $piezas, $cajas, $kilos);
+                echo json_encode(['success' => true, 'message' => 'Inventario ajustado correctamente.']);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'ID de inventario inválido.']);
+        }
+        break;
+
+    case 'listarHistorial':
+        try {
+            $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+            if ($pagina < 1) $pagina = 1;
+            
+            $busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
+            $limite = 5; 
+            $offset = ($pagina - 1) * $limite;
+
+            $estadosHistorial = ['APROBADO', 'RECHAZADA'];
+
+            $totalNotas = $modelo->contarNotasPorEstado($estadosHistorial, $busqueda);
+            $totalPaginas = ceil($totalNotas / $limite);
+            
+            $notas = $modelo->obtenerNotasPorEstado($estadosHistorial, $busqueda, $limite, $offset);
+            
+            echo json_encode([
+                'success' => true, 
+                'notas' => $notas,
+                'paginaActual' => $pagina,
+                'totalPaginas' => $totalPaginas
+            ]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'verificarAutorizaciones':
+        try {
+            // Contamos las notas que el vendedor mandó con estado PREVAUTORIZAR
+            $totalAuth = $modelo->contarNotasPorEstado('PREVAUTORIZAR');
+            echo json_encode(['success' => true, 'total' => $totalAuth]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'listarAutorizaciones':
+        try {
+            // Traemos los detalles para pintarlos en la bandeja de la campana
+            $notas = $modelo->obtenerNotasPorEstado('PREVAUTORIZAR');
+            echo json_encode(['success' => true, 'notas' => $notas]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'procesarAutorizacion':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
+            exit;
+        }
+
+        $idNota = (int)($_POST['id_nota'] ?? 0);
+        $accionAuth = $_POST['accion_auth'] ?? ''; // 'aprobar' o 'denegar'
+        $password = trim($_POST['password'] ?? '');
+        $idCuenta = $_SESSION['idCuenta'] ?? null;
+
+        if ($idNota <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID de nota inválido.']);
+            exit;
+        }
+
+        try {
+            if ($accionAuth === 'aprobar') {
+                if (empty($password)) {
+                    echo json_encode(['success' => false, 'message' => 'Contraseña vacía.']);
+                    exit;
+                }
+                
+                // Verificar que la contraseña del Encargado sea correcta
+                $esValida = $modelo->verificarPassword($idCuenta, $password);
+                if (!$esValida) {
+                    echo json_encode(['success' => false, 'message' => 'Contraseña incorrecta.']);
+                    exit;
+                }
+                
+                // Cambiar estado a PENDIENTE para que el Cajero la pueda cobrar
+                $modelo->cambiarEstadoNota($idNota, 'PENDIENTE');
+                echo json_encode(['success' => true]);
+
+            } elseif ($accionAuth === 'denegar') {
+                // Cambiar a RECHAZADA, devolver todo al inventario y guardar quién rechazó
+                $modelo->rechazarNotaYDevolverInventario($idNota, (int)$idCuenta);
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Acción desconocida.']);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    default:
+        echo json_encode(['success' => false, 'message' => 'Acción no válida.']);
+        break;
+}

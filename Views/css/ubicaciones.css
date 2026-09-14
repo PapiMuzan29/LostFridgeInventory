@@ -1,0 +1,200 @@
+/* ===================================================================
+   1. CONFIGURACIÓN GENERAL Y SCROLL DE LA PÁGINA
+=================================================================== */
+html, body {
+    min-height: 100vh;
+    overflow-x: hidden !important; /* Bloquea cualquier desbordamiento horizontal accidental */
+    overflow-y: auto !important;
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    padding: 0;
+}
+
+.config-container {
+    padding: 30px 40px 80px 40px;
+    margin-left: 260px;
+    margin-top: 65px;
+    width: calc(100% - 260px) !important; /* Usa porcentaje en lugar de 100vw para ajustarse al espacio real */
+    min-height: calc(100vh - 65px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===================================================================
+   2. TARJETA Y BUSCADOR ÚNICO
+=================================================================== */
+.card-entrada {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 22px;
+    box-sizing: border-box;
+    width: 100%;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.grupo-campo {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+}
+
+.grupo-campo label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.input-with-icon {
+    position: relative;
+    width: 100%;
+}
+
+.input-with-icon input {
+    padding-left: 38px !important;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 14px;
+}
+
+.input-captura {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d5dce6;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: #1e293b;
+    outline: none;
+    background: #ffffff;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.input-captura:focus {
+    border-color: #2f5ea7;
+    box-shadow: 0 0 0 3px rgba(47, 94, 167, 0.15);
+}
+
+/* ===================================================================
+   3. TABLA DE EXISTENCIAS PENDIENTES (6 COLUMNAS SIN SCROLL)
+=================================================================== */
+.tabla-partidas-container {
+    background: #ffffff;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 15px !important;
+}
+
+#tablaEstandar {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+}
+
+/* Distribución exacta y proporcional para las 6 columnas clave */
+#tablaEstandar th:nth-child(1), #tablaEstandar td:nth-child(1) { width: 6% !important; }   /* # */
+#tablaEstandar th:nth-child(2), #tablaEstandar td:nth-child(2) { width: 18% !important; }  /* Lote / Producto */
+#tablaEstandar th:nth-child(3), #tablaEstandar td:nth-child(3) { width: 34% !important; }  /* Descripción */
+#tablaEstandar th:nth-child(4), #tablaEstandar td:nth-child(4) { width: 16% !important; }  /* Stock Pendiente (Cajas) */
+#tablaEstandar th:nth-child(5), #tablaEstandar td:nth-child(5) { width: 14% !important; }  /* Kgs Totales */
+#tablaEstandar th:nth-child(6), #tablaEstandar td:nth-child(6) { width: 12% !important; }  /* Ubicación */
+
+#tablaEstandar th {
+    background-color: #f1f5f9 !important;
+    color: #1f2f56 !important;
+    padding: 12px 6px !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    text-align: center !important;
+}
+
+#tablaEstandar td {
+    padding: 10px 6px !important;
+    color: #334155 !important;
+    font-size: 0.85rem !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    vertical-align: middle !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+#tablaEstandar tbody tr:hover td {
+    background-color: #f8fafc;
+}
+
+
+/* ===================================================================
+   4. MODO OSCURO (COLORIMETRÍA IDÉNTICA A CONFIGURACIÓN)
+=================================================================== */
+body.dark-theme {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .config-container {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .config-title {
+    color: #ffffff !important;
+}
+
+body.dark-theme .card-entrada,
+body.dark-theme .tabla-partidas-container {
+    background-color: #121215 !important;
+    border: 1px solid #27272a !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-theme .grupo-campo label {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .input-with-icon i {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .input-captura {
+    background-color: #0a0a0c !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .input-captura:focus {
+    border-color: #2f5ea7 !important;
+    box-shadow: 0 0 0 3px rgba(47, 94, 167, 0.25) !important;
+}
+
+/* Tabla en Modo Oscuro */
+body.dark-theme #tablaEstandar th {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme #tablaEstandar tbody tr,
+body.dark-theme #tablaEstandar tbody td {
+    background-color: #121215 !important;
+    color: #f4f4f5 !important;
+    border-bottom-color: #27272a !important;
+}
+
+body.dark-theme #tablaEstandar tbody tr:hover td {
+    background-color: #18181b !important;
+}

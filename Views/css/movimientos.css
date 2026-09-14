@@ -1,0 +1,615 @@
+/* ==========================================
+   1. RESET, FUENTE Y CONFIGURACIÓN BASE (Heredados)
+========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex; 
+    height: 100vh;
+    background-color: #f1f5f9;
+    overflow: hidden; 
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ================================================= */
+/* 2. CONTENEDOR PRINCIPAL (CONVIVE CON TOP-BAR)     */
+/* ================================================= */
+.contenedor {
+    width: calc(100% - 260px);
+    margin-left: 260px;
+    height: calc(100vh - 65px);
+    margin-top: 65px;
+    background-color: #ffffff;
+    padding: 20px 30px 40px 30px;
+    overflow-y: auto !important;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ================================================= */
+/* 3. HEADER                                         */
+/* ================================================= */
+.header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;            
+    width: 100%;
+    min-height: 50px;               
+    flex-shrink: 0;                 
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 10;            
+}
+
+.header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+    color: #1f2f56;                 
+    font-family: 'Segoe UI', sans-serif;
+    transition: color 0.3s ease;
+}
+
+/* ================================================= */
+/* 4. BOTONES GENERALES                              */
+/* ================================================= */
+.btnAplicar, .btnLimpiar {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: .3s;
+}
+
+.btnAplicar {
+    background: #1a365d;
+    color: white;
+    border: none;
+}
+
+.btnAplicar:hover {
+    background: #244a82;
+}
+
+.btnLimpiar {
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #475569;
+    text-decoration: none;
+}
+
+.btnLimpiar:hover {
+    background: #f8fafc;
+}
+
+/* ================================================= */
+/* 5. CARDS DE ESTADÍSTICAS                          */
+/* ================================================= */
+.cards {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    margin-top: 5px;
+}
+
+.card {
+    flex: 1;
+    min-width: 240px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 24px;
+    transition: .3s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card h3 {
+    color: #64748b;
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.card span {
+    font-size: 38px;
+    font-weight: bold;
+    color: #1e293b;
+    transition: color 0.3s ease;
+}
+
+/* Bordes personalizados */
+.general-mov { border-left: 5px solid #1a365d; }
+.success { border-left: 5px solid #16a34a; }
+.danger { border-left: 5px solid #dc2626; }
+
+/* ================================================= */
+/* 6. BARRA FILTROS                                  */
+/* ================================================= */
+.barra-filtros {
+    width: 100%;
+    background: transparent;
+    flex-shrink: 0;
+}
+
+.form-movimientos-filtros {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.filtros-izquierda-movimientos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    min-width: 320px;
+}
+
+.tipo-movimiento-selector {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.radio-movimiento {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.radio-movimiento input[type="radio"] {
+    accent-color: #1a365d;
+    margin: 0;
+}
+
+/* Selects universales de filtro */
+select,
+.select-estados {
+    height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0 14px;
+    background: white;
+    color: #1e293b;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.buscador {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+}
+
+.buscador input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0 44px 0 16px;
+    outline: none;
+    font-size: 14px;
+    color: #1e293b;
+    background: white;
+    transition: .3s;
+}
+
+.buscador input:focus {
+    border-color: #1a365d;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.buscador i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 15px;
+}
+
+.filtros-derecha-movimientos {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.input-fecha-bitacora {
+    height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0 14px;
+    color: #1e293b;
+    font-size: 14px;
+    outline: none;
+    background: white;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* ================================================= */
+/* 7. TABLA DE REGISTROS                             */
+/* ================================================= */
+.tablaUsuarios {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    transition: border-color 0.3s ease;
+}
+
+.tablaUsuarios thead {
+    background: #f8fafc;
+    transition: background-color 0.3s ease;
+}
+
+.tablaUsuarios thead th {
+    padding: 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f2f56;
+    transition: color 0.3s ease;
+}
+
+.tablaUsuarios tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    color: #334155;
+    vertical-align: middle; 
+    height: 68px; 
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.tablaUsuarios tbody tr {
+    transition: background-color .2s ease;
+}
+
+.tablaUsuarios tbody tr:hover {
+    background: #f8fafc;
+}
+
+.usuarioCell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 100%; 
+}
+
+.usuarioCell i {
+    color: #1a365d;
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: color 0.3s ease;
+}
+
+/* ================================================= */
+/* 8. BADGES DE TIPOS OVALADOS                       */
+/* ================================================= */
+.badge-tipo {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-usr { background-color: #eff6ff; color: #1e40af; }
+.badge-ent { background-color: #f0fdf4; color: #16a34a; }
+.badge-sal { background-color: #fef2f2; color: #dc2626; }
+.badge-inv { background-color: #fff7ed; color: #ea580c; }
+
+.txt-verde { color: #16a34a; }
+.txt-rojo { color: #dc2626; }
+.font-600 { font-weight: 600; }
+
+.btn-info-bitacora {
+    background: transparent;
+    border: none;
+    color: #1a365d;
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+/* ================================================= */
+/* 9. PAGINACIÓN CON INTERACCIONES                   */
+/* ================================================= */
+.botones-paginacion {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 8px; 
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #edf2f7;
+    width: 100%;
+    flex-shrink: 0;
+    font-family: 'Segoe UI', sans-serif; 
+    transition: border-color 0.3s ease;
+}
+
+#contenedorNumeros {
+    display: flex; 
+    gap: 8px; 
+    align-items: center;
+}
+
+.btn-pagina {
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #475569;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 38px; 
+    text-align: center;
+    text-decoration: none; 
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-pagina:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+}
+
+.btn-pagina:active {
+    transform: scale(0.94); 
+}
+
+.btn-pagina.activa {
+    background: #1a365d;
+    color: white;
+    border-color: #1a365d;
+}
+
+.btn-pagina:disabled {
+    color: #94a3b8;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.puntos {
+    color: #64748b;
+    font-weight: 600;
+    padding: 0 4px;
+}
+
+/* ================================================= */
+/* 10. ANIMACIONES                                   */
+/* ================================================= */
+.tablaUsuarios tbody tr {
+    opacity: 0;
+    animation: suavizarEntradaUsuarios 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.tablaUsuarios tbody tr:nth-child(1) { animation-delay: 0.02s; }
+.tablaUsuarios tbody tr:nth-child(2) { animation-delay: 0.04s; }
+.tablaUsuarios tbody tr:nth-child(3) { animation-delay: 0.06s; }
+.tablaUsuarios tbody tr:nth-child(4) { animation-delay: 0.08s; }
+
+@keyframes suavizarEntradaUsuarios {
+    from {
+        opacity: 0;
+        transform: translateY(8px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);    
+    }
+}
+
+@keyframes transicionBotonActivo {
+    0% { transform: scale(0.9); opacity: 0.8; }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.text-center { text-align: center; }
+
+
+/* ===================================================================
+   11. REGLAS MODO OSCURO (COMPLETAMENTE CORREGIDO)
+=================================================================== */
+
+body.dark-theme {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .contenedor {
+    background-color: #0a0a0c !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .header h1 {
+    color: #ffffff !important;
+}
+
+/* Cards de Estadísticas */
+body.dark-theme .card {
+    background-color: #121215 !important;
+    border-top: 1px solid #27272a !important;
+    border-right: 1px solid #27272a !important;
+    border-bottom: 1px solid #27272a !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-theme .card h3 {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .card span {
+    color: #ffffff !important;
+}
+
+/* Bordes laterales Neón en Cards */
+body.dark-theme .general-mov {
+    border-left: 5px solid #2563eb !important;
+}
+
+body.dark-theme .card.success {
+    border-left: 5px solid #22c55e !important;
+}
+
+body.dark-theme .card.danger {
+    border-left: 5px solid #ef4444 !important;
+}
+
+/* Filtros, Selector Radio, Buscador y Selects Oscuros */
+body.dark-theme .radio-movimiento {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .radio-movimiento input[type="radio"] {
+    accent-color: #2563eb !important;
+}
+
+body.dark-theme select,
+body.dark-theme .select-estados,
+body.dark-theme .buscador input,
+body.dark-theme .input-fecha-bitacora {
+    background-color: #121215 !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+}
+
+body.dark-theme select option {
+    background-color: #121215 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .buscador input::placeholder {
+    color: #71717a !important;
+}
+
+body.dark-theme .buscador i {
+    color: #a1a1aa !important;
+}
+
+body.dark-theme .btnLimpiar {
+    background-color: #18181b !important;
+    border: 1px solid #27272a !important;
+    color: #f4f4f5 !important;
+}
+
+body.dark-theme .btnLimpiar:hover {
+    background-color: #27272a !important;
+    color: #ffffff !important;
+}
+
+/* Tabla de Movimientos */
+body.dark-theme .tablaUsuarios {
+    border-color: #27272a !important;
+}
+
+body.dark-theme .tablaUsuarios thead {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .tablaUsuarios thead th {
+    color: #ffffff !important;
+}
+
+body.dark-theme .tablaUsuarios tbody td {
+    border-bottom-color: #1f1f23 !important;
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .tablaUsuarios tbody tr:hover {
+    background-color: #18181b !important;
+}
+
+body.dark-theme .usuarioCell i {
+    color: #3b82f6 !important;
+}
+
+body.dark-theme .btn-info-bitacora {
+    color: #60a5fa !important;
+}
+
+/* Badges de Tipo */
+body.dark-theme .badge-usr { background-color: rgba(30, 64, 175, 0.3) !important; color: #93c5fd !important; }
+body.dark-theme .badge-ent { background-color: rgba(22, 163, 74, 0.25) !important; color: #4ade80 !important; }
+body.dark-theme .badge-sal { background-color: rgba(220, 38, 38, 0.25) !important; color: #f87171 !important; }
+body.dark-theme .badge-inv { background-color: rgba(234, 88, 12, 0.25) !important; color: #fb923c !important; }
+
+body.dark-theme .txt-verde { color: #4ade80 !important; }
+body.dark-theme .txt-rojo { color: #f87171 !important; }
+
+/* Paginación */
+body.dark-theme .botones-paginacion {
+    border-top-color: #27272a !important;
+}
+
+body.dark-theme .btn-pagina {
+    background-color: #121215 !important;
+    border-color: #27272a !important;
+    color: #e4e4e7 !important;
+}
+
+body.dark-theme .btn-pagina:hover {
+    background-color: #18181b !important;
+    border-color: #3f3f46 !important;
+}
+
+body.dark-theme .btn-pagina.activa {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-pagina:disabled {
+    background-color: #0a0a0c !important;
+    border-color: #27272a !important;
+    color: #52525b !important;
+}
+
+body.dark-theme .puntos {
+    color: #a1a1aa !important;
+}

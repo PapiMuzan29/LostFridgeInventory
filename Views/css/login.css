@@ -1,0 +1,448 @@
+/* --- RESET Y FUENTE --- */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-image: url('../../SRC/control-de-temperatura.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* --- TARJETA PRINCIPAL --- */
+
+.tarjeta-blanca {
+    background-color: white;
+    width: 900px;
+    border-radius: 12px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.contenido-superior {
+    display: flex;
+    padding: 25px 40px;
+    align-items: center;
+}
+
+/* --- COLUMNA IZQUIERDA --- */
+
+.columna-izquierda {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding-right: 20px;
+}
+
+.logo-lfi {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    margin-top: -15px;
+}
+
+.titulo-lfi {
+    color: #1a365d;
+    font-size: 34px;
+    font-weight: bold;
+    margin-top: -20px;
+    margin-bottom: 10px;
+    white-space: nowrap;
+}
+
+.subtitulo-lfi {
+    color: #64748b;
+    font-size: 17px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.logo-america {
+    width: 250px;
+    height: auto;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #dfdcdc;
+}
+
+/* --- DIVISOR --- */
+
+.linea-divisoria {
+    width: 1px;
+    height: 220px;
+    background-color: #dfdcdc;
+    margin: 0 30px;
+}
+
+/* --- COLUMNA DERECHA --- */
+
+.columna-derecha {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* --- ENCABEZADO --- */
+
+.encabezado-bienvenida {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+#usuarioCirculo {
+    color: #255CD0;
+    font-size: 55px;
+    margin: 0;
+}
+
+#Bienvenido {
+    color: #1a365d;
+    margin: 0 0 5px 0;
+    font-size: 32px;
+}
+
+#iniciarSesion {
+    color: #64748b;
+    margin: 0;
+    font-size: 16px;
+}
+
+/* --- INPUTS --- */
+
+.grupo-input {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.credenciales {
+    font-weight: bold;
+    font-size: 16px;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.caja-con-icono {
+    position: relative;
+}
+
+.caja-con-icono input {
+    width: 100%;
+    padding: 14px 15px;
+    padding-left: 45px;
+    padding-right: 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.caja-con-icono input:focus {
+    border-color: #1a365d;
+    box-shadow: 0 0 0 3px rgba(37, 92, 208, 0.15);
+}
+
+/* --- ICONOS DE INPUTS --- */
+
+#usericon,
+#candado {
+    position: absolute;
+    left: 15px;
+    top: 42px;
+    margin: 0;
+    color: #255CD0;
+    font-size: 17px;
+    pointer-events: none;
+}
+
+#iconoOjo {
+    position: absolute;
+    right: 15px;
+    top: 42px;
+    color: #a0aec0;
+    font-size: 17px;
+    cursor: pointer !important;
+    transition: color 0.3s;
+}
+
+#iconoOjo:hover {
+    color: #255CD0;
+}
+
+/* --- BOTÓN INICIAR SESIÓN --- */
+
+.boton-iniciar {
+    background-color: #255CD0;
+    color: white;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    transition: all 0.2s ease-in-out !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer !important;
+    box-shadow: 0 3px 6px rgba(37, 92, 208, 0.2);
+}
+
+.boton-iniciar:hover {
+    background-color: #1a4299;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(37, 92, 208, 0.35);
+}
+
+.boton-iniciar:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(37, 92, 208, 0.2);
+}
+
+/* --- PIE DE PÁGINA --- */
+
+.pie-de-pagina {
+    border-top: 1px solid #e2e8f0;
+    padding: 20px 40px;
+    background-color: #f8fafc;
+    color: #64748b;
+    font-size: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fecha-hora {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.separador-vertical {
+    color: #cbd5e1;
+    margin: 0 10px;
+}
+
+#reloj,
+#calendario {
+    color: #255CD0;
+    margin: 0;
+    font-size: 18px;
+}
+
+/* --- BOTÓN ACERCA DE --- */
+
+.boton-acerca {
+    background-color: transparent;
+    color: #255CD0;
+    padding: 10px 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+}
+
+.boton-acerca:hover {
+    background-color: #e2e8f0;
+    color: #1a4299;
+    transform: translateY(-1px);
+}
+
+/* ===================================================================
+   MODAL Y BOTÓN DE CIERRE
+=================================================================== */
+
+.modal {
+    display: none;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+    z-index: 999999 !important;
+}
+
+.modal-contenido {
+    background: #ffffff;
+    width: 380px;
+    padding: 30px 25px;
+    border-radius: 12px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.35);
+    color: #334155;
+    z-index: 1000000 !important;
+    animation: fadeInModal 0.25s ease-out;
+}
+
+@keyframes fadeInModal {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-contenido h2 {
+    color: #1a365d;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.modal-contenido p {
+    font-size: 14px;
+    margin: 8px 0;
+    line-height: 1.4;
+    color: #64748b;
+}
+
+/* --- BOTÓN CERRAR (X) --- */
+
+.cerrar {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #94a3b8;
+    cursor: pointer !important;
+    z-index: 1000001 !important;
+    pointer-events: auto !important;
+    padding: 5px 10px;
+    line-height: 1;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.cerrar:hover {
+    color: #dc2626;
+    transform: scale(1.15);
+}
+
+/* ===================================================================
+   RESPONSIVE DESIGN (MÓVILES Y TABLETS PEQUEÑAS)
+=================================================================== */
+
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+        align-items: center;
+    }
+
+    .tarjeta-blanca {
+        width: 100%;
+        max-width: 450px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .contenido-superior {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    /* Ocultar elementos innecesarios en pantallas pequeñas */
+    .linea-divisoria,
+    .logo-america,
+    .subtitulo-lfi {
+        display: none;
+    }
+
+    .columna-izquierda {
+        padding-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .logo-lfi {
+        width: 140px;
+        height: 140px;
+        margin-bottom: 10px;
+        margin-top: 0;
+    }
+
+    .titulo-lfi {
+        font-size: 22px;
+        margin-top: 0;
+        margin-bottom: 5px;
+        white-space: normal;
+    }
+
+    .columna-derecha {
+        width: 100%;
+    }
+
+    .encabezado-bienvenida {
+        margin-bottom: 20px;
+        justify-content: center;
+        text-align: center;
+    }
+
+    #usuarioCirculo {
+        font-size: 40px;
+    }
+
+    #Bienvenido {
+        font-size: 24px;
+    }
+
+    #iniciarSesion {
+        font-size: 14px;
+    }
+
+    .pie-de-pagina {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px 20px;
+        text-align: center;
+    }
+
+    .fecha-hora {
+        font-size: 14px;
+    }
+
+    .boton-acerca {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-contenido {
+        width: 90%;
+        padding: 25px 15px;
+    }
+}
