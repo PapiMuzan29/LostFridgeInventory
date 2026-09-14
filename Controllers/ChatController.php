@@ -185,7 +185,7 @@ try {
                 exit;
             }
 
-            // 1. Crear el grupo con fechaCreacion
+            // 1. Crear el grupo con fechaCreacionmm
             $sqlGrupo = "INSERT INTO chat_grupos (nombreGrupo, idCreador, fechaCreacion) VALUES (?, ?, NOW())";
             $idGrupo = $bd->insert($sqlGrupo, [$nombreGrupo, $idUsuarioActual]);
 
